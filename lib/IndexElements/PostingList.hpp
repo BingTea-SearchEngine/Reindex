@@ -11,7 +11,7 @@ class PostingList {
 
     static PostingList Deserialize(const char* buf);
 
-    PostingList();
+    // PostingList();
 
     size_t getBytesRequired();
 
