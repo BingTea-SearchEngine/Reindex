@@ -1,5 +1,9 @@
 #include "Post.hpp"
 
+Post::Post() {
+// For compilation
+}
+
 Post::Post(docname name) : document(name) {
 }
 
