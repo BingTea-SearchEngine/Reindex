@@ -1,0 +1,112 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.9 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="26.0.9">
+  <diagram name="Page-1" id="QZPFU4ziQHcLEOgR_lUD">
+    <mxGraphModel dx="1064" dy="690" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-1" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Inverted Word Index layout (Per machine)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="10" y="10" width="280" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-10" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Index statistics&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;- Number of urls&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;- Number of unique words&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;- Total size&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="140" width="140" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-12" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Frontier (URLs to crawl next)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="190" y="140" width="220" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-13" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;List of index chunks and their filenames&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="400" y="140" width="220" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-15" value="&lt;h1&gt;&lt;font style=&quot;font-size: 17px;&quot;&gt;Master Index&lt;/font&gt;&lt;/h1&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="50" y="80" width="110" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-16" value="&lt;h1&gt;&lt;font style=&quot;font-size: 17px;&quot;&gt;Index Chunk&lt;/font&gt;&lt;/h1&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="50" y="270" width="110" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-17" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Chunk info&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Number of URLs&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- URLs in this chunk&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="340" width="140" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-18" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Dictionary (Word to location of posting list)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="190" y="340" width="140" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-19" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Posting List&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="330" y="340" width="80" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-20" value="&lt;h1&gt;&lt;span style=&quot;font-size: 17px;&quot;&gt;Posting list&lt;/span&gt;&lt;/h1&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="50" y="490" width="110" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-21" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Posting list info&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Number of matching documents&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="550" width="140" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-22" value="&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Synchronization point. Offset from index to location with positing list&amp;nbsp;&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="190" y="550" width="220" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-23" value="&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Post&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="410" y="550" width="70" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-24" value="&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Post&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="475" y="550" width="70" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-25" value="&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Post&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="545" y="550" width="70" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-26" value="&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Post&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="610" y="550" width="70" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-27" value="&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Post&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="680" y="550" width="70" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-28" value="&lt;h1&gt;&lt;span style=&quot;font-size: 17px;&quot;&gt;Post&lt;/span&gt;&lt;/h1&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="50" y="690" width="60" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-29" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Post Info&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- URL&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Offset to next post&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="750" width="140" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-31" value="- Offset word found in&lt;div&gt;- Location word found in (title, anchor, body)&lt;br&gt;&lt;div&gt;- Delta to next location (size)&lt;/div&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="190" y="750" width="120" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-32" value="- Offset word found in&lt;div&gt;- Delta to next location (size)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="310" y="750" width="120" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-33" value="- Offset word found in&lt;div&gt;- Delta to next location (size)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="430" y="750" width="120" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-34" value="- Offset word found in&lt;div&gt;- Delta to next location (size)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="550" y="750" width="120" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-35" value="&lt;font style=&quot;font-size: 20px;&quot;&gt;Inverted Word Index Construction Flow&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="850" y="10" width="280" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="6rc-de4Jw4ZwWITpY6am-37" target="6rc-de4Jw4ZwWITpY6am-41" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1270" y="320" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-37" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Document parser:&lt;br&gt;- Extract words from document from crawler, label them as title, anchor, body, etc&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="950" y="110" width="640" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6rc-de4Jw4ZwWITpY6am-41" target="CK_6UfcrY7q_jjl1HdFR-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-41" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;IndexChunk&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;addDocument&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Iterate through all words in document. Add document to the posting list of word&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="1130.5" y="300" width="279" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-50" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Serializer:&lt;br&gt;Serialize everything into a contiguous buffer&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Write into a file&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="950" y="940" width="650" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-1" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;IndexChunk&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;addDocument&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="500" width="279" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-3" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Posting List&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="410" y="340" width="80" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-4" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Posting List&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="490" y="340" width="80" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-5" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Posting List&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="570" y="340" width="80" height="130" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
