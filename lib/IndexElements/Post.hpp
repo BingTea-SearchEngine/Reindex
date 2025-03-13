@@ -8,6 +8,8 @@ class Post {
 
     static Post Deserailize(const char* buf);
 
+    Post(docname name);
+
     size_t getBytesRequired(Post* post);
 
     void addWord(word_t word);

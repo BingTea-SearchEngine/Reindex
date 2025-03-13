@@ -2,9 +2,14 @@
 
 #include <unordered_map>
 #include <unordered_set>
+#include <iostream>
 
 #include "PostingList.hpp"
 #include "Types.hpp"
+
+using std::cout;
+using std::endl;
+
 
 class IndexChunk {
    public:
@@ -26,4 +31,6 @@ class IndexChunk {
     std::unordered_map<std::string, PostingList> _postingLists;
     // Bytes Required to serialize this index
     size_t _bytesRequired;
+    // Offset out of all documents
+    uint32_t _offset;
 };

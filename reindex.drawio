@@ -88,14 +88,17 @@
         <mxCell id="CK_6UfcrY7q_jjl1HdFR-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6rc-de4Jw4ZwWITpY6am-41" target="CK_6UfcrY7q_jjl1HdFR-1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="6rc-de4Jw4ZwWITpY6am-41" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;IndexChunk&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;addDocument&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Iterate through all words in document. Add document to the posting list of word&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6rc-de4Jw4ZwWITpY6am-41" target="CK_6UfcrY7q_jjl1HdFR-26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="6rc-de4Jw4ZwWITpY6am-41" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Master Chunk&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;addDocument&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Check if IndexChunk is getting too big or not.&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Call the function to write to disk&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Keep track of the index chunk and names&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="1130.5" y="300" width="279" height="130" as="geometry" />
         </mxCell>
-        <mxCell id="6rc-de4Jw4ZwWITpY6am-50" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Serializer:&lt;br&gt;Serialize everything into a contiguous buffer&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Write into a file&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="950" y="940" width="650" height="130" as="geometry" />
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="CK_6UfcrY7q_jjl1HdFR-1" target="CK_6UfcrY7q_jjl1HdFR-8">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="CK_6UfcrY7q_jjl1HdFR-1" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;IndexChunk&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;addDocument&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="1130" y="500" width="279" height="130" as="geometry" />
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-1" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;IndexChunk&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;addDocument&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Iterate over all words in the document&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Maintain offset (from start of all documents)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;-&amp;nbsp;&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="990" y="460" width="279" height="130" as="geometry" />
         </mxCell>
         <mxCell id="CK_6UfcrY7q_jjl1HdFR-3" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Posting List&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="410" y="340" width="80" height="130" as="geometry" />
@@ -105,6 +108,30 @@
         </mxCell>
         <mxCell id="CK_6UfcrY7q_jjl1HdFR-5" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Posting List&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="570" y="340" width="80" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="CK_6UfcrY7q_jjl1HdFR-8" target="CK_6UfcrY7q_jjl1HdFR-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-8" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Posting List&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;addWord&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Keep track of vector of Posts&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Create new Posts if in a new document&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="990" y="620" width="279" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-12" value="&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Post&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;addWord&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;- Maintain a vector of word_t&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="990" y="780" width="279" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="CK_6UfcrY7q_jjl1HdFR-15" target="CK_6UfcrY7q_jjl1HdFR-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-15" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;IndexChunk&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Serialize&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 14px;&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="620" width="279" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-17" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;IndexChunk&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Serialize&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 14px;&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="780" width="279" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-18" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;IndexChunk&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Serialize&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); font-size: 14px;&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="940" width="279" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="CK_6UfcrY7q_jjl1HdFR-26" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;Master Chunk&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;saveIndexChunk&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Allocate buffer big enough to fit entire IndexChunk&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;- Call IndexChunk::Serialize&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="460" width="279" height="130" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

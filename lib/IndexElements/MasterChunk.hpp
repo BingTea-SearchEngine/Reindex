@@ -21,6 +21,6 @@ private:
     std::unordered_set<std::string> _indexChunks;
     IndexChunk _currIndexChunk;
     int _numDocuments;
-    size_t bytesRequired;
-    size_t totalIndexSize;
+    size_t _bytesRequired;
+    size_t _totalIndexSize;
 };
