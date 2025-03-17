@@ -10,20 +10,26 @@ class PostingList {
     static void Serialize(const char* buf, const PostingList& postingList);
 
     static PostingList Deserialize(const char* buf);
+    
 
-    // PostingList();
+    PostingList();
 
-    size_t getBytesRequired();
+    PostingList(const std::string& _word);
 
-    void addWord(docname doc, word_t word);
+    size_t getOverheadBytes();
+
+    size_t addWord(docname doc, word_t word);
+
+    Post getPost(size_t index);
+
+    std::vector<Post>::iterator begin();
+
+    std::vector<Post>::iterator end();
 
     std::string word;
 
    private:
     std::vector<Post> _posts;
-    //TODO
-    //Synchronization point. Need to do this as we are writing to memory
-    size_t _bytesRequired;
 
-    Post _currPost;
+    std::unordered_map<uint32_t, std::tuple<size_t>> _sync;
 };

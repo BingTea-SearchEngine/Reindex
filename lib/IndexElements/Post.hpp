@@ -12,14 +12,14 @@ class Post {
 
     Post(docname name);
 
-    size_t getBytesRequired(Post* post);
+    size_t addWord(word_t word);
 
-    void addWord(word_t word);
+    words::iterator begin();
+
+    words::iterator end();
 
     docname document;
 
    private:
     words _entries;
-
-    size_t bytesRequired;
 };

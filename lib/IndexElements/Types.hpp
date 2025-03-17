@@ -10,7 +10,6 @@ enum class wordlocation_t {
     body = 2,
 };
 
-
 struct word_t {
     std::string word;
     uint32_t offset;
@@ -35,8 +34,12 @@ struct word_t {
         return os;
     }
 
-};
+    size_t getBytesRequired() {
+        // 1 for null terminator
+        return word.size() + 1 + sizeof(offset) + sizeof(location);
+    }
 
+};
 
 typedef std::vector<word_t> words;
 typedef std::string docname;
