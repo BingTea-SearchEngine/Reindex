@@ -15,8 +15,6 @@ void Post::Serialize(char* base_region, size_t &offset, const Post& post) {
             - string document_name ("cnn.com/index.html")
             - vector<word_t> _entries
     */
-
-    spdlog::info("Attempting to serialize the Post for the document \"{}\" at location {} + {} = {}", post.document, base_region, offset, base_region + offset);
     spdlog::info("offset variable is currently at {}", offset);
 
     size_t document_name_size = post.document.size() + 1; // account for null terminator

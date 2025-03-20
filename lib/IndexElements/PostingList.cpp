@@ -1,6 +1,4 @@
-#include <spdlog/fmt/bundled/ranges.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 
 #include "PostingList.hpp"
 #include "cstring"
@@ -15,8 +13,6 @@ void PostingList::Serialize(char* base_region, size_t &offset, const PostingList
             - vector<Post> posts
             - TODO: 100% need a synchronization table
     */
-
-    spdlog::info("Trying to serialize a PostingList for the word {} at location {} + {} = {}", postingList.word, base_region, offset, base_region + offset);
     spdlog::info("offset variable is currently at {}", offset);
 
     size_t num_posts = postingList._posts.size();

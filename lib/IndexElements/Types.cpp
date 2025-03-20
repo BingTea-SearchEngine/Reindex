@@ -18,8 +18,6 @@ void word_t::Serialize(char* base_region, size_t &offset, const word_t &word_occ
             - uint32_t offset
             - enum int location
     */
-
-    spdlog::info("Attempting to serialize {} at location {} + {} = {}", word_occurrence, base_region, offset, base_region + offset);
     spdlog::info("offset variable is currently at {}", offset);
 
     size_t word_size = word_occurrence.word.size() + 1; // account for null terminator
@@ -35,7 +33,7 @@ void word_t::Serialize(char* base_region, size_t &offset, const word_t &word_occ
     offset += sizeof(word_occurrence.location);
     spdlog::info("After writing the enum int location, offset is now at {}", offset);
 
-    spdlog::info("Serializing {} complete", word_occurrence);
+    spdlog::info("Serializing {} complete", word_occurrence.word);
     spdlog::info("offset variable is now at {}", offset);
 }
 
