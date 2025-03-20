@@ -39,6 +39,25 @@ struct word_t {
         return word.size() + 1 + sizeof(offset) + sizeof(location);
     }
 
+    /*
+        Serializes a given word_t object into a specific region of memory
+
+        Preconditions:
+            - base_region must be a valid pointer to the very beginning of a
+                contiguous region of memory where this nested serialization will occur.
+                this is determined by the uppermost parent that wants serialization
+            - offset must be a number that when added to base_region will point
+                to the region of memory where this specific word_t object will be serialized to
+            - word_occurrence is a word_t object
+
+        Postconditions:
+            - Writes the bytes of this word_t object into memory at this calculated region
+            - offset will be modified. at the end of this function, offset will be a number
+                that when added to base_region will point to the next available memory region
+                that is not yet written to
+    */
+    static void Serialize(char* base_region, size_t &offset, word_t &word_occurrence);
+
 };
 
 typedef std::vector<word_t> words;
