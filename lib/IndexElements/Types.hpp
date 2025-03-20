@@ -48,7 +48,7 @@ struct word_t {
                 this is determined by the uppermost parent that wants serialization
             - offset must be a number that when added to base_region will point
                 to the region of memory where this specific word_t object will be serialized to
-            - word_occurrence is a word_t object
+            - word_occurrence is the word_t object to be serialized
 
         Postconditions:
             - Writes the bytes of this word_t object into memory at this calculated region
@@ -56,7 +56,7 @@ struct word_t {
                 that when added to base_region will point to the next available memory region
                 that is not yet written to
     */
-    static void Serialize(char* base_region, size_t &offset, word_t &word_occurrence);
+    static void Serialize(char* base_region, size_t &offset, const word_t &word_occurrence);
 
 };
 

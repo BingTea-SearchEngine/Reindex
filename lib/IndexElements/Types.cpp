@@ -11,7 +11,7 @@ bool operator==(const word_t& lhs, const word_t& rhs) {
            lhs.location == rhs.location;
 }
 
-static void Serialize(char* base_region, size_t &offset, word_t &word_occurrence) {
+void word_t::Serialize(char* base_region, size_t &offset, const word_t &word_occurrence) {
     /*
         word_t object has:
             - std::string word
@@ -22,7 +22,7 @@ static void Serialize(char* base_region, size_t &offset, word_t &word_occurrence
     spdlog::info("Attempting to serialize {}", word_occurrence);
     spdlog::info("offset variable is currently at {}", offset);
 
-    size_t word_size = word_occurrence.word.size() + 1; // for null terminator
+    size_t word_size = word_occurrence.word.size() + 1; // account for null terminator
     std::memcpy(base_region + offset, word_occurrence.word.c_str(), word_size);
     offset += word_size;
 

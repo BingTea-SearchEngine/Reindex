@@ -1,8 +1,44 @@
+#include <spdlog/fmt/bundled/ranges.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/spdlog.h>
+
 #include "Post.hpp"
+#include <cstring>
 
 Post::Post() {}
 
 Post::Post(docname name) : document(name) {}
+
+void Post::Serialize(char* base_region, size_t &offset, const Post& post) {
+    /*
+        Post object has:
+            - string document_name ("cnn.com/index.html")
+            - vector<word_t> _entries
+    */
+
+    spdlog::info("Attempting to serialize the Post for the document \"{}\"", post.document);
+    spdlog::info("offset variable is currently at {}", offset);
+
+    size_t document_name_size = post.document.size() + 1; // account for null terminator
+    std::memcpy(base_region + offset, post.document.c_str(), document_name_size);
+    offset += document_name_size;
+
+    // serialize the vector of words
+
+    // first, record the number of entries in the vector
+    size_t num_words = post._entries.size();
+    std::memcpy(base_region + offset, &num_words, sizeof(num_words));
+    offset += sizeof(num_words);
+
+    // then, serialize each individual word occurrence
+    spdlog::info("Before trying to serialize each word_t, offset is currently at {}", offset);
+    for (const auto& word: post._entries) {
+        word_t::Serialize(base_region, offset, word);
+    }
+
+    spdlog::info("Finished serializing Post for the document \"{}\"", post.document);
+    spdlog::info("Offset is now at {}", offset);
+}
 
 size_t Post::addWord(word_t word) {
     _entries.push_back(word);
