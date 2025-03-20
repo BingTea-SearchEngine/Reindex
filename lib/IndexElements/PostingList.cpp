@@ -32,6 +32,26 @@ void PostingList::Serialize(char* base_region, size_t &offset, const PostingList
     spdlog::info("Offset is now at {}", offset);
 }
 
+PostingList PostingList::Deserialize(char* base_region, size_t &offset) {
+    spdlog::info("Attempting to deserialize a PostingList at location {}", base_region + offset);
+
+    PostingList postingList;
+
+    size_t num_of_posts;
+    std::memcpy(&num_of_posts, base_region + offset, sizeof(num_of_posts));
+    offset += sizeof(num_of_posts);
+    postingList._posts.resize(num_of_posts);
+
+    for (size_t i = 0; i < num_of_posts; ++i) {
+        postingList._posts[i] = Post::Deserialize(base_region, offset);
+    }
+
+    spdlog::info("Deserializing a PostingList complete");
+    spdlog::info("Offset is now at {}", offset);
+
+    return postingList;
+}
+
 size_t PostingList::getOverheadBytes() {
     size_t ret;
     ret += sizeof(_posts.size());
