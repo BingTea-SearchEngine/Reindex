@@ -58,6 +58,19 @@ struct word_t {
     */
     static void Serialize(char* base_region, size_t &offset, const word_t &word_occurrence);
 
+    /*
+        Deserializes a given word_t object that resides in a certain region of memory
+
+        Preconditions:
+            - base_region + offset points to the beginning of a region of memory
+                where a word_t object resides at
+        
+        Postconditions:
+            - constructs a word_t object from the bytes at this region of memory
+                and returns it
+    */
+    static word_t Deserialize(char* base_region, size_t &offset);
+
 };
 
 typedef std::vector<word_t> words;

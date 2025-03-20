@@ -26,8 +26,19 @@ class PostingList {
     */
     static void Serialize(char* base_region, size_t &offset, const PostingList& postingList);
 
-    static PostingList Deserialize(const char* buf);
-    
+    /*
+        Deserializes a given PostingList object that resides in a certain region of memory
+
+        Preconditions:
+            - base_region + offset points to the beginning of a region of memory
+                where a PostingList object resides at
+        
+        Postconditions:
+            - constructs a PostingList object from the bytes at this region of memory
+                and returns it
+    */
+   static PostingList Deserialize(char* base_region, size_t &offset);
+
 
     PostingList();
 

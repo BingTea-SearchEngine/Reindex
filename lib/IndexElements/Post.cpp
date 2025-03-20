@@ -40,6 +40,29 @@ void Post::Serialize(char* base_region, size_t &offset, const Post& post) {
     spdlog::info("Offset is now at {}", offset);
 }
 
+Post Post::Deserialize(char* base_region, size_t &offset) {
+    spdlog::info("Attempting to deserialize a Post at location {}", base_region + offset);
+
+    Post post;
+
+    post.document = std::string(base_region + offset);
+    offset += post.document.size() + 1;
+
+    size_t num_of_words;
+    std::memcpy(&num_of_words, base_region + offset, sizeof(num_of_words));
+    offset += sizeof(num_of_words);
+    post._entries.resize(num_of_words);
+
+    for (size_t i = 0; i < num_of_words; ++i) {
+        post._entries[i] = word_t::Deserialize(base_region, offset);
+    }
+
+    spdlog::info("Deserializing a Post complete");
+    spdlog::info("Offset is now at {}", offset);
+
+    return post;
+}
+
 size_t Post::addWord(word_t word) {
     _entries.push_back(word);
     return word.getBytesRequired();

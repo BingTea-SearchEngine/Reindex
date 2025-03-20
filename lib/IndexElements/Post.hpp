@@ -23,7 +23,18 @@ class Post {
     */
     static void Serialize(char* base_region, size_t &offset, const Post& post);
 
-    static Post Deserialize(const char* buf);
+    /*
+        Deserializes a given Post object that resides in a certain region of memory
+
+        Preconditions:
+            - base_region + offset points to the beginning of a region of memory
+                where a Post object resides at
+        
+        Postconditions:
+            - constructs a Post object from the bytes at this region of memory
+                and returns it
+    */
+   static Post Deserialize(char* base_region, size_t &offset);
 
     Post();
 

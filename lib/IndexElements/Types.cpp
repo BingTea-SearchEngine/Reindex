@@ -35,3 +35,23 @@ void word_t::Serialize(char* base_region, size_t &offset, const word_t &word_occ
     spdlog::info("Serializing {} complete", word_occurrence);
     spdlog::info("offset variable is now at {}", offset);
 }
+
+word_t word_t::Deserialize(char* base_region, size_t &offset) {
+    spdlog::info("Attempting to deserialize a word_t at location {}", base_region + offset);
+
+    word_t word;
+
+    word.word = std::string(base_region + offset);
+    offset += word.word.size() + 1;
+
+    std::memcpy(&word.offset, base_region + offset, sizeof(word.offset));
+    offset += sizeof(word.offset);
+
+    std::memcpy(&word.location, base_region + offset, sizeof(word.location));
+    offset += sizeof(word.location);
+
+    spdlog::info("Deserializing a word_t complete");
+    spdlog::info("Offset is now at {}", offset);
+
+    return word;
+}
