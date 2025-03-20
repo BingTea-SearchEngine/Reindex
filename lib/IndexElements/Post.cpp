@@ -16,12 +16,13 @@ void Post::Serialize(char* base_region, size_t &offset, const Post& post) {
             - vector<word_t> _entries
     */
 
-    spdlog::info("Attempting to serialize the Post for the document \"{}\"", post.document);
+    spdlog::info("Attempting to serialize the Post for the document \"{}\" at location {} + {} = {}", post.document, base_region, offset, base_region + offset);
     spdlog::info("offset variable is currently at {}", offset);
 
     size_t document_name_size = post.document.size() + 1; // account for null terminator
     std::memcpy(base_region + offset, post.document.c_str(), document_name_size);
     offset += document_name_size;
+    spdlog::info("After writing the std::string document_name, offset is now at {}", offset);
 
     // serialize the vector of words
 
@@ -29,9 +30,9 @@ void Post::Serialize(char* base_region, size_t &offset, const Post& post) {
     size_t num_words = post._entries.size();
     std::memcpy(base_region + offset, &num_words, sizeof(num_words));
     offset += sizeof(num_words);
+    spdlog::info("After recording the size of the vec<word_t>, offset is now at {}", offset);
 
     // then, serialize each individual word occurrence
-    spdlog::info("Before trying to serialize each word_t, offset is currently at {}", offset);
     for (const auto& word: post._entries) {
         word_t::Serialize(base_region, offset, word);
     }
@@ -41,17 +42,20 @@ void Post::Serialize(char* base_region, size_t &offset, const Post& post) {
 }
 
 Post Post::Deserialize(char* base_region, size_t &offset) {
-    spdlog::info("Attempting to deserialize a Post at location {}", base_region + offset);
+    spdlog::info("Attempting to deserialize a Post at location {} + {} = {}", base_region, offset, base_region + offset);
+    spdlog::info("offset variable is currently at {}", offset);
 
     Post post;
 
     post.document = std::string(base_region + offset);
     offset += post.document.size() + 1;
+    spdlog::info("After reading the std::string document_name, offset is now at {}", offset);
 
     size_t num_of_words;
     std::memcpy(&num_of_words, base_region + offset, sizeof(num_of_words));
     offset += sizeof(num_of_words);
     post._entries.resize(num_of_words);
+    spdlog::info("After reading the size of the vector and resizing, offset is now at {}", offset);
 
     for (size_t i = 0; i < num_of_words; ++i) {
         post._entries[i] = word_t::Deserialize(base_region, offset);
