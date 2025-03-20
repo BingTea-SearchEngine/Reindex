@@ -7,7 +7,24 @@
 
 class PostingList {
    public:
-    static void Serialize(const char* buf, const PostingList& postingList);
+   /*
+        Serializes a given PostingList object into a specific region of memory
+
+        Preconditions:
+            - base_region must be a valid pointer to the very beginning of a
+                contiguous region of memory where this nested serialization will occur.
+                this is determined by the uppermost parent that wants serialization
+            - offset must be a number that when added to base_region will point
+                to the region of memory where this specific PostingList object will be serialized to
+            - postingList is the PostingList object to be serialized
+
+        Postconditions:
+            - Writes the bytes of this PostingList object into memory at this calculated region
+            - offset will be modified. at the end of this function, offset will be a number
+                that when added to base_region will point to the next available memory region
+                that is not yet written to
+    */
+    static void Serialize(char* base_region, size_t &offset, const PostingList& postingList);
 
     static PostingList Deserialize(const char* buf);
     
