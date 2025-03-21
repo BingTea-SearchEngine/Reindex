@@ -16,28 +16,35 @@
 #include "Types.hpp"
 
 void* create_mmap_region(int& fd, size_t size) {
-    fd = open("test_posting_list", O_CREAT | O_RDWR, 0666);
+    fd = open("test_posting_list", O_CREAT | O_RDWR, 0666); // 0666 = rw
     ftruncate(fd, size);
     return mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 }
 
-int main(int argc, char** argv) {
-    argparse::ArgumentParser program("reindex");
-    program.add_argument("-i", "--input")
-      .required()
-      .help("Specify the input file.");
-
-    try {
-        program.parse_args(argc, argv);
-    } catch (const std::exception& err) {
-        std::cerr << err.what() << std::endl;
-        std::cerr << program;
-        std::exit(1);
+void* read_mmap_region(int& fd, size_t size) {
+    fd = open("test_posting_list", O_RDONLY);
+    if (fd == -1) {
+        throw std::runtime_error("Failed to open file");
     }
 
-    std::string inputDir = program.get<std::string>("-i");
-    spdlog::info("======= Reindex Started =======");
+    struct stat fileStat;
+    size_t fileSize;
+    if (fstat(fd, &fileStat) == -1) {
+        close(fd);
+        throw std::runtime_error("Error: Failed to get file size for test_posting_list");
+    }
+    fileSize = fileStat.st_size;
 
+    void* mappedRegion = mmap(nullptr, fileSize, PROT_READ, MAP_PRIVATE, fd, 0);
+    if (mappedRegion == MAP_FAILED) {
+        close(fd);
+        throw std::runtime_error("Error: Failed to memory-map file");
+    }
+
+    return mappedRegion;
+}
+
+void test_serializiation() {
     int fd;
     const size_t REGION_SIZE = 4096;
     void* base_region = create_mmap_region(fd, REGION_SIZE);
@@ -75,6 +82,132 @@ int main(int argc, char** argv) {
     munmap(base_region, REGION_SIZE);
     close(fd);
     delete postingList;
+}
+
+void test_deserialization() {
+    int fd;
+    const size_t REGION_SIZE = 4096;
+    void* base_region = read_mmap_region(fd, REGION_SIZE);
+    size_t offset = 0;
+
+    PostingList postingList = PostingList::Deserialize(static_cast<char*>(base_region), offset);
+
+    if (postingList.getPosts().size() == 2) { // one for cnn and one for fox
+        std::cout << "Passed!" << std::endl;
+    }
+    else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    Post cnnPost = postingList.getPost(0);
+    if (cnnPost.document == "cnn/index.html") {
+        std::cout << "Passed!" << std::endl;
+    }
+    else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    words w = cnnPost.getEntries();
+
+    word_t cnn_word_occurrence_1 = w[0];
+    if (cnn_word_occurrence_1.word == "cat" && cnn_word_occurrence_1.offset == 5 && cnn_word_occurrence_1.location == wordlocation_t::body) {
+        std::cout << "Passed!" << std::endl;
+    }
+    else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    word_t cnn_word_occurrence_2 = w[1];
+    if (cnn_word_occurrence_2.word == "cat" && cnn_word_occurrence_2.offset == 10 && cnn_word_occurrence_2.location == wordlocation_t::body) {
+        std::cout << "Passed!" << std::endl;
+    }
+    else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    word_t cnn_word_occurrence_3 = w[2];
+    if (cnn_word_occurrence_3.word == "cat" && cnn_word_occurrence_3.offset == 17 && cnn_word_occurrence_3.location == wordlocation_t::body) {
+        std::cout << "Passed!" << std::endl;
+    }
+    else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    Post foxPost = postingList.getPost(1);
+    if (foxPost.document == "fox/index.html") {
+        std::cout << "Passed!" << std::endl;
+    }
+    else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    w = foxPost.getEntries();
+
+    word_t fox_word_occurrence_1 = w[0];
+    if (fox_word_occurrence_1.word == "cat" && fox_word_occurrence_1.offset == 20 && fox_word_occurrence_1.location == wordlocation_t::body) {
+        std::cout << "Passed!" << std::endl;
+    }
+    else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    word_t fox_word_occurrence_2 = w[1];
+    if (fox_word_occurrence_2.word == "cat" && fox_word_occurrence_2.offset == 25 && fox_word_occurrence_2.location == wordlocation_t::body) {
+        std::cout << "Passed!" << std::endl;
+    }
+    else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    word_t fox_word_occurrence_3 = w[2];
+    if (fox_word_occurrence_3.word == "cat" && fox_word_occurrence_3.offset == 29 && fox_word_occurrence_3.location == wordlocation_t::body) {
+        std::cout << "Passed!" << std::endl;
+    }
+    else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    word_t fox_word_occurrence_4 = w[3];
+    if (fox_word_occurrence_4.word == "cat" && fox_word_occurrence_4.offset == 40 && fox_word_occurrence_4.location == wordlocation_t::body) {
+        std::cout << "Passed!" << std::endl;
+    }
+    else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    std::cout << "All tests passed!" << std::endl;
+}
+
+int main(int argc, char** argv) {
+    argparse::ArgumentParser program("reindex");
+    program.add_argument("-i", "--input")
+      .required()
+      .help("Specify the input file.");
+
+    try {
+        program.parse_args(argc, argv);
+    } catch (const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+        std::cerr << program;
+        std::exit(1);
+    }
+
+    std::string inputDir = program.get<std::string>("-i");
+    spdlog::info("======= Reindex Started =======");
+
+    // test_serializiation();
+    test_deserialization();
+
     return 0;
 }
 
