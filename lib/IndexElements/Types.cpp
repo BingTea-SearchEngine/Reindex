@@ -38,7 +38,6 @@ void word_t::Serialize(char* base_region, size_t &offset, const word_t &word_occ
 }
 
 word_t word_t::Deserialize(char* base_region, size_t &offset) {
-    spdlog::info("Attempting to deserialize a word_t at location {} + {} = {}", base_region, offset, base_region + offset);
     spdlog::info("offset variable is currently at {}", offset);
 
     word_t word;

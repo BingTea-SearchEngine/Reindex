@@ -44,7 +44,6 @@ void Post::Serialize(char* base_region, size_t &offset, const Post& post) {
 }
 
 Post Post::Deserialize(char* base_region, size_t &offset) {
-    spdlog::info("Attempting to deserialize a Post at location {} + {} = {}", base_region, offset, base_region + offset);
     spdlog::info("offset variable is currently at {}", offset);
 
     Post post;

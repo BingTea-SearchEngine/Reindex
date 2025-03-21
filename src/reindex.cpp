@@ -205,7 +205,7 @@ int main(int argc, char** argv) {
     std::string inputDir = program.get<std::string>("-i");
     spdlog::info("======= Reindex Started =======");
 
-    // test_serializiation();
+    test_serializiation();
     test_deserialization();
 
     return 0;

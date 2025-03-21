@@ -31,7 +31,6 @@ void PostingList::Serialize(char* base_region, size_t &offset, const PostingList
 }
 
 PostingList PostingList::Deserialize(char* base_region, size_t &offset) {
-    spdlog::info("Attempting to deserialize a PostingList at location {} + {} = {}", base_region, offset, base_region + offset);
     spdlog::info("offset variable is currently at {}", offset);
 
     PostingList postingList;
