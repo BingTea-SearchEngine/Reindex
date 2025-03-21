@@ -40,6 +40,8 @@ class Post {
 
     Post(docname name);
 
+    words getEntries();
+
     size_t addWord(word_t word);
 
     words::iterator begin();

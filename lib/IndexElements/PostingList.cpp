@@ -15,6 +15,8 @@ void PostingList::Serialize(char* base_region, size_t &offset, const PostingList
     */
     spdlog::info("offset variable is currently at {}", offset);
 
+    // TODO: should probably write down what word this PostingList is representing
+
     size_t num_posts = postingList._posts.size();
     std::memcpy(base_region + offset, &num_posts, sizeof(num_posts));
     offset += sizeof(num_posts);
@@ -58,11 +60,18 @@ size_t PostingList::getOverheadBytes() {
 }; 
 
 size_t PostingList::addWord(docname doc, word_t word) {
-    // If docname is different from current post's document, add to back of vector
-    if(doc != _posts.back().document) {
+    if (_posts.empty()) {
+        _posts.emplace_back(doc);
+    }
+
+    if (doc != _posts.back().document) {
         _posts.emplace_back(doc);
     }
     return _posts.back().addWord(word);
+}
+
+std::vector<Post> PostingList::getPosts() {
+    return _posts;
 }
 
 Post PostingList::getPost(size_t index) {

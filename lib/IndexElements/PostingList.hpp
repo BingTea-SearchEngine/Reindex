@@ -50,6 +50,8 @@ class PostingList {
 
     Post getPost(size_t index);
 
+    std::vector<Post> PostingList::getPosts();
+
     std::vector<Post>::iterator begin();
 
     std::vector<Post>::iterator end();

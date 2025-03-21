@@ -7,7 +7,11 @@
 
 Post::Post() {}
 
-Post::Post(docname name) : document(name) {}
+Post::Post(docname name) : document(name), _entries() {}
+
+words Post::getEntries() {
+    return _entries;
+}
 
 void Post::Serialize(char* base_region, size_t &offset, const Post& post) {
     /*
