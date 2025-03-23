@@ -13,7 +13,7 @@ public:
 
     MasterChunk();
 
-    void addDocument(std::string doc, std::vector<postentry_t> words);
+    void addDocument(std::string doc, std::vector<PostEntry> words);
 
     size_t getBytesRequired();
 

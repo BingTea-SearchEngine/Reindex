@@ -34,6 +34,20 @@ class PostEntry
         friend std::ostream& operator<<(std::ostream& os, const PostEntry& obj);
 
         /**
+         * @brief Returns the delta of this PostEntry.
+         * 
+         * @return A uint32_t of this PostEntry's delta.
+         */
+        uint32_t getDelta();
+
+        /**
+         * @brief Returns the location of where this word occurred.
+         * 
+         * @return A wordlocation_t of where this word occurred.
+         */
+        wordlocation_t getLocationFound();
+
+        /**
          * @brief Serializes a given PostEntry object into a specific region of memory.
          *
          * @param base_region A pointer to the beginning of the contiguous memory region 

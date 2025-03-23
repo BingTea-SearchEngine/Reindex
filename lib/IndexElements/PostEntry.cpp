@@ -1,4 +1,3 @@
-#include <iostream>
 #include <spdlog/spdlog.h>
 
 #include "PostEntry.hpp"
@@ -32,9 +31,19 @@ std::ostream& operator<<(std::ostream& os, const PostEntry& obj)
     return os;
 }
 
+uint32_t PostEntry::getDelta()
+{
+    return delta;
+}
+
+wordlocation_t PostEntry::getLocationFound()
+{
+    return location_found;
+}
+
 void PostEntry::Serialize(char* base_region, size_t &offset, const PostEntry &word_occurrence)
 {
-    spdlog::info("Trying to serialize this {}", word_occurrence);
+    spdlog::info("Trying to serialize a PostEntry");
     spdlog::info("Offset variable is currently at {}", offset);
 
     std::memcpy(base_region + offset, &word_occurrence.delta, sizeof(word_occurrence.delta));

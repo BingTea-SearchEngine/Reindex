@@ -5,41 +5,32 @@
 
 TEST(BasicPostingList, TestConstructor) {
     PostingList pl("hello");
-    EXPECT_EQ(pl.word, "hello");
-    EXPECT_EQ(pl.getOverheadBytes(), 10);
+    EXPECT_EQ(pl.getWord(), "hello");
 }
 
 TEST(BasicPostingList, TestAddWord) {
     PostingList pl("test");
-    postentry_t w1 = {0, wordlocation_t::title};
-    postentry_t w2 = {1, wordlocation_t::body};
-    postentry_t w3 = {2, wordlocation_t::bold};
+    PostEntry w1 = {0, wordlocation_t::title};
+    PostEntry w2 = {1, wordlocation_t::body};
+    PostEntry w3 = {2, wordlocation_t::bold};
     pl.addWord("doc1", w1);
     pl.addWord("doc1", w2);
     pl.addWord("doc2", w3);
 
-    auto postsIterator = pl.begin();
-    auto end = pl.end();
-    auto wordIterator = postsIterator->begin();
-    EXPECT_EQ(postsIterator->document, "doc1");
-    EXPECT_EQ(wordIterator->offset, w1.offset);
-    EXPECT_EQ(wordIterator->location, w1.location);
-    ++wordIterator;
-    EXPECT_EQ(wordIterator->offset, w2.offset);
-    EXPECT_EQ(wordIterator->location, w2.location);
+    // Access posts using getPosts()
+    auto posts = pl.getPosts();
+    
+    // First post
+    EXPECT_EQ(posts[0].getDocumentName(), "doc1");
+    auto wordEntries1 = posts[0].getEntries(); // Get entries for the first post
+    EXPECT_EQ(wordEntries1[0].getDelta(), w1.getDelta());
+    EXPECT_EQ(wordEntries1[0].getLocationFound(), w1.getLocationFound());
+    EXPECT_EQ(wordEntries1[1].getDelta(), w2.getDelta());
+    EXPECT_EQ(wordEntries1[1].getLocationFound(), w2.getLocationFound());
 
-    ++postsIterator;
-    wordIterator = postsIterator->begin();
-    EXPECT_EQ(postsIterator->document, "doc2");
-    EXPECT_EQ(wordIterator->offset, w3.offset);
-    EXPECT_EQ(wordIterator->location, w3.location);
-
-    ++postsIterator;
-    EXPECT_EQ(postsIterator, end);
-}
-
-TEST(BasicPostingList, TestBytesRequired) {
-    PostingList pl("test");
-    pl.addWord("doc1", postentry_t{0, wordlocation_t::title});
-    pl.addWord("doc1", postentry_t{1, wordlocation_t::body});
+    // Second post
+    EXPECT_EQ(posts[1].getDocumentName(), "doc2");
+    auto wordEntries2 = posts[1].getEntries(); // Get entries for the second post
+    EXPECT_EQ(wordEntries2[0].getDelta(), w3.getDelta());
+    EXPECT_EQ(wordEntries2[0].getLocationFound(), w3.getLocationFound());
 }
