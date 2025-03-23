@@ -11,9 +11,9 @@ TEST(BasicPostingList, TestConstructor) {
 
 TEST(BasicPostingList, TestAddWord) {
     PostingList pl("test");
-    word_t w1 = {"word1", 0, wordlocation_t::title};
-    word_t w2 = {"word2", 1, wordlocation_t::body};
-    word_t w3 = {"word1", 2, wordlocation_t::bold};
+    postentry_t w1 = {0, wordlocation_t::title};
+    postentry_t w2 = {1, wordlocation_t::body};
+    postentry_t w3 = {2, wordlocation_t::bold};
     pl.addWord("doc1", w1);
     pl.addWord("doc1", w2);
     pl.addWord("doc2", w3);
@@ -22,18 +22,15 @@ TEST(BasicPostingList, TestAddWord) {
     auto end = pl.end();
     auto wordIterator = postsIterator->begin();
     EXPECT_EQ(postsIterator->document, "doc1");
-    EXPECT_EQ(wordIterator->word, w1.word);
     EXPECT_EQ(wordIterator->offset, w1.offset);
     EXPECT_EQ(wordIterator->location, w1.location);
     ++wordIterator;
-    EXPECT_EQ(wordIterator->word, w2.word);
     EXPECT_EQ(wordIterator->offset, w2.offset);
     EXPECT_EQ(wordIterator->location, w2.location);
 
     ++postsIterator;
     wordIterator = postsIterator->begin();
     EXPECT_EQ(postsIterator->document, "doc2");
-    EXPECT_EQ(wordIterator->word, w3.word);
     EXPECT_EQ(wordIterator->offset, w3.offset);
     EXPECT_EQ(wordIterator->location, w3.location);
 
@@ -43,6 +40,6 @@ TEST(BasicPostingList, TestAddWord) {
 
 TEST(BasicPostingList, TestBytesRequired) {
     PostingList pl("test");
-    pl.addWord("doc1", word_t{"word1", 0, wordlocation_t::title});
-    pl.addWord("doc1", word_t{"word2", 1, wordlocation_t::body});
+    pl.addWord("doc1", postentry_t{0, wordlocation_t::title});
+    pl.addWord("doc1", postentry_t{1, wordlocation_t::body});
 }

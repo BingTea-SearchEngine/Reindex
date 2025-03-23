@@ -22,12 +22,12 @@ class IndexChunk {
     size_t getBytesRequired();
 
     // Iterates through all words in the document and adds document to posting list of the word
-    void addDocument(docname doc, words words);
+    void addDocument(std::string doc, std::vector<postentry_t> words);
 
    private:
-    std::unordered_set<docname> _documents;
+    std::unordered_set<std::string> _documents;
     // Need to be built at serial time
-    std::unordered_map<docname, uint32_t> _postingListOffsets;
+    std::unordered_map<std::string, uint32_t> _postingListOffsets;
     std::unordered_map<std::string, PostingList> _postingLists;
     // Bytes Required to serialize this index
     size_t _bytesRequired;

@@ -38,18 +38,18 @@ class Post {
 
     Post();
 
-    Post(docname name);
+    Post(std::string name);
 
-    words getEntries();
+    std::vector<postentry_t> getEntries();
 
-    size_t addWord(word_t word);
+    size_t addWord(postentry_t word);
 
-    words::iterator begin();
+    std::vector<postentry_t>::iterator begin();
 
-    words::iterator end();
+    std::vector<postentry_t>::iterator end();
 
-    docname document;
+    std::string document;
 
    private:
-    words _entries;
+    std::vector<postentry_t> _entries;
 };

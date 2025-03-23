@@ -60,7 +60,7 @@ std::pair<docname, words> DocStream::nextFile() {
     std::istringstream titleIss(line);
     std::string word;
     while (titleIss >> word) {
-        output.push_back(word_t{word, offset, wordlocation_t::title});
+        output.push_back(postentry_t{offset, wordlocation_t::title});
         ++offset;
     }
 
@@ -79,7 +79,7 @@ std::pair<docname, words> DocStream::nextFile() {
     std::getline(document, line);
     std::istringstream bodyIss(line);
     while (bodyIss >> word) {
-        output.push_back(word_t{word, offset, wordlocation_t::body});
+        output.push_back(postentry_t{offset, wordlocation_t::body});
         ++offset;
     }
 

@@ -7,9 +7,9 @@
 
 Post::Post() {}
 
-Post::Post(docname name) : document(name), _entries() {}
+Post::Post(std::string name) : document(name), _entries() {}
 
-words Post::getEntries() {
+std::vector<postentry_t> Post::getEntries() {
     return _entries;
 }
 
@@ -17,7 +17,7 @@ void Post::Serialize(char* base_region, size_t &offset, const Post& post) {
     /*
         Post object has:
             - string document_name ("cnn.com/index.html")
-            - vector<word_t> _entries
+            - vector<postentry_t> _entries
     */
     spdlog::info("offset variable is currently at {}", offset);
 
@@ -32,11 +32,11 @@ void Post::Serialize(char* base_region, size_t &offset, const Post& post) {
     size_t num_words = post._entries.size();
     std::memcpy(base_region + offset, &num_words, sizeof(num_words));
     offset += sizeof(num_words);
-    spdlog::info("After recording the size of the vec<word_t>, offset is now at {}", offset);
+    spdlog::info("After recording the size of the vec<postentry_t>, offset is now at {}", offset);
 
     // then, serialize each individual word occurrence
     for (const auto& word: post._entries) {
-        word_t::Serialize(base_region, offset, word);
+        postentry_t::Serialize(base_region, offset, word);
     }
 
     spdlog::info("Finished serializing Post for the document \"{}\"", post.document);
@@ -59,7 +59,7 @@ Post Post::Deserialize(char* base_region, size_t &offset) {
     spdlog::info("After reading the size of the vector and resizing, offset is now at {}", offset);
 
     for (size_t i = 0; i < num_of_words; ++i) {
-        post._entries[i] = word_t::Deserialize(base_region, offset);
+        post._entries[i] = postentry_t::Deserialize(base_region, offset);
     }
 
     spdlog::info("Deserializing a Post complete");
@@ -68,7 +68,7 @@ Post Post::Deserialize(char* base_region, size_t &offset) {
     return post;
 }
 
-size_t Post::addWord(word_t word) {
+size_t Post::addWord(postentry_t word) {
     _entries.push_back(word);
     return word.getBytesRequired();
 }

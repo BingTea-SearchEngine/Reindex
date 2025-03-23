@@ -7,7 +7,7 @@
 
 class PostingList {
    public:
-   /*
+    /*
         Serializes a given PostingList object into a specific region of memory
 
         Preconditions:
@@ -46,7 +46,7 @@ class PostingList {
 
     size_t getOverheadBytes();
 
-    size_t addWord(docname doc, word_t word);
+    size_t addWord(std::string doc, postentry_t word);
 
     Post getPost(size_t index);
 

@@ -10,13 +10,12 @@ enum class wordlocation_t {
     body = 2,
 };
 
-struct word_t {
-    std::string word;
+struct postentry_t {
     uint32_t offset;
     wordlocation_t location;
 
-    friend std::ostream& operator<<(std::ostream& os, const word_t& w) {
-        os << "word_t{ word=" << w.word << " offset=" << w.offset << " location=";
+    friend std::ostream& operator<<(std::ostream& os, const postentry_t& w) {
+        os << "postentry_t{ offset=" << w.offset << " location=";
         switch (w.location) {
             case (wordlocation_t::title):
                 os << "title";
@@ -35,8 +34,7 @@ struct word_t {
     }
 
     size_t getBytesRequired() {
-        // 1 for null terminator
-        return word.size() + 1 + sizeof(offset) + sizeof(location);
+        return sizeof(offset) + sizeof(location);
     }
 
     /*
@@ -56,7 +54,7 @@ struct word_t {
                 that when added to base_region will point to the next available memory region
                 that is not yet written to
     */
-    static void Serialize(char* base_region, size_t &offset, const word_t &word_occurrence);
+    static void Serialize(char* base_region, size_t &offset, const postentry_t &word_occurrence);
 
     /*
         Deserializes a given word_t object that resides in a certain region of memory
@@ -69,9 +67,8 @@ struct word_t {
             - constructs a word_t object from the bytes at this region of memory
                 and returns it
     */
-    static word_t Deserialize(char* base_region, size_t &offset);
-
+    static postentry_t Deserialize(char* base_region, size_t &offset);
 };
 
-typedef std::vector<word_t> words;
+typedef std::vector<postentry_t> words;
 typedef std::string docname;

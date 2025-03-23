@@ -15,7 +15,10 @@ void PostingList::Serialize(char* base_region, size_t &offset, const PostingList
     */
     spdlog::info("offset variable is currently at {}", offset);
 
-    // TODO: should probably write down what word this PostingList is representing
+    size_t postingList_word_size = postingList.word.size() + 1; // account for the null terminator
+    std::memcpy(base_region + offset, postingList.word.c_str(), postingList_word_size);
+    offset += postingList_word_size;
+    spdlog::info("After writing the word this postingList represents, offset is now at {}", offset);
 
     size_t num_posts = postingList._posts.size();
     std::memcpy(base_region + offset, &num_posts, sizeof(num_posts));
@@ -34,6 +37,10 @@ PostingList PostingList::Deserialize(char* base_region, size_t &offset) {
     spdlog::info("offset variable is currently at {}", offset);
 
     PostingList postingList;
+
+    postingList.word = std::string(base_region + offset);
+    offset += postingList.word.size() + 1;
+    spdlog::info("After reading the word that this postingList represents, offset is now at {}", offset);
 
     size_t num_of_posts;
     std::memcpy(&num_of_posts, base_region + offset, sizeof(num_of_posts));
@@ -58,7 +65,7 @@ size_t PostingList::getOverheadBytes() {
     return ret;
 }; 
 
-size_t PostingList::addWord(docname doc, word_t word) {
+size_t PostingList::addWord(std::string doc, postentry_t word) {
     if (_posts.empty()) {
         _posts.emplace_back(doc);
     }
