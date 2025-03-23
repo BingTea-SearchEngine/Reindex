@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <iostream>
 
-#include "Types.hpp"
+#include "WordLocation.hpp"
 
 /** 
  * @class PostEntry

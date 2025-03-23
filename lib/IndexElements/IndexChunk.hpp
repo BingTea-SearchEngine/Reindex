@@ -2,13 +2,8 @@
 
 #include <unordered_map>
 #include <unordered_set>
-#include <iostream>
 
 #include "PostingList.hpp"
-
-using std::cout;
-using std::endl;
-
 
 class IndexChunk {
    public:

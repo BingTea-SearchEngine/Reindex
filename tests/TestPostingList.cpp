@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "PostingList.hpp"
-#include "Types.hpp"
+#include "WordLocation.hpp"
 
 TEST(BasicPostingList, TestConstructor) {
     PostingList pl("hello");

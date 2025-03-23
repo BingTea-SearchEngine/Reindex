@@ -15,7 +15,7 @@ using std::cout;
 using std::endl;
 
 #include "PostEntry.hpp"
-#include "Types.hpp"
+#include "WordLocation.hpp"
 
 bool checkTagExists(std::string line, std::string tag);
 

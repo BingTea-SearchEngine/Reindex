@@ -13,7 +13,7 @@
 #include "MasterChunk.hpp"
 #include "PostingList.hpp"
 #include "Post.hpp"
-#include "Types.hpp"
+#include "WordLocation.hpp"
 
 void* create_mmap_region(int& fd, size_t size) {
     fd = open("test_posting_list", O_CREAT | O_RDWR, 0666); // 0666 = rw
