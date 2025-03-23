@@ -14,7 +14,8 @@
 using std::cout;
 using std::endl;
 
-#include "Types.hpp"
+#include "PostEntry.hpp"
+#include "WordLocation.hpp"
 
 bool checkTagExists(std::string line, std::string tag);
 
@@ -31,7 +32,7 @@ class DocStream {
     DocStream(std::string dirPath);
 
     // Parse next file in _documents priority queue
-    std::pair<docname, words> nextFile();
+    std::pair<std::string, std::vector<PostEntry>> nextFile();
 
     size_t size();
 

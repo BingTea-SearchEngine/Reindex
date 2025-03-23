@@ -1,8 +1,8 @@
 #pragma once
 
 #include <unordered_set>
+#include <vector>
 
-#include "Types.hpp"
 #include "IndexChunk.hpp"
 
 class MasterChunk {
@@ -13,7 +13,7 @@ public:
 
     MasterChunk();
 
-    void addDocument(std::string doc, std::vector<postentry_t> words);
+    void addDocument(std::string doc, std::vector<PostEntry> words);
 
     size_t getBytesRequired();
 

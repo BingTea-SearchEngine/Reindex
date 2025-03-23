@@ -13,7 +13,7 @@
 #include "MasterChunk.hpp"
 #include "PostingList.hpp"
 #include "Post.hpp"
-#include "Types.hpp"
+#include "WordLocation.hpp"
 
 void* create_mmap_region(int& fd, size_t size) {
     fd = open("test_posting_list", O_CREAT | O_RDWR, 0666); // 0666 = rw
@@ -54,16 +54,16 @@ void test_serializiation() {
     // let's say there is a document named cnn/index.html
     std::string cnn_doc = "cnn/index.html";
     // and on this document, there are a couple occurrences of the word "cat" in the body
-    postentry_t word_occurrence_1 = {5, wordlocation_t::body};
-    postentry_t word_occurrence_2 = {10, wordlocation_t::title};
-    postentry_t word_occurrence_3 = {17, wordlocation_t::body};
+    PostEntry word_occurrence_1 = {5, wordlocation_t::body};
+    PostEntry word_occurrence_2 = {10, wordlocation_t::title};
+    PostEntry word_occurrence_3 = {17, wordlocation_t::body};
 
     // and let's say there is another document called fox/index.html
     std::string fox_doc = "fox/index.html";
-    postentry_t word_occurrence_4 = {20, wordlocation_t::body};
-    postentry_t word_occurrence_5 = {25, wordlocation_t::title};
-    postentry_t word_occurrence_6 = {29, wordlocation_t::title};
-    postentry_t word_occurrence_7 = {40, wordlocation_t::body};
+    PostEntry word_occurrence_4 = {20, wordlocation_t::body};
+    PostEntry word_occurrence_5 = {25, wordlocation_t::title};
+    PostEntry word_occurrence_6 = {29, wordlocation_t::title};
+    PostEntry word_occurrence_7 = {40, wordlocation_t::body};
 
     postingList->addWord(cnn_doc, word_occurrence_1);
     postingList->addWord(cnn_doc, word_occurrence_2);
@@ -92,7 +92,7 @@ void test_deserialization() {
 
     PostingList postingList = PostingList::Deserialize(static_cast<char*>(base_region), offset);
 
-    if (postingList.word == "cat") {
+    if (postingList.getWord() == "cat") {
         std::cout << "Passed!" << std::endl;
     }
     else {
@@ -108,8 +108,9 @@ void test_deserialization() {
         exit(1);
     }
 
-    Post cnnPost = postingList.getPost(0);
-    if (cnnPost.document == "cnn/index.html") {
+    std::vector<Post> catPostingList = postingList.getPosts();
+    Post cnnPost = catPostingList[0];
+    if (cnnPost.getDocumentName() == "cnn/index.html") {
         std::cout << "Passed!" << std::endl;
     }
     else {
@@ -119,8 +120,8 @@ void test_deserialization() {
 
     auto entries = cnnPost.getEntries();
 
-    postentry_t cnn_word_occurrence_1 = entries[0];
-    if (cnn_word_occurrence_1.offset == 5 && cnn_word_occurrence_1.location == wordlocation_t::body) {
+    PostEntry cnn_word_occurrence_1 = entries[0];
+    if (cnn_word_occurrence_1.getDelta() == 5 && cnn_word_occurrence_1.getLocationFound() == wordlocation_t::body) {
         std::cout << "Passed!" << std::endl;
     }
     else {
@@ -128,8 +129,8 @@ void test_deserialization() {
         exit(1);
     }
 
-    postentry_t cnn_word_occurrence_2 = entries[1];
-    if (cnn_word_occurrence_2.offset == 10 && cnn_word_occurrence_2.location == wordlocation_t::title) {
+    PostEntry cnn_word_occurrence_2 = entries[1];
+    if (cnn_word_occurrence_2.getDelta() == 10 && cnn_word_occurrence_2.getLocationFound() == wordlocation_t::title) {
         std::cout << "Passed!" << std::endl;
     }
     else {
@@ -137,8 +138,8 @@ void test_deserialization() {
         exit(1);
     }
 
-    postentry_t cnn_word_occurrence_3 = entries[2];
-    if (cnn_word_occurrence_3.offset == 17 && cnn_word_occurrence_3.location == wordlocation_t::body) {
+    PostEntry cnn_word_occurrence_3 = entries[2];
+    if (cnn_word_occurrence_3.getDelta() == 17 && cnn_word_occurrence_3.getLocationFound() == wordlocation_t::body) {
         std::cout << "Passed!" << std::endl;
     }
     else {
@@ -146,8 +147,8 @@ void test_deserialization() {
         exit(1);
     }
 
-    Post foxPost = postingList.getPost(1);
-    if (foxPost.document == "fox/index.html") {
+    Post foxPost = catPostingList[1];
+    if (foxPost.getDocumentName() == "fox/index.html") {
         std::cout << "Passed!" << std::endl;
     }
     else {
@@ -157,8 +158,8 @@ void test_deserialization() {
 
     entries = foxPost.getEntries();
 
-    postentry_t fox_word_occurrence_1 = entries[0];
-    if (fox_word_occurrence_1.offset == 20 && fox_word_occurrence_1.location == wordlocation_t::body) {
+    PostEntry fox_word_occurrence_1 = entries[0];
+    if (fox_word_occurrence_1.getDelta() == 20 && fox_word_occurrence_1.getLocationFound() == wordlocation_t::body) {
         std::cout << "Passed!" << std::endl;
     }
     else {
@@ -166,8 +167,8 @@ void test_deserialization() {
         exit(1);
     }
 
-    postentry_t fox_word_occurrence_2 = entries[1];
-    if (fox_word_occurrence_2.offset == 25 && fox_word_occurrence_2.location == wordlocation_t::title) {
+    PostEntry fox_word_occurrence_2 = entries[1];
+    if (fox_word_occurrence_2.getDelta() == 25 && fox_word_occurrence_2.getLocationFound() == wordlocation_t::title) {
         std::cout << "Passed!" << std::endl;
     }
     else {
@@ -175,8 +176,8 @@ void test_deserialization() {
         exit(1);
     }
 
-    postentry_t fox_word_occurrence_3 = entries[2];
-    if (fox_word_occurrence_3.offset == 29 && fox_word_occurrence_3.location == wordlocation_t::title) {
+    PostEntry fox_word_occurrence_3 = entries[2];
+    if (fox_word_occurrence_3.getDelta() == 29 && fox_word_occurrence_3.getLocationFound() == wordlocation_t::title) {
         std::cout << "Passed!" << std::endl;
     }
     else {
@@ -184,8 +185,8 @@ void test_deserialization() {
         exit(1);
     }
 
-    postentry_t fox_word_occurrence_4 = entries[3];
-    if (fox_word_occurrence_4.offset == 40 && fox_word_occurrence_4.location == wordlocation_t::body) {
+    PostEntry fox_word_occurrence_4 = entries[3];
+    if (fox_word_occurrence_4.getDelta() == 40 && fox_word_occurrence_4.getLocationFound() == wordlocation_t::body) {
         std::cout << "Passed!" << std::endl;
     }
     else {
@@ -213,7 +214,7 @@ int main(int argc, char** argv) {
     std::string inputDir = program.get<std::string>("-i");
     spdlog::info("======= Reindex Started =======");
 
-    // test_serializiation();
+    test_serializiation();
     test_deserialization();
 
     return 0;
