@@ -26,6 +26,13 @@ class Post
         Post(std::string name);
 
         /**
+         * @brief Returns the name of this document that this Post represents.
+         * 
+         * @return A std::string of the document's name.
+         */
+        std::string getDocumentName();
+
+        /**
          * @brief Returns a vector containing all word occurrences (PostEntry objects) in the post.
          * 
          * @return A vector of PostEntry objects.
@@ -45,10 +52,20 @@ class Post
          * This function writes the Post object's data into the memory region starting at the given
          * offset, updating the offset to point to the next available region of memory.
          * 
-         * @param base_region The beginning of the memory region where the Post will be serialized.
-         *                    This region is memory-mapped.
-         * @param offset The offset within the memory region where the serialization should begin.
+         * @param base_region A pointer to the beginning of the contiguous memory region 
+         *                    where serialization will occur. This is determined by the
+         *                    uppermost parent that wants serialization. This contiguous
+         *                    memory region is memory-mapped to disk.
+         * @param offset A reference to an offset value. After serialization, 
+         *               this will be updated to point to the next available memory region.
          * @param post The Post object to serialize.
+         * 
+         * @pre `base_region` must be a valid pointer to a memory region that is mmap'ed.
+         * @pre `offset` must be a valid number such that `base_region + offset`
+         *       points to the target serialization location.
+         * 
+         * @post Writes the bytes of the Post object into memory at the calculated region.
+         * @post Updates `offset` to the next available memory location.
          */
         static void Serialize(char* base_region, size_t &offset, const Post& post);
 
@@ -58,11 +75,14 @@ class Post
          * This function reconstructs a Post object from the bytes in the specified memory region, 
          * starting at the given offset, and returns the deserialized Post object.
          * 
-         * @param base_region The memory region containing the serialized Post object.
-         *                    This region is memory-mapped.
-         * @param offset The offset within the memory region where the deserialization should begin.
-         * 
+         * @param base_region A pointer to the beginning of the memory region containing the object.
+         *                    This memory region is memory-mapped to disk.
+         * @param offset A reference to an offset value. After deserialization, 
+         *               this will be updated to point to the next available memory region.
          * @return The deserialized Post object.
+         * 
+         * @pre `base_region + offset` must point to a valid serialized Post object.
+         * @post A Post object is created and the offset is updated.
          */
         static Post Deserialize(char* base_region, size_t &offset);
 

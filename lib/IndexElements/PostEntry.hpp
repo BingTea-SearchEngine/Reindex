@@ -34,7 +34,7 @@ class PostEntry
         friend std::ostream& operator<<(std::ostream& os, const PostEntry& obj);
 
         /**
-         * @brief Serializes a PostEntry object into a specific region of memory.
+         * @brief Serializes a given PostEntry object into a specific region of memory.
          *
          * @param base_region A pointer to the beginning of the contiguous memory region 
          *                    where serialization will occur. This is determined by the
@@ -63,7 +63,7 @@ class PostEntry
          * @return The deserialized PostEntry object.
          *
          * @pre `base_region + offset` must point to a valid serialized PostEntry object.
-         * @post Constructs a PostEntry object from the memory bytes and returns it.
+         * @post A PostEntry object is created and the offset is updated.
          */
         static PostEntry Deserialize(char* base_region, size_t &offset);
 

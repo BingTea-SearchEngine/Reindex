@@ -6,9 +6,19 @@ Post::Post() {}
 
 Post::Post(std::string name) : document_name(name), entries() {}
 
+std::string Post::getDocumentName()
+{
+    return document_name;
+}
+
 std::vector<PostEntry> Post::getEntries()
 {
     return entries;
+}
+
+void Post::addWord(PostEntry word)
+{
+    entries.push_back(word);
 }
 
 void Post::Serialize(char* base_region, size_t &offset, const Post& post)
@@ -65,9 +75,4 @@ Post Post::Deserialize(char* base_region, size_t &offset)
     spdlog::info("Offset is now at {}", offset);
 
     return post;
-}
-
-void Post::addWord(PostEntry word)
-{
-    entries.push_back(word);
 }

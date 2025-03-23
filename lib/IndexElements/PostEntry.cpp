@@ -5,11 +5,7 @@
 
 PostEntry::PostEntry() {}
 
-PostEntry::PostEntry(uint32_t delta, wordlocation_t location_found)
-{
-    this->delta = delta;
-    this->location_found = location_found;
-}
+PostEntry::PostEntry(uint32_t delta, wordlocation_t location_found) : delta(delta), location_found(location_found) {}
 
 // bool operator==(const PostEntry& lhs, const PostEntry& rhs)
 // {
