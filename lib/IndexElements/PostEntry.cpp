@@ -11,6 +11,11 @@ PostEntry::PostEntry(uint32_t delta, wordlocation_t location_found)
     this->location_found = location_found;
 }
 
+// bool operator==(const PostEntry& lhs, const PostEntry& rhs)
+// {
+//     return (lhs.delta == rhs.delta) && (lhs.location_found == rhs.location_found);
+// }
+
 std::ostream& operator<<(std::ostream& os, const PostEntry& obj)
 {
     os << "PostEntry{ delta=" << obj.delta << " location_found=";

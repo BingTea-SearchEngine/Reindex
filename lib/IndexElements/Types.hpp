@@ -9,5 +9,3 @@ enum class wordlocation_t {
     bold = 1,
     body = 2,
 };
-
-typedef std::string docname;

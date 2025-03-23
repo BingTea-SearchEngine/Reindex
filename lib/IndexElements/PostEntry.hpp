@@ -5,8 +5,6 @@
 
 #include "Types.hpp"
 
-using WordOccurrences = std::vector<PostEntry>;
-
 /** 
  * @class PostEntry
  * @brief Represents a single occurrence of a word in the corpus.
@@ -18,7 +16,7 @@ class PostEntry
 {
     public:
         /** 
-         * @brief Default constructor for PostEntry.
+         * @brief Default constructor for a PostEntry.
          */
         PostEntry();
 
@@ -29,12 +27,10 @@ class PostEntry
          */
         PostEntry(uint32_t delta, wordlocation_t location_found);
 
-        /**
-         * @brief Overloads the output stream operator for printing a PostEntry object.
-         * @param os The output stream.
-         * @param obj The PostEntry object to be printed.
-         * @return The modified output stream.
-         */
+        // Friend function to overload the == operator for PostEntry comparison
+        // friend bool operator==(const PostEntry& lhs, const PostEntry& rhs);
+
+        // Friend function to overload the << operator for PostEntry printing
         friend std::ostream& operator<<(std::ostream& os, const PostEntry& obj);
 
         /**
