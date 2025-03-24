@@ -1,21 +1,18 @@
-// #include "IndexChunk.hpp"
+#include "IndexChunk.hpp"
+//
+IndexChunk::IndexChunk() {}
 
-// IndexChunk::IndexChunk() {
+void IndexChunk::addDocument(std::string doc, std::vector<word_t> words) {
+    // Add to set of documents
 
-// }
-
-// void IndexChunk::addDocument(std::string doc, std::vector<postentry_t> words) {
-//     // Add to set of documents
-    
-//     // Iterate over words
-//     for (postentry_t& word : words) {
-//         word.offset = _offset;
-//         cout << word << endl;
-//         if(_postingLists.find(word.word) == _postingLists.end()){
-//             _postingLists.insert(make_pair(word.word, PostingList(word.word)));
-//             _bytesRequired += _postingLists.at(word.word).getOverheadBytes(); 
-//         }
-//         _bytesRequired += _postingLists[word.word].addWord(doc, word);
-//         _offset++;
-//     }
-// }
+    // Iterate over words
+    for (word_t& word : words) {
+        cout << word << endl;
+        if(_postingLists.find(word.word) == _postingLists.end()){
+            _postingLists.insert(make_pair(word.word, PostingList(word.word)));
+            // _bytesRequired += _postingLists.at(word.word).getOverheadBytes();
+        }
+        _postingLists[word.word].addWord(doc, PostEntry(_offset, word.location));
+        _offset++;
+    }
+}

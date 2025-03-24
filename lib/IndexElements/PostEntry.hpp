@@ -12,42 +12,41 @@
  * This class is the most basic, atomic part of the inverted word index.
  * It provides capabilities to serialize and deserialize to/from storage.
  */
-class PostEntry
-{
-    public:
-        /** 
+class PostEntry {
+   public:
+    /** 
          * @brief Default constructor for a PostEntry.
          */
-        PostEntry();
+    PostEntry();
 
-        /** 
+    /** 
          * @brief Constructs a PostEntry object.
          * @param delta The relative position of this word in the index chunk.
          * @param location_found The section of the page where the word was found.
          */
-        PostEntry(uint32_t delta, wordlocation_t location_found);
+    PostEntry(uint32_t delta, wordlocation_t location_found);
 
-        // Friend function to overload the == operator for PostEntry comparison
-        // friend bool operator==(const PostEntry& lhs, const PostEntry& rhs);
+    // Friend function to overload the == operator for PostEntry comparison
+    // friend bool operator==(const PostEntry& lhs, const PostEntry& rhs);
 
-        // Friend function to overload the << operator for PostEntry printing
-        friend std::ostream& operator<<(std::ostream& os, const PostEntry& obj);
+    // Friend function to overload the << operator for PostEntry printing
+    friend std::ostream& operator<<(std::ostream& os, const PostEntry& obj);
 
-        /**
+    /**
          * @brief Returns the delta of this PostEntry.
          * 
          * @return A uint32_t of this PostEntry's delta.
          */
-        uint32_t getDelta();
+    uint32_t getDelta();
 
-        /**
+    /**
          * @brief Returns the location of where this word occurred.
          * 
          * @return A wordlocation_t of where this word occurred.
          */
-        wordlocation_t getLocationFound();
+    wordlocation_t getLocationFound();
 
-        /**
+    /**
          * @brief Serializes a given PostEntry object into a specific region of memory.
          *
          * @param base_region A pointer to the beginning of the contiguous memory region 
@@ -65,9 +64,10 @@ class PostEntry
          * @post Writes the bytes of the PostEntry object into memory at the calculated region.
          * @post Updates `offset` to the next available memory location.
          */
-        static void Serialize(char* base_region, size_t &offset, const PostEntry &word_occurrence);
+    static void Serialize(char* base_region, size_t& offset,
+                          const PostEntry& word_occurrence);
 
-        /**
+    /**
          * @brief Deserializes a PostEntry object from a specific region of memory.
          *
          * @param base_region A pointer to the beginning of the memory region containing the object.
@@ -79,13 +79,13 @@ class PostEntry
          * @pre `base_region + offset` must point to a valid serialized PostEntry object.
          * @post A PostEntry object is created and the offset is updated.
          */
-        static PostEntry Deserialize(char* base_region, size_t &offset);
+    static PostEntry Deserialize(char* base_region, size_t& offset);
 
-    private:
-        /// The relative position of this word in the index chunk.
-        /// @todo Convert this to use relative deltas.
-        uint32_t delta;
-        
-        /// The section of the page where the word was found.
-        wordlocation_t location_found;
+    /// The relative position of this word in the index chunk.
+    /// @todo Convert this to use relative deltas.
+    uint32_t delta;
+   private:
+
+    /// The section of the page where the word was found.
+    wordlocation_t location_found;
 };
