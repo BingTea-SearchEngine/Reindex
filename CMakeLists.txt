@@ -59,11 +59,15 @@ target_include_directories(${THIS} PRIVATE ${LIB_DIR}/DocStream ${LIB_DIR}/Index
 add_executable(TestExample tests/TestExample.cpp)
 target_link_libraries(TestExample PRIVATE GTest::gtest_main)
 
+add_executable(TestMasterChunk tests/TestMasterChunk.cpp)
+target_link_libraries(TestMasterChunk PRIVATE GTest::gtest_main IndexElements)
+
 add_executable(TestPostingList tests/TestPostingList.cpp)
 target_link_libraries(TestPostingList PRIVATE GTest::gtest_main IndexElements)
 
 include(GoogleTest)
 gtest_discover_tests(TestExample)
+gtest_discover_tests(TestMasterChunk)
 gtest_discover_tests(TestPostingList)
 
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type")

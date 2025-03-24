@@ -20,9 +20,6 @@ DocStream::DocStream(std::string dirPath) : _dirPath(dirPath) {
 }
 
 std::pair<docname, words> DocStream::nextFile() {
-    //TODO
-    //Parse the next file in the priority queue. Populate the file type struct with words in the
-    //title section and normal words.
     std::string documentName = _documents.top();
     _documents.pop();
     std::ifstream document(_dirPath + "/" + documentName);

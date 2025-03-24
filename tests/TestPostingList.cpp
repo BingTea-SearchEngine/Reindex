@@ -6,7 +6,7 @@
 TEST(BasicPostingList, TestConstructor) {
     PostingList pl("hello");
     EXPECT_EQ(pl.word, "hello");
-    EXPECT_EQ(pl.getOverheadBytes(), 10);
+    EXPECT_EQ(pl.GetOverheadBytes(), 14);
 }
 
 TEST(BasicPostingList, TestAddWord) {
@@ -14,13 +14,13 @@ TEST(BasicPostingList, TestAddWord) {
     word_t w1 = {"word1", 0, wordlocation_t::title};
     word_t w2 = {"word2", 1, wordlocation_t::body};
     word_t w3 = {"word1", 2, wordlocation_t::bold};
-    pl.addWord("doc1", w1);
-    pl.addWord("doc1", w2);
-    pl.addWord("doc2", w3);
+    pl.AddWord("doc1", w1);
+    pl.AddWord("doc1", w2);
+    pl.AddWord("doc2", w3);
 
-    auto postsIterator = pl.begin();
-    auto end = pl.end();
-    auto wordIterator = postsIterator->begin();
+    auto postsIterator = pl.Begin();
+    auto end = pl.End();
+    auto wordIterator = postsIterator->Begin();
     EXPECT_EQ(postsIterator->document, "doc1");
     EXPECT_EQ(wordIterator->word, w1.word);
     EXPECT_EQ(wordIterator->offset, w1.offset);
@@ -31,7 +31,7 @@ TEST(BasicPostingList, TestAddWord) {
     EXPECT_EQ(wordIterator->location, w2.location);
 
     ++postsIterator;
-    wordIterator = postsIterator->begin();
+    wordIterator = postsIterator->Begin();
     EXPECT_EQ(postsIterator->document, "doc2");
     EXPECT_EQ(wordIterator->word, w3.word);
     EXPECT_EQ(wordIterator->offset, w3.offset);
@@ -43,6 +43,6 @@ TEST(BasicPostingList, TestAddWord) {
 
 TEST(BasicPostingList, TestBytesRequired) {
     PostingList pl("test");
-    pl.addWord("doc1", word_t{"word1", 0, wordlocation_t::title});
-    pl.addWord("doc1", word_t{"word2", 1, wordlocation_t::body});
+    pl.AddWord("doc1", word_t{"word1", 0, wordlocation_t::title});
+    pl.AddWord("doc1", word_t{"word2", 1, wordlocation_t::body});
 }

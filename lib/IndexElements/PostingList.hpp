@@ -16,15 +16,15 @@ class PostingList {
 
     PostingList(const std::string& _word);
 
-    size_t getOverheadBytes();
+    size_t GetOverheadBytes();
 
-    size_t addWord(docname doc, word_t word);
+    size_t AddWord(docname doc, word_t word);
 
-    Post getPost(size_t index);
+    Post GetPost(size_t index);
 
-    std::vector<Post>::iterator begin();
+    std::vector<Post>::iterator Begin();
 
-    std::vector<Post>::iterator end();
+    std::vector<Post>::iterator End();
 
     std::string word;
 

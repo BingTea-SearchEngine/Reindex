@@ -4,29 +4,29 @@ PostingList::PostingList() {}
 
 PostingList::PostingList(const std::string& _word) : word(_word) {}
 
-size_t PostingList::getOverheadBytes() {
-    size_t ret;
+size_t PostingList::GetOverheadBytes() {
+    size_t ret = 0;
     ret += sizeof(_posts.size());
     ret += word.size() + 1; // Word and null terminator
     return ret;
 }; 
 
-size_t PostingList::addWord(docname doc, word_t word) {
+size_t PostingList::AddWord(docname doc, word_t word) {
     // If docname is different from current post's document, add to back of vector
-    if(doc != _posts.back().document) {
+    if(_posts.empty() || doc != _posts.back().document) {
         _posts.emplace_back(doc);
     }
-    return _posts.back().addWord(word);
+    return _posts.back().AddWord(word);
 }
 
-Post PostingList::getPost(size_t index) {
+Post PostingList::GetPost(size_t index) {
     return _posts[index];
 }
 
-std::vector<Post>::iterator PostingList::begin() {
+std::vector<Post>::iterator PostingList::Begin() {
     return _posts.begin();
 }
 
-std::vector<Post>::iterator PostingList::end() {
+std::vector<Post>::iterator PostingList::End() {
     return _posts.end();
 }

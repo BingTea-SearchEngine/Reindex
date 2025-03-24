@@ -1,26 +1,33 @@
 #pragma once
 
-#include <unordered_set>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+#include <string>
 
 #include "Types.hpp"
 #include "IndexChunk.hpp"
 
 class MasterChunk {
 public:
-    static void Serialize(const char* buf, const MasterChunk& masterChunk);
+    static size_t Serialize(const char* buffer, const MasterChunk& master);
 
-    static MasterChunk Deserailize(const char* buf);
+    static MasterChunk Deserailize(char* buffer);
 
-    MasterChunk();
+    MasterChunk(std::string outputDir, size_t chunkSize);
 
-    void addDocument(docname doc, words words);
+    std::vector<std::string> GetChunkList();
 
-    size_t getBytesRequired();
+    int GetNumDocuments();
+
+    void AddDocument(docname doc, words words);
 
 private:
-    std::unordered_set<std::string> _indexChunks;
+    std::vector<std::string> _indexChunks;
+    std::string _outputDir;
     IndexChunk _currIndexChunk;
+    size_t _chunkSize;
     int _numDocuments;
-    size_t _bytesRequired;
-    size_t _totalIndexSize;
 };

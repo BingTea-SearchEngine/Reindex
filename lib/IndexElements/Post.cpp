@@ -4,16 +4,16 @@ Post::Post() {}
 
 Post::Post(docname name) : document(name) {}
 
-size_t Post::addWord(word_t word) {
+size_t Post::AddWord(word_t word) {
     _entries.push_back(word);
-    return word.getBytesRequired();
+    return word.GetBytesRequired();
 }
 
-words::iterator Post::begin() {
+words::iterator Post::Begin() {
     return _entries.begin();
 }
 
-words::iterator Post::end() {
+words::iterator Post::End() {
     return _entries.end();
 }
 

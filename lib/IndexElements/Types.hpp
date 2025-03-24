@@ -34,11 +34,10 @@ struct word_t {
         return os;
     }
 
-    size_t getBytesRequired() {
+    size_t GetBytesRequired() {
         // 1 for null terminator
         return word.size() + 1 + sizeof(offset) + sizeof(location);
     }
-
 };
 
 typedef std::vector<word_t> words;
