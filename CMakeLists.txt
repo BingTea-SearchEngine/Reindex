@@ -43,9 +43,11 @@ add_library(IndexElements STATIC
     ${LIB_DIR}/IndexElements/IndexChunk.cpp
     ${LIB_DIR}/IndexElements/PostingList.cpp
     ${LIB_DIR}/IndexElements/Post.cpp
-    ${LIB_DIR}/IndexElements/Types.cpp
+    ${LIB_DIR}/IndexElements/PostEntry.cpp
+    ${LIB_DIR}/IndexElements/WordLocation.hpp
 )
 target_include_directories(IndexElements PUBLIC ${LIB_DIR}/IndexElements)
+target_link_libraries(IndexElements PUBLIC spdlog::spdlog)
 
 add_library(DocStream STATIC ${LIB_DIR}/DocStream/DocStream.cpp)
 target_include_directories(DocStream PUBLIC ${LIB_DIR}/DocStream)

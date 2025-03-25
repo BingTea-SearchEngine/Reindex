@@ -18,7 +18,7 @@ int MasterChunk::GetNumDocuments() {
     return _numDocuments;
 }
 
-void MasterChunk::AddDocument(docname doc, words words) {
+void MasterChunk::addDocument(std::string doc, std::vector<word_t> words) {
     _numDocuments++;
     _currIndexChunk.AddDocument(doc, words);
 
@@ -31,5 +31,6 @@ void MasterChunk::AddDocument(docname doc, words words) {
         // IndexChunk::Serialize(buf, _currIndexChunk);
         _currIndexChunk = IndexChunk();
     }
-    
+    _currIndexChunk.addDocument(doc, words);
 }
+    

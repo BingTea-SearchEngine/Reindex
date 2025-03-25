@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 #include <iostream>
 
 enum class wordlocation_t {
@@ -39,6 +38,3 @@ struct word_t {
         return word.size() + 1 + sizeof(offset) + sizeof(location);
     }
 };
-
-typedef std::vector<word_t> words;
-typedef std::string docname;

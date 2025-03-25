@@ -6,19 +6,23 @@
 #include <unistd.h>
 
 #include <string>
+#include <unordered_set>
+#include <vector>
 
-#include "Types.hpp"
 #include "IndexChunk.hpp"
+#include "WordLocation.hpp"
 
 class MasterChunk {
-public:
-    static size_t Serialize(const char* buffer, const MasterChunk& master);
+   public:
+    static void Serialize(const char* buf, const MasterChunk& masterChunk);
 
     static MasterChunk Deserailize(char* buffer);
 
     MasterChunk(std::string outputDir, size_t chunkSize);
 
     std::vector<std::string> GetChunkList();
+
+    void addDocument(std::string doc, std::vector<word_t> words);
 
     int GetNumDocuments();
 

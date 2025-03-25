@@ -4,12 +4,10 @@
 #include <unordered_set>
 #include <iostream>
 
+using std::cout, std::endl;
+
 #include "PostingList.hpp"
-#include "Types.hpp"
-
-using std::cout;
-using std::endl;
-
+#include "PostEntry.hpp"
 
 class IndexChunk {
    public:
@@ -22,12 +20,12 @@ class IndexChunk {
     size_t GetBytesRequired();
 
     // Iterates through all words in the document and adds document to posting list of the word
-    void AddDocument(docname doc, words words);
+    void addDocument(std::string doc, std::vector<word_t> words);
 
    private:
-    std::unordered_set<docname> _documents;
+    std::unordered_set<std::string> _documents;
     // Need to be built at serial time
-    std::unordered_map<docname, uint32_t> _postingListOffsets;
+    std::unordered_map<std::string, uint32_t> _postingListOffsets;
     std::unordered_map<std::string, PostingList> _postingLists;
     // Bytes Required to serialize this index
     size_t _bytesRequired;
