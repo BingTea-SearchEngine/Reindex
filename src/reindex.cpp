@@ -83,6 +83,7 @@ int main(int argc, char** argv) {
         }
         master.AddDocument(document, words);
     }
+    master.PrintCurrentIndexChunk();
     master.Flush();
 
     // Open file and mmap

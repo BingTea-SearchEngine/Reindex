@@ -47,6 +47,11 @@ class Post {
          */
     void AddWord(PostEntry word);
 
+    /*
+     * @brief Prints the contents of the PostEntry
+     * */
+    void Print() const;
+
     /**
          * @brief Serializes a given Post object into a specific region of memory.
          * 

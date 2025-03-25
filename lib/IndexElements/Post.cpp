@@ -18,6 +18,16 @@ void Post::AddWord(PostEntry word) {
     entries.push_back(word);
 }
 
+void Post::Print() const {
+    cout << "\tPost{ " << document_name << " }: " << entries.size() << " entries" << endl;
+    cout << "\t\t";
+    for (const PostEntry& entry : entries) {
+        entry.Print();
+        cout << " | ";
+    }
+    cout << endl;
+}
+
 void Post::Serialize(char* base_region, size_t& offset, const Post& post) {
     spdlog::info("Trying to serialize a Post for the document \"{}\"",
                  post.document_name);

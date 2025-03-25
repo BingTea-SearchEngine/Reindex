@@ -55,6 +55,11 @@ class MasterChunk {
      * */
     void Flush();
 
+    /*
+     * @brief Prints the current index chunk
+     * */
+    void PrintCurrentIndexChunk() const;
+
     /**
      * @brief Serializes a given MasterChunk object into a specific region of memory.
      *

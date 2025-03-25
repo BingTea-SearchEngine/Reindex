@@ -44,7 +44,7 @@ add_library(IndexElements STATIC
     ${LIB_DIR}/IndexElements/PostingList.cpp
     ${LIB_DIR}/IndexElements/Post.cpp
     ${LIB_DIR}/IndexElements/PostEntry.cpp
-    ${LIB_DIR}/IndexElements/WordLocation.hpp
+    ${LIB_DIR}/IndexElements/WordLocation.cpp
     ${LIB_DIR}/IndexElements/Util.cpp
 )
 target_include_directories(IndexElements PUBLIC ${LIB_DIR}/IndexElements)

@@ -1,3 +1,4 @@
+#include "Post.hpp"
 #include "spdlog/spdlog.h"
 
 #include "PostingList.hpp"
@@ -29,6 +30,14 @@ size_t PostingList::AddWord(std::string doc, PostEntry word) {
     posts.back().AddWord(word);
     bytesRequired+=word.GetBytesRequired();
     return bytesRequired;
+}
+
+void PostingList::Print() const {
+    cout << "PostingList{ " << word << " }: ";
+    cout << posts.size() << " document(s)" << endl;
+    for (const Post& post : posts) {
+        post.Print();
+    }
 }
 
 std::vector<Post> PostingList::GetPosts() {

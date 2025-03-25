@@ -77,14 +77,20 @@ void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words) {
     // Check if index will become too big
     // If too big write to disk and reinitialize _currIndexChunk
     if (_currIndexChunk.GetBytesRequired() > _chunkSize) {
-        _serializeCurrIndexChunk();
-        _currIndexChunk = IndexChunk();
+        Flush();
     }
     _currIndexChunk.AddDocument(doc, words);
 }
 
 void MasterChunk::Flush() {
     _serializeCurrIndexChunk();
+    _currIndexChunk = IndexChunk();
+}
+
+void MasterChunk::PrintCurrentIndexChunk() const {
+    cout << "---------- Index Chunk " << _indexChunks.size() << " ----------" << endl;
+    _currIndexChunk.Print();
+    cout << "---------- Index Chunk " << _indexChunks.size() << " ----------" << endl;
 }
     
 void MasterChunk::_serializeCurrIndexChunk() {

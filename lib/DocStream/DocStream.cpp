@@ -13,7 +13,7 @@ bool checkTagExists(std::string line, std::string tag) {
 DocStream::DocStream(std::string dirPath) : _dirPath(dirPath) {
     for (const auto& entry : std::filesystem::directory_iterator(dirPath)) {
         std::string filename = entry.path().filename();
-        if (filename == "logs") {
+        if (filename == "logs.txt") {
             continue;
         }
         _documents.push(filename);
@@ -38,7 +38,7 @@ std::pair<std::string, std::vector<word_t>> DocStream::nextFile() {
     }
 
     // Get first line that contains URL
-    std::regex url_regex(R"(URL:\s*(\S+)\s+B)");
+    std::regex url_regex(R"(URL:\s*(\S+)\s+D)");
     std::smatch match;
     std::string url;
     if (std::regex_search(line, match, url_regex)) {

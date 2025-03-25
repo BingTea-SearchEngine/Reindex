@@ -22,6 +22,11 @@ class IndexChunk {
     // Iterates through all words in the document and adds document to posting list of the word
     void AddDocument(std::string doc, std::vector<word_t> words);
 
+    /*
+     * @brief Prints the contents of the IndexChunk
+     * */
+    void Print() const;
+
    private:
     std::unordered_set<std::string> _documents;
     // Need to be built at serial time

@@ -7,8 +7,21 @@ size_t IndexChunk::GetBytesRequired() {
     return _bytesRequired;
 }
 
+void IndexChunk::Print() const {
+    cout << _documents.size() << " Documents: ";
+    for (std::string doc : _documents) {
+        cout << doc << " ";
+    }
+    cout << endl;
+    cout << _postingLists.size() << " Words" << endl;
+    for (auto [word, postingList] : _postingLists) {
+        postingList.Print();
+    }
+}
+
 void IndexChunk::AddDocument(std::string doc, std::vector<word_t> words) {
     // Add to set of documents
+    _documents.insert(doc);
 
     // Iterate over words
     for (word_t& word : words) {

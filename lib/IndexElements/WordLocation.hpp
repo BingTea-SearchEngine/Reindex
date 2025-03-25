@@ -9,6 +9,8 @@ enum class wordlocation_t {
     body = 2,
 };
 
+std::ostream& operator<<(std::ostream& os, wordlocation_t loc);
+
 struct word_t {
     std::string word;
     uint32_t offset;

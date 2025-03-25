@@ -56,6 +56,11 @@ class PostingList {
          */
     std::vector<Post> GetPosts();
 
+    /*
+     * @brief Prints the contents of the PostingList
+     * */
+    void Print() const;
+
     /**
          * @brief Serializes a given PostingList object into a specific region of memory.
          *

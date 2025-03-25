@@ -38,6 +38,10 @@ size_t PostEntry::GetBytesRequired() {
     return sizeof(delta) + sizeof(location_found);
 }
 
+void PostEntry::Print() const {
+    cout << delta << " " << location_found;
+}
+
 void PostEntry::Serialize(char* base_region, size_t& offset,
                           const PostEntry& word_occurrence) {
     spdlog::info("Trying to serialize a PostEntry");

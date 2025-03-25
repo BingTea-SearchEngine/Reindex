@@ -5,6 +5,8 @@
 
 #include "WordLocation.hpp"
 
+using std::cout, std::endl;
+
 /** 
  * @class PostEntry
  * @brief Represents a single occurrence of a word in the corpus.
@@ -52,6 +54,11 @@ class PostEntry {
         * @return A size_t of the bytes required to serialize this entry
         */
     size_t GetBytesRequired();
+
+    /*
+     * @brief Prints the contents of the PostEntry
+     * */
+    void Print() const;
 
     /**
          * @brief Serializes a given PostEntry object into a specific region of memory.
