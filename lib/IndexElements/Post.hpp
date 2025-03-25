@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "PostEntry.hpp"
 
 /**
@@ -10,43 +12,42 @@
  * name and a collection of word occurrences (PostEntry objects). It provides functionality for adding words,
  * getting word entries, and serializing or deserializing the post's data.
  */
-class Post
-{
-    public:
-        /**
+class Post {
+   public:
+    /**
          * @brief Default constructor for a Post.
          */
-        Post();
+    Post();
 
-        /**
+    /**
          * @brief Constructs a Post with a specified name.
          * 
          * @param name The name of the document.
          */
-        Post(std::string name);
+    Post(std::string name);
 
-        /**
+    /**
          * @brief Returns the name of this document that this Post represents.
          * 
          * @return A std::string of the document's name.
          */
-        std::string getDocumentName();
+    std::string getDocumentName();
 
-        /**
+    /**
          * @brief Returns a vector containing all word occurrences (PostEntry objects) in the post.
          * 
          * @return A vector of PostEntry objects.
          */
-        std::vector<PostEntry> getEntries();
+    std::vector<PostEntry> getEntries();
 
-        /**
+    /**
          * @brief Adds a word occurrence (PostEntry) to the post.
          * 
          * @param word The word occurrence (PostEntry) to add.
          */
-        void addWord(PostEntry word);
+    void addWord(PostEntry word);
 
-        /**
+    /**
          * @brief Serializes a given Post object into a specific region of memory.
          * 
          * This function writes the Post object's data into the memory region starting at the given
@@ -67,9 +68,9 @@ class Post
          * @post Writes the bytes of the Post object into memory at the calculated region.
          * @post Updates `offset` to the next available memory location.
          */
-        static void Serialize(char* base_region, size_t &offset, const Post& post);
+    static void Serialize(char* base_region, size_t& offset, const Post& post);
 
-        /**
+    /**
          * @brief Deserializes a Post object from a specific region of memory.
          * 
          * This function reconstructs a Post object from the bytes in the specified memory region, 
@@ -84,12 +85,12 @@ class Post
          * @pre `base_region + offset` must point to a valid serialized Post object.
          * @post A Post object is created and the offset is updated.
          */
-        static Post Deserialize(char* base_region, size_t &offset);
+    static Post Deserialize(char* base_region, size_t& offset);
 
-    private:
-        /// The name of the document.
-        std::string document_name;
+   private:
+    /// The name of the document.
+    std::string document_name;
 
-        /// A vector containing the word occurrences (PostEntry objects) in the document.
-        std::vector<PostEntry> entries;
+    /// A vector containing the word occurrences (PostEntry objects) in the document.
+    std::vector<PostEntry> entries;
 };

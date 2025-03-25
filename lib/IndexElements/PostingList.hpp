@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <vector>
 
 #include "Post.hpp"
 
@@ -11,45 +12,44 @@
  * This class is used to store a collection of posts that relate to a specific word. Each post contains information about 
  * a document and its associated word occurrences. It supports serialization and deserialization to/from memory.
  */
-class PostingList
-{
-    public:
-        /**
+class PostingList {
+   public:
+    /**
          * @brief Default constructor for a PostingList.
          *
          */
-        PostingList();
+    PostingList();
 
-        /**
+    /**
          * @brief Constructs a PostingList object for a specific word.
          *
          * @param word The word that this PostingList represents.
          */
-        PostingList(const std::string& word);
+    PostingList(const std::string& word);
 
-        /**
+    /**
          * @brief Gets the word associated with this PostingList.
          *
          * @return The word associated with this PostingList.
          */
-        std::string getWord();
+    std::string getWord();
 
-        /**
+    /**
          * @brief Adds a new word (PostEntry) to the list of posts in this PostingList.
          *
          * @param doc The document name where the word is found.
          * @param word The PostEntry object that contains the word occurrence information.
          */
-        void addWord(std::string doc, PostEntry word);
+    void addWord(std::string doc, PostEntry word);
 
-        /**
+    /**
          * @brief Retrieves the list of posts associated with this PostingList.
          *
          * @return A vector of Post objects associated with this PostingList.
          */
-        std::vector<Post> getPosts();
+    std::vector<Post> getPosts();
 
-        /**
+    /**
          * @brief Serializes a given PostingList object into a specific region of memory.
          *
          * @param base_region A pointer to the beginning of the contiguous memory region 
@@ -67,9 +67,10 @@ class PostingList
          * @post Writes the bytes of the PostingList object into memory at the calculated region.
          * @post Updates `offset` to the next available memory location.
          */
-        static void Serialize(char* base_region, size_t &offset, const PostingList& postingList);
+    static void Serialize(char* base_region, size_t& offset,
+                          const PostingList& postingList);
 
-        /**
+    /**
          * @brief Deserializes a PostingList object from a specific region of memory.
          *
          * @param base_region A pointer to the beginning of the memory region containing the object.
@@ -81,15 +82,15 @@ class PostingList
          * @pre `base_region + offset` must point to a valid serialized PostingList object.
          * @post A PostingList object is created and the offset is updated.
          */
-        static PostingList Deserialize(char* base_region, size_t &offset);
+    static PostingList Deserialize(char* base_region, size_t& offset);
 
-    private:
-        /// The word associated with this PostingList
-        std::string word;
+   private:
+    /// The word associated with this PostingList
+    std::string word;
 
-        /// A vector of Post objects associated with the word
-        std::vector<Post> posts;
+    /// A vector of Post objects associated with the word
+    std::vector<Post> posts;
 
-        /// A synchronization table for efficient access
-        std::unordered_map<uint32_t, std::tuple<size_t>> sync_table;
+    /// A synchronization table for efficient access
+    std::unordered_map<uint32_t, std::tuple<size_t>> sync_table;
 };
