@@ -28,11 +28,18 @@ class PostingList {
     PostingList(const std::string& word);
 
     /**
+        * @brief Returns the bytes required to serialize just the word and size of posts in this
+        * posting list
+        *
+        * @return size_t
+        */
+    size_t GetOverheadBytesRequired();
+    /**
          * @brief Gets the word associated with this PostingList.
          *
          * @return The word associated with this PostingList.
          */
-    std::string getWord();
+    std::string GetWord();
 
     /**
          * @brief Adds a new word (PostEntry) to the list of posts in this PostingList.
@@ -40,14 +47,14 @@ class PostingList {
          * @param doc The document name where the word is found.
          * @param word The PostEntry object that contains the word occurrence information.
          */
-    void addWord(std::string doc, PostEntry word);
+    size_t AddWord(std::string doc, PostEntry word);
 
     /**
          * @brief Retrieves the list of posts associated with this PostingList.
          *
          * @return A vector of Post objects associated with this PostingList.
          */
-    std::vector<Post> getPosts();
+    std::vector<Post> GetPosts();
 
     /**
          * @brief Serializes a given PostingList object into a specific region of memory.

@@ -20,7 +20,7 @@ class IndexChunk {
     size_t GetBytesRequired();
 
     // Iterates through all words in the document and adds document to posting list of the word
-    void addDocument(std::string doc, std::vector<word_t> words);
+    void AddDocument(std::string doc, std::vector<word_t> words);
 
    private:
     std::unordered_set<std::string> _documents;

@@ -3,16 +3,10 @@
 #include <spdlog/spdlog.h>
 #include <argparse/argparse.hpp>
 
-#include <fcntl.h>  // For O_CREAT, O_RDWR
-#include <sys/mman.h>  // For shm_open, mmap, PROT_READ, PROT_WRITE, MAP_SHARED, munmap
-#include <sys/stat.h>  // For mode constants
-#include <unistd.h>    // For ftruncate, close
-
 #include "DocStream.hpp"
 #include "MasterChunk.hpp"
-#include "Post.hpp"
-#include "PostingList.hpp"
 #include "WordLocation.hpp"
+#include "Util.hpp"
 
 void* create_mmap_region(int& fd, size_t size) {
     fd = open("test_posting_list", O_CREAT | O_RDWR, 0666);  // 0666 = rw
@@ -89,40 +83,22 @@ int main(int argc, char** argv) {
         }
         master.AddDocument(document, words);
     }
+    master.Flush();
 
-    // mmap and serialize Master Chunk
-    std::string filePath = outputDir + "/master_chunk";
-    size_t masterSize = 1024 * 5; // 5 KB for now
+    // Open file and mmap
+    std::string masterchunkOutputFile = outputDir + "/masterchunk";
+    int fd = -1;
+    void* base_region = create_mmap_region(fd, 4098, masterchunkOutputFile);
 
-    int fd = open(filePath.c_str(), O_CREAT | O_RDWR);
-    // Ensure file is at least masterSize
-    if (ftruncate(fd, masterSize) == -1) {
-        perror("Error extending file size");
-        close(fd);
-        return 1;
-    }
-    // Memory map 
-    char* buf = (char *)mmap(nullptr, masterSize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    if (buf == MAP_FAILED) {
-        perror("Error mmap");
-        close(fd);
-        return 1;
-    }
-    // Serailize master
-    size_t memUsed = MasterChunk::Serialize(buf, master);
-    // Flush changes to file
-    if (msync(buf, masterSize, MS_SYNC) == -1) {
-        perror("Error syncing file");
-    }
-    // Truncate file to bytes actually used
-    if (ftruncate(fd, memUsed) == -1) {
+    //Serialize master chunk
+    size_t offset = 0;
+    MasterChunk::Serialize(static_cast<char*>(base_region), offset, master);
+
+    // Un memory map and truncate file
+    munmap(base_region, 4098);
+    if (ftruncate(fd, offset) == -1) {
         perror("Error truncating file");
-    }
-    // Unmap and close file
-    if (munmap(buf, memUsed) == -1) {
-        perror("Error unmapping memory");
     }
     close(fd);
 }
-
 
