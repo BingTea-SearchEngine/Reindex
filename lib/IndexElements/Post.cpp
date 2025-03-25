@@ -6,16 +6,26 @@ Post::Post() {}
 
 Post::Post(std::string name) : document_name(name), entries() {}
 
-std::string Post::getDocumentName() {
+std::string Post::GetDocumentName() {
     return document_name;
 }
 
-std::vector<PostEntry> Post::getEntries() {
+std::vector<PostEntry> Post::GetEntries() {
     return entries;
 }
 
-void Post::addWord(PostEntry word) {
+void Post::AddWord(PostEntry word) {
     entries.push_back(word);
+}
+
+void Post::Print() const {
+    cout << "\tPost{ " << document_name << " }: " << entries.size() << " entries" << endl;
+    cout << "\t\t";
+    for (const PostEntry& entry : entries) {
+        entry.Print();
+        cout << " | ";
+    }
+    cout << endl;
 }
 
 void Post::Serialize(char* base_region, size_t& offset, const Post& post) {

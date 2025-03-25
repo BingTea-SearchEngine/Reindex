@@ -1,3 +1,4 @@
+#include "Post.hpp"
 #include "spdlog/spdlog.h"
 
 #include "PostingList.hpp"
@@ -6,23 +7,40 @@ PostingList::PostingList() {}
 
 PostingList::PostingList(const std::string& word) : word(word) {}
 
-std::string PostingList::getWord() {
+size_t PostingList::GetOverheadBytesRequired() {
+    return word.size()+1+sizeof(posts.size());
+}
+
+std::string PostingList::GetWord() {
     return word;
 }
 
-void PostingList::addWord(std::string doc, PostEntry word) {
+size_t PostingList::AddWord(std::string doc, PostEntry word) {
+    size_t bytesRequired = 0;
     if (posts.empty()) {
         posts.emplace_back(doc);
+        bytesRequired+=doc.size()+1;
     }
 
-    if (doc != posts.back().getDocumentName()) {
+    if (doc != posts.back().GetDocumentName()) {
         posts.emplace_back(doc);
+        bytesRequired+=doc.size()+1;
     }
 
-    posts.back().addWord(word);
+    posts.back().AddWord(word);
+    bytesRequired+=word.GetBytesRequired();
+    return bytesRequired;
 }
 
-std::vector<Post> PostingList::getPosts() {
+void PostingList::Print() const {
+    cout << "PostingList{ " << word << " }: ";
+    cout << posts.size() << " document(s)" << endl;
+    for (const Post& post : posts) {
+        post.Print();
+    }
+}
+
+std::vector<Post> PostingList::GetPosts() {
     return posts;
 }
 

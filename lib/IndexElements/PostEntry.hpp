@@ -5,6 +5,8 @@
 
 #include "WordLocation.hpp"
 
+using std::cout, std::endl;
+
 /** 
  * @class PostEntry
  * @brief Represents a single occurrence of a word in the corpus.
@@ -37,14 +39,26 @@ class PostEntry {
          * 
          * @return A uint32_t of this PostEntry's delta.
          */
-    uint32_t getDelta();
+    uint32_t GetDelta();
 
     /**
          * @brief Returns the location of where this word occurred.
          * 
          * @return A wordlocation_t of where this word occurred.
          */
-    wordlocation_t getLocationFound();
+    wordlocation_t GetLocationFound();
+
+    /*
+        * @brief Returns the bytes required to serialize this post entry
+        *
+        * @return A size_t of the bytes required to serialize this entry
+        */
+    size_t GetBytesRequired();
+
+    /*
+     * @brief Prints the contents of the PostEntry
+     * */
+    void Print() const;
 
     /**
          * @brief Serializes a given PostEntry object into a specific region of memory.
@@ -81,10 +95,10 @@ class PostEntry {
          */
     static PostEntry Deserialize(char* base_region, size_t& offset);
 
+   private:
     /// The relative position of this word in the index chunk.
     /// @todo Convert this to use relative deltas.
     uint32_t delta;
-   private:
 
     /// The section of the page where the word was found.
     wordlocation_t location_found;

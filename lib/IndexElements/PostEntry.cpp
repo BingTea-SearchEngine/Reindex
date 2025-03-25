@@ -26,12 +26,20 @@ std::ostream& operator<<(std::ostream& os, const PostEntry& obj) {
     return os;
 }
 
-uint32_t PostEntry::getDelta() {
+uint32_t PostEntry::GetDelta() {
     return delta;
 }
 
-wordlocation_t PostEntry::getLocationFound() {
+wordlocation_t PostEntry::GetLocationFound() {
     return location_found;
+}
+
+size_t PostEntry::GetBytesRequired() {
+    return sizeof(delta) + sizeof(location_found);
+}
+
+void PostEntry::Print() const {
+    cout << delta << " " << location_found;
 }
 
 void PostEntry::Serialize(char* base_region, size_t& offset,

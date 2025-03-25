@@ -23,7 +23,7 @@ class Post {
          * @brief Constructs a Post with a specified name.
          * 
          * @param name The name of the document.
-         */
+        */
     Post(std::string name);
 
     /**
@@ -31,21 +31,26 @@ class Post {
          * 
          * @return A std::string of the document's name.
          */
-    std::string getDocumentName();
+    std::string GetDocumentName();
 
     /**
          * @brief Returns a vector containing all word occurrences (PostEntry objects) in the post.
          * 
          * @return A vector of PostEntry objects.
          */
-    std::vector<PostEntry> getEntries();
+    std::vector<PostEntry> GetEntries();
 
     /**
          * @brief Adds a word occurrence (PostEntry) to the post.
          * 
          * @param word The word occurrence (PostEntry) to add.
          */
-    void addWord(PostEntry word);
+    void AddWord(PostEntry word);
+
+    /*
+     * @brief Prints the contents of the PostEntry
+     * */
+    void Print() const;
 
     /**
          * @brief Serializes a given Post object into a specific region of memory.

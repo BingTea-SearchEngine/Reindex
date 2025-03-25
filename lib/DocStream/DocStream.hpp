@@ -20,7 +20,9 @@ bool checkTagExists(std::string line, std::string tag);
 
 struct BatchNumCompare {
     bool operator()(std::string a, std::string b) {
-        return a[0] > b[0];  // Min-heap (smallest element at top)
+        int anum = std::stoi(a.substr(0, a.find('.')));
+        int bnum = std::stoi(b.substr(0, b.find('.')));
+        return anum > bnum;  // Min-heap (smallest element at top)
     }
 };
 
