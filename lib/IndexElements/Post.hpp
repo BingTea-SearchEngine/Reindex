@@ -96,6 +96,7 @@ class Post {
     /// The name of the document.
     std::string document_name;
 
-    /// A vector containing the word occurrences (PostEntry objects) in the document.
+    /// A vector containing the word occurrences (PostEntry objects) in the document that
+    /// pertain to the specifc word this PostingList represents.
     std::vector<PostEntry> entries;
 };
