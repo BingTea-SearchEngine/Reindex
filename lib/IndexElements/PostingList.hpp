@@ -34,6 +34,7 @@ class PostingList {
         * @return size_t
         */
     size_t GetOverheadBytesRequired();
+
     /**
          * @brief Gets the word associated with this PostingList.
          *

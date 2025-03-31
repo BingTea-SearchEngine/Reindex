@@ -12,6 +12,7 @@
 
 #include "IndexChunk.hpp"
 #include "WordLocation.hpp"
+#include "Util.hpp"
 
 /**
  * @class MasterChunk
