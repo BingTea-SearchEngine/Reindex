@@ -11,15 +11,45 @@
  */
 class ISR {
    public:
-    virtual PostEntry Next();
+    /**
+         * @brief Returns the next PostEntry that matches the occurrence of
+         * this term that this ISR is looking for.
+         * 
+         * @return A PostEntry object.
+         */
+    virtual PostEntry Next() = 0;
 
-    virtual PostEntry NextDocument();
+    /**
+         * @brief Returns the next PostEntry that belongs in a brand new document
+         *        that matches the occurrence of this term that this ISR is looking for.
+         * 
+         * @return A PostEntry object.
+         */
+    virtual PostEntry NextDocument() = 0;
 
-    virtual PostEntry Seek(size_t target);
+    /**
+         * @brief Returns the first PostEntry that matches the occurrence of
+         *        this term that this ISR is looking for located at location >= target.
+         * 
+         * @param target The location the ISR will start at to find the first
+         *               matching PostEntry.
+         * 
+         * @return A PostEntry object.
+         * @todo What if can't find anything?
+         */
+    virtual PostEntry Seek(size_t target) = 0;
 
-    virtual size_t GetStartLocation();
+    /**
+         * @brief Returns the starting location of whatever the ISR is currently on.
+         * 
+         * @return The starting location of whatever the ISR is currently on.
+         */
+    virtual size_t GetStartLocation() = 0;
 
-    virtual size_t GetEndLocation();
-
-   private:
+    /**
+         * @brief Returns the ending location of whatever the ISR is currently on.
+         * 
+         * @return The ending location of whatever the ISR is currently on.
+         */
+    virtual size_t GetEndLocation() = 0;
 };
