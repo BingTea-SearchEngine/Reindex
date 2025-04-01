@@ -12,10 +12,17 @@
 class ISR {
    public:
     /**
+         * @brief Returns the current PostEntry this ISR is pointing at.
+         * 
+         * @return A pointer to the current PostEntry or nullptr if there is none.
+         */
+    PostEntry* GetCurrentPost();
+
+    /**
          * @brief Returns the next PostEntry that matches the occurrence of
          * this term that this ISR is looking for and advances the ISR forward.
          * 
-         * @return A pointer to a PostEntry object.
+         * @return A pointer to a PostEntry object or nullptr if there is none.
          */
     virtual PostEntry* Next() = 0;
 
@@ -36,8 +43,7 @@ class ISR {
          * @param target The location the ISR will start at to find the first
          *               matching PostEntry.
          * 
-         * @return A pointer to a PostEntry object.
-         * @todo What if can't find anything?
+         * @return A pointer to a PostEntry object or nullptr if there is none.
          */
     virtual PostEntry* Seek(size_t target) = 0;
 
