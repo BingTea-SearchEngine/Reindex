@@ -11,6 +11,16 @@ size_t ISROr::GetEndLocation() {
     return this->nearestEndLocation;
 }
 
+PostEntry* ISROr::GetCurrentPostEntry() {
+    // extract whatever the earliest child ISR is pointing at
+    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+}
+
+std::string ISROr::GetDocumentName() {
+    // extract the name of the document that the earliest child ISR is pointing at
+    return (this->childISRs)[this->nearestTerm]->GetDocumentName();
+}
+
 // helper function to update the internal marker variables
 // when any of the ISRs get moved around
 void ISROr::UpdateMarkers() {
