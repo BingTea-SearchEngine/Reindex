@@ -31,7 +31,7 @@ class ISR {
          *        that matches the occurrence of this term that this ISR is looking for
          *        and advances the ISR forward.
          * 
-         * @return A pointer to a PostEntry object.
+         * @return A pointer to a PostEntry object or nullptr if there is none.
          */
     virtual PostEntry* NextDocument() = 0;
 

@@ -69,7 +69,7 @@ PostEntry* ISRWord::NextDocument() {
             this->currentPostIdx = outerPost;
             this->currentPostEntryIdx = innerPostEntry;
 
-            auto& postEntry = post.GetEntries()[0]; // just need to grab the first one // TODO: inefficient but negligible?
+            auto& postEntry = post.GetEntries()[0]; // just need to grab the first one
             this->currentPostEntry = &postEntry;
             this->absoluteLocation = postEntry.GetDelta();
             return this->currentPostEntry;
