@@ -69,7 +69,7 @@ class ISROr : public ISR {
     /// the children ISRs that this ISR OR's on
     std::vector<ISR*> childISRs;
 
-    /// among the children ISRs, which has the smallest absolute location?
+    /// among the children ISRs, which has the smallest absolute location? is it child 0, child 1, etc.?
     size_t nearestTerm;
 
     /// at the current state of the ISR, what is the absolute location of the earliest sub-ISR?
@@ -77,4 +77,7 @@ class ISROr : public ISR {
 
     /// at the current state of the ISR, what is the absolute location of the latest sub-ISR?
     size_t nearestEndLocation;
+
+    /// internal helper function
+    void UpdateMarkers();
 };

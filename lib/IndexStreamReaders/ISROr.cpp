@@ -11,34 +11,47 @@ size_t ISROr::GetEndLocation() {
     return this->nearestEndLocation;
 }
 
+// helper function to update the internal marker variables
+// when any of the ISRs get moved around
+void ISROr::UpdateMarkers() {
+    size_t whichChild;
+    size_t nearestStart = SIZE_MAX;
+    size_t nearestEnd = 0;
+
+    // figure out who is now the newest earliest occurrence and other variables
+    for (int i = 0; i < this->childISRs.size(); ++i) {
+        auto& child = this->childISRs[i];
+
+        if (child->GetStartLocation() < nearestStart) {
+            nearestStart = child->GetStartLocation();
+            whichChild = i;
+        }
+
+        if (child->GetEndLocation() > nearestEnd) {
+            nearestEnd = child->GetEndLocation();
+        }
+    }
+
+    // whichChild is now the value of whatever child is at the earliest location
+    this->nearestTerm = whichChild;
+    this->nearestStartLocation = nearestStart;
+    this->nearestEndLocation = nearestEnd;
+}
+
 PostEntry* ISROr::Next() {
     // check whether or not this ISROr
     // has ever been used before
     if (nearestStartLocation == -1) {
-        size_t whichChild;
-        size_t nearestStart = SIZE_MAX;
-        size_t nearestEnd = 0;
-
         // need to do a Next() on all the child ISRs to initialize them
-        for (int i = 0; i < this->childISRs.size(); ++i) {
-            auto& child = this->childISRs[i];
-            child->Next();
-
-            if (child->GetStartLocation() < nearestStart) {
-                nearestStart = child->GetStartLocation();
-                whichChild = i;
-            }
-
-            if (child->GetEndLocation() > nearestEnd) {
-                nearestEnd = child->GetEndLocation();
+        for (auto& child : childISRs) {
+            if (child->Next() == nullptr) {
+                return nullptr;
             }
         }
 
-        // whichChild is now the value of whatever child is at the earliest location
-        this->nearestTerm = whichChild;
-        this->nearestStartLocation = nearestStart;
-        this->nearestEndLocation = nearestEnd;
-        return (this->childISRs)[whichChild]->GetCurrentPost();
+        this->UpdateMarkers();
+
+        return (this->childISRs)[this->nearestTerm]->GetCurrentPost();
     } else {
         // this ISROr has been used before
         // so its child ISRs are guaranteed
@@ -50,30 +63,39 @@ PostEntry* ISROr::Next() {
         // the new nearest/earliest match.
 
         // this->nearestTerm points to the childISR that is the earliest
-        this->childISRs[this->nearestTerm]->Next();
-
-        size_t whichChild;
-        size_t nearestStart = SIZE_MAX;
-        size_t nearestEnd = 0;
-
-        // figure out who is now the newest earliest occurrence and other variables
-        for (int i = 0; i < this->childISRs.size(); ++i) {
-            auto& child = this->childISRs[i];
-
-            if (child->GetStartLocation() < nearestStart) {
-                nearestStart = child->GetStartLocation();
-                whichChild = i;
-            }
-
-            if (child->GetEndLocation() > nearestEnd) {
-                nearestEnd = child->GetEndLocation();
-            }
+        if (this->childISRs[this->nearestTerm]->Next() == nullptr) {
+            return nullptr;
         }
-
-        // whichChild is now the value of whatever child is at the earliest location
-        this->nearestTerm = whichChild;
-        this->nearestStartLocation = nearestStart;
-        this->nearestEndLocation = nearestEnd;
-        return (this->childISRs)[whichChild]->GetCurrentPost();
+        this->UpdateMarkers();
+        return (this->childISRs)[this->nearestTerm]->GetCurrentPost();
     }
+}
+
+PostEntry* ISROr::NextDocument() {
+    // Position all the ISRs to the first occurrence
+    // immediately after the current document.
+    for (auto& child : this->childISRs) {
+        // need to double check logic on this
+        // I'm not actually sure if this works?
+        // can't think of a case that disproves
+        // but can't 100% say this recursion is correct
+        if (child->NextDocument() == nullptr) {
+            return nullptr;
+        }
+    }
+    this->UpdateMarkers();
+    return (this->childISRs)[this->nearestTerm]->GetCurrentPost();
+}
+
+PostEntry* ISROr::Seek(size_t target) {
+    // Seek all the ISRs to the first occurrence beginning at
+    // the target location. Return null if there is no match.
+    // The document is the document containing the nearest term.
+    for (auto& child : this->childISRs) {
+        if (child->Seek(target) == nullptr) {
+            return nullptr;
+        }
+    }
+    this->UpdateMarkers();
+    return (this->childISRs)[this->nearestTerm]->GetCurrentPost();
 }
