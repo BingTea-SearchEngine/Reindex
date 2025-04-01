@@ -51,17 +51,14 @@ void ISROr::UpdateMarkers() {
 PostEntry* ISROr::Next() {
     // check whether or not this ISROr
     // has ever been used before
-    if (nearestStartLocation == -1) {
+    if (this->nearestStartLocation == -1) {
         // need to do a Next() on all the child ISRs to initialize them
         for (auto& child : childISRs) {
-            if (child->Next() == nullptr) {
+            if (child->Next() == nullptr) { // TODO: this is wrong logic! Just because one term could not be found, does not
+                                            // mean we should invalidate the whole OR query
                 return nullptr;
             }
         }
-
-        this->UpdateMarkers();
-
-        return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
     } else {
         // this ISROr has been used before
         // so its child ISRs are guaranteed
@@ -76,9 +73,10 @@ PostEntry* ISROr::Next() {
         if (this->childISRs[this->nearestTerm]->Next() == nullptr) {
             return nullptr;
         }
-        this->UpdateMarkers();
-        return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
     }
+
+    this->UpdateMarkers();
+    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
 
 PostEntry* ISROr::NextDocument() {

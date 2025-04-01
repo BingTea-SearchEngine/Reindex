@@ -5,20 +5,20 @@
 #include "ISR.hpp"
 
 /**
- * @class ISROr
- * @brief An ISR class that uses the boolean OR operation on its children.
+ * @class ISRAnd
+ * @brief An ISR class that uses the boolean AND operation on its children.
  *
- * This ISR class searches for *any* instance of its children terms in the
- * inverted word index.
+ * This ISR class searches for documents where *all* of the children ISRs occur
+ * within that document.
  */
-class ISROr : public ISR {
+class ISRAnd : public ISR {
    public:
     /**
-     * @brief Constructs an ISROr for a group of child ISRs.
+     * @brief Constructs an ISRAnd for a group of child ISRs.
      *
      * @param children A vector of the children ISRs.
      */
-    ISROr(std::vector<ISR*> children);
+    ISRAnd(std::vector<ISR*> children);
 
     /**
      * @brief Returns the absolute location of the earliest occurrence
@@ -86,6 +86,9 @@ class ISROr : public ISR {
     /// among the children ISRs, which has the smallest absolute location? is it child 0, child 1, etc.?
     size_t nearestTerm;
 
+    /// among the children ISRs, which has the largest absolute location? is it child 0, child 1, etc.?
+    size_t farthestTerm;
+
     /// at the current state of the ISR, what is the absolute location of the earliest sub-ISR?
     size_t nearestStartLocation;
 
@@ -94,4 +97,10 @@ class ISROr : public ISR {
 
     /// internal helper function
     void UpdateMarkers();
+
+    /// internal helper function
+    bool ChildrenOnSameDocument();
+
+    /// internal helper function
+    bool CatchUpStragglerISRs();
 };
