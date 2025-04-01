@@ -13,62 +13,78 @@
 class ISRWord : public ISR {
    public:
     /**
-         * @brief Constructs an ISRWord for a particular word.
-         *
-         * @param pL A pointer to a posting list for a particular word.
-         */
+      * @brief Constructs an ISRWord for a particular word.
+      *
+      * @param pL A pointer to a posting list for a particular word.
+      */
     ISRWord(PostingList* pL);
-    
+
     /**
-         * @brief Returns the number of documents that this term appears in
-         *        (ie the number of Posts).
-         * 
-         * @return size_t
-         */
+      * @brief Returns the absolute location of the earliest occurrence
+      *        among the child ISRs at this moment.
+      * 
+      * @return size_t
+      */
+    virtual size_t GetStartLocation() override;
+
+    /**
+      * @brief Returns the absolute location of the latest occurrence
+      *        among the child ISRs at this moment.
+      * 
+      * @return size_t
+      */
+    virtual size_t GetEndLocation() override;
+
+    /**
+      * @brief Returns the current PostEntry this ISR is pointing at.
+      * 
+      * @return A pointer to the current PostEntry or nullptr if there is none.
+      */
+    virtual PostEntry* GetCurrentPostEntry() override;
+
+    /**
+      * @brief Returns the number of documents that this term appears in
+      *        (ie the number of Posts).
+      * 
+      * @return size_t
+      */
     size_t GetDocumentCount();
 
     /**
-         * @brief Returns the number of occurrences that this term has
-         *        (ie the number of PostEntries).
-         * 
-         * @return size_t
-         */
+      * @brief Returns the number of occurrences that this term has
+      *        (ie the number of PostEntries).
+      * 
+      * @return size_t
+      */
     size_t GetNumberOfOccurrences();
 
     /**
-         * @brief Returns the current PostEntry this ISR is pointing at.
-         * 
-         * @return A pointer to the current PostEntry or nullptr if there is none.
-         */
-    PostEntry* GetCurrentPost();
-
-    /**
-         * @brief Returns the next PostEntry that matches the occurrence of
-         * this word that this ISR is looking for and advances the ISR forward.
-         * 
-         * @return A pointer to a PostEntry object or nullptr if there is none.
-         */
+      * @brief Returns the next PostEntry that matches the occurrence of
+      * this word that this ISR is looking for and advances the ISR forward.
+      * 
+      * @return A pointer to a PostEntry object or nullptr if there is none.
+      */
     virtual PostEntry* Next() override;
 
     /**
-         * @brief Returns the next PostEntry that belongs in a brand new document
-         *        that matches the occurrence of this term that this ISR is looking for
-         *        and advances the ISR forward.
-         * 
-         * @return A pointer to a PostEntry object or nullptr if there is none.
-         */
+      * @brief Returns the next PostEntry that belongs in a brand new document
+      *        that matches the occurrence of this term that this ISR is looking for
+      *        and advances the ISR forward.
+      * 
+      * @return A pointer to a PostEntry object or nullptr if there is none.
+      */
     virtual PostEntry* NextDocument() override;
 
     /**
-         * @brief Returns the first PostEntry that matches the occurrence of
-         *        this term that this ISR is looking for located at location >= target
-         *        and advances the ISR forward.
-         * 
-         * @param target The location the ISR will start at to find the first
-         *               matching PostEntry.
-         * 
-         * @return A pointer to a PostEntry object or nullptr if there is none.
-         */
+      * @brief Returns the first PostEntry that matches the occurrence of
+      *        this term that this ISR is looking for located at location >= target
+      *        and advances the ISR forward.
+      * 
+      * @param target The location the ISR will start at to find the first
+      *               matching PostEntry.
+      * 
+      * @return A pointer to a PostEntry object or nullptr if there is none.
+      */
     virtual PostEntry* Seek(size_t target) override;
 
    private:

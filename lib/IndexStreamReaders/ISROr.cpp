@@ -51,7 +51,7 @@ PostEntry* ISROr::Next() {
 
         this->UpdateMarkers();
 
-        return (this->childISRs)[this->nearestTerm]->GetCurrentPost();
+        return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
     } else {
         // this ISROr has been used before
         // so its child ISRs are guaranteed
@@ -67,7 +67,7 @@ PostEntry* ISROr::Next() {
             return nullptr;
         }
         this->UpdateMarkers();
-        return (this->childISRs)[this->nearestTerm]->GetCurrentPost();
+        return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
     }
 }
 
@@ -84,7 +84,7 @@ PostEntry* ISROr::NextDocument() {
         }
     }
     this->UpdateMarkers();
-    return (this->childISRs)[this->nearestTerm]->GetCurrentPost();
+    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
 
 PostEntry* ISROr::Seek(size_t target) {
@@ -97,5 +97,5 @@ PostEntry* ISROr::Seek(size_t target) {
         }
     }
     this->UpdateMarkers();
-    return (this->childISRs)[this->nearestTerm]->GetCurrentPost();
+    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
