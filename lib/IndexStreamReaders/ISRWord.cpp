@@ -2,7 +2,7 @@
 
 ISRWord::ISRWord(PostingList* pL) : postingList(pL), currentPostIdx(-1),
                                     currentPostEntry(nullptr), currentPostEntryIdx(-1),
-                                    absoluteLocation(-1) {}
+                                    absoluteLocation(-1), documentName() {}
 
 size_t ISRWord::GetStartLocation() {
     return this->absoluteLocation;
@@ -30,6 +30,10 @@ PostEntry* ISRWord::GetCurrentPostEntry() {
     return currentPostEntry;
 }
 
+std::string ISRWord::GetDocumentName() {
+    return documentName;
+}
+
 PostEntry* ISRWord::Next() {
     // TODO: inefficient because going through one by one
     // one at a time -- is there a fix? (probably)
@@ -38,12 +42,15 @@ PostEntry* ISRWord::Next() {
     size_t innerPostEntry = 0;
 
     for (auto& post : this->postingList->GetPosts()) {
+        std::string currDocumentName = post.GetDocumentName();
+
         for (auto& postEntry : post.GetEntries()) {
             if (innerPostEntry > this->currentPostEntryIdx) {
                 this->currentPostIdx = outerPost;
                 this->currentPostEntryIdx = innerPostEntry;
                 this->currentPostEntry = &postEntry;
                 this->absoluteLocation = postEntry.GetDelta();
+                this->documentName = currDocumentName;
                 return this->currentPostEntry;
             }
 
@@ -66,6 +73,8 @@ PostEntry* ISRWord::NextDocument() {
     size_t innerPostEntry = 0;
 
     for (auto& post : this->postingList->GetPosts()) {
+        std::string currDocumentName = post.GetDocumentName();
+
         if (this->currentPostIdx >= outerPost) {
             // this post is not the immediate next of our current one
             outerPost++;
@@ -80,6 +89,7 @@ PostEntry* ISRWord::NextDocument() {
             auto& postEntry = post.GetEntries()[0]; // just need to grab the first one
             this->currentPostEntry = &postEntry;
             this->absoluteLocation = postEntry.GetDelta();
+            this->documentName = currDocumentName;
             return this->currentPostEntry;
         }
     }
@@ -94,12 +104,15 @@ PostEntry* ISRWord::Seek(size_t target) {
     size_t innerPostEntry = 0;
 
     for (auto& post : this->postingList->GetPosts()) {
+        std::string currDocumentName = post.GetDocumentName();
+
         for (auto& postEntry : post.GetEntries()) {
             if (postEntry.GetDelta() >= target) {
                 this->currentPostIdx = outerPost;
                 this->currentPostEntryIdx = innerPostEntry;
                 this->currentPostEntry = &postEntry;
                 this->absoluteLocation = postEntry.GetDelta();
+                this->documentName = currDocumentName;
                 return this->currentPostEntry;
             }
 

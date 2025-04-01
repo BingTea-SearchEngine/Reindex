@@ -33,6 +33,13 @@ class ISR {
     virtual PostEntry* GetCurrentPostEntry() = 0;
 
     /**
+      * @brief Returns the document name this ISR is pointing at.
+      * 
+      * @return The name of the document this ISR is currently on.
+      */
+    virtual std::string GetDocumentName() = 0;
+
+    /**
       * @brief Returns the next PostEntry that matches the occurrence of
       * this term that this ISR is looking for and advances the ISR forward.
       * 

@@ -43,6 +43,13 @@ class ISRWord : public ISR {
     virtual PostEntry* GetCurrentPostEntry() override;
 
     /**
+      * @brief Returns the document name this ISR is pointing at.
+      * 
+      * @return The name of the document this ISR is currently on.
+      */
+    virtual std::string GetDocumentName() override;
+
+    /**
       * @brief Returns the number of documents that this term appears in
       *        (ie the number of Posts).
       * 
@@ -103,4 +110,7 @@ class ISRWord : public ISR {
     /// The absolute location of whatever this ISR is pointing at, relative
     /// to the start of this index chunk.
     size_t absoluteLocation;
+
+    /// The name of the document this ISR is currently pointing at.
+    std::string documentName;
 };
