@@ -4,6 +4,14 @@ ISRWord::ISRWord(PostingList* pL) : postingList(pL), currentPostIdx(-1),
                                     currentPostEntry(nullptr), currentPostEntryIdx(-1),
                                     absoluteLocation(-1) {}
 
+size_t ISRWord::GetStartLocation() {
+    return this->absoluteLocation;
+}
+
+size_t ISRWord::GetEndLocation() {
+    return this->absoluteLocation;
+}
+
 size_t ISRWord::GetDocumentCount() {
     return postingList->GetPosts().size();
 }
@@ -18,7 +26,7 @@ size_t ISRWord::GetNumberOfOccurrences() {
     return occurrences;
 }
 
-PostEntry* ISRWord::GetCurrentPost() {
+PostEntry* ISRWord::GetCurrentPostEntry() {
     return currentPostEntry;
 }
 

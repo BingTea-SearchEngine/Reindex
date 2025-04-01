@@ -12,52 +12,52 @@
 class ISR {
    public:
     /**
-         * @brief Returns the current PostEntry this ISR is pointing at.
-         * 
-         * @return A pointer to the current PostEntry or nullptr if there is none.
-         */
-    PostEntry* GetCurrentPost();
-
-    /**
-         * @brief Returns the next PostEntry that matches the occurrence of
-         * this term that this ISR is looking for and advances the ISR forward.
-         * 
-         * @return A pointer to a PostEntry object or nullptr if there is none.
-         */
-    virtual PostEntry* Next() = 0;
-
-    /**
-         * @brief Returns the next PostEntry that belongs in a brand new document
-         *        that matches the occurrence of this term that this ISR is looking for
-         *        and advances the ISR forward.
-         * 
-         * @return A pointer to a PostEntry object or nullptr if there is none.
-         */
-    virtual PostEntry* NextDocument() = 0;
-
-    /**
-         * @brief Returns the first PostEntry that matches the occurrence of
-         *        this term that this ISR is looking for located at location >= target
-         *        and advances the ISR forward.
-         * 
-         * @param target The location the ISR will start at to find the first
-         *               matching PostEntry.
-         * 
-         * @return A pointer to a PostEntry object or nullptr if there is none.
-         */
-    virtual PostEntry* Seek(size_t target) = 0;
-
-    /**
-         * @brief Returns the starting location of whatever the ISR is currently on.
-         * 
-         * @return The starting location of whatever the ISR is currently on.
-         */
+      * @brief Returns the starting location of whatever the ISR is currently on.
+      * 
+      * @return The starting location of whatever the ISR is currently on.
+      */
     virtual size_t GetStartLocation() = 0;
 
     /**
-         * @brief Returns the ending location of whatever the ISR is currently on.
-         * 
-         * @return The ending location of whatever the ISR is currently on.
-         */
+      * @brief Returns the ending location of whatever the ISR is currently on.
+      * 
+      * @return The ending location of whatever the ISR is currently on.
+      */
     virtual size_t GetEndLocation() = 0;
+
+    /**
+      * @brief Returns the current PostEntry this ISR is pointing at.
+      * 
+      * @return A pointer to the current PostEntry or nullptr if there is none.
+      */
+    virtual PostEntry* GetCurrentPostEntry() = 0;
+
+    /**
+      * @brief Returns the next PostEntry that matches the occurrence of
+      * this term that this ISR is looking for and advances the ISR forward.
+      * 
+      * @return A pointer to a PostEntry object or nullptr if there is none.
+      */
+    virtual PostEntry* Next() = 0;
+
+    /**
+      * @brief Returns the next PostEntry that belongs in a brand new document
+      *        that matches the occurrence of this term that this ISR is looking for
+      *        and advances the ISR forward.
+      * 
+      * @return A pointer to a PostEntry object or nullptr if there is none.
+      */
+    virtual PostEntry* NextDocument() = 0;
+
+    /**
+      * @brief Returns the first PostEntry that matches the occurrence of
+      *        this term that this ISR is looking for located at location >= target
+      *        and advances the ISR forward.
+      * 
+      * @param target The location the ISR will start at to find the first
+      *               matching PostEntry.
+      * 
+      * @return A pointer to a PostEntry object or nullptr if there is none.
+      */
+    virtual PostEntry* Seek(size_t target) = 0;
 };
