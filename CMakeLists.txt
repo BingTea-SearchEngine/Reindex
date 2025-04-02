@@ -56,6 +56,15 @@ target_include_directories(DocStream PUBLIC ${LIB_DIR}/DocStream)
 target_link_libraries(DocStream PUBLIC IndexElements)
 
 
+add_library(IndexStreamReaders STATIC 
+    ${LIB_DIR}/IndexStreamReaders/ISRAnd.cpp
+    ${LIB_DIR}/IndexStreamReaders/ISROr.cpp
+    ${LIB_DIR}/IndexStreamReaders/ISRPhrase.cpp
+    ${LIB_DIR}/IndexStreamReaders/ISRWord.cpp
+)
+target_include_directories(IndexStreamReaders PUBLIC ${LIB_DIR}/IndexStreamReaders)
+target_link_libraries(IndexStreamReaders PUBLIC IndexElements)
+
 add_executable(${THIS} src/reindex.cpp)
 target_link_libraries(${THIS} PUBLIC spdlog::spdlog argparse DocStream IndexElements)
 target_include_directories(${THIS} PRIVATE ${LIB_DIR}/DocStream ${LIB_DIR}/IndexElements)
