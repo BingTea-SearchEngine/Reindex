@@ -343,3 +343,48 @@ TEST_F(ISRTest, Word_SimpleSeekAndNext) {
     EXPECT_EQ(ISR_word_the->Next(), std::nullopt);
     EXPECT_EQ(ISR_word_the->GetCurrentPostEntry(), std::nullopt);
 }
+
+TEST_F(ISRTest, Word_ComplexStressTest) {
+	// stress test / kitchen sink
+}
+
+TEST_F(ISRTest, Or_SimpleNext) {
+	ISR* ISR_word_protein = new ISRWord(index["protein"]);
+	ISR* ISR_word_bananas = new ISRWord(index["bananas"]);
+
+	ISR* ISR_protein_OR_bananas = new ISROr({ISR_word_protein, ISR_word_bananas});
+
+	EXPECT_EQ(ISR_protein_OR_bananas->GetStartLocation(), -1);
+	EXPECT_EQ(ISR_protein_OR_bananas->GetEndLocation(), -1);
+	EXPECT_EQ(ISR_protein_OR_bananas->GetCurrentPostEntry(), std::nullopt);
+	EXPECT_EQ(ISR_protein_OR_bananas->GetDocumentName(), "");
+
+	// protein at 28
+	EXPECT_EQ(ISR_protein_OR_bananas->Next()->GetDelta(), 28);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetCurrentPostEntry()->GetDelta(), 28);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetStartLocation(), 28);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetEndLocation(), 42);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetDocumentName(), "Document 2");
+
+	// bananas at 42
+	EXPECT_EQ(ISR_protein_OR_bananas->Next()->GetDelta(), 42);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetCurrentPostEntry()->GetDelta(), 42);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetStartLocation(), 42);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetEndLocation(), 51);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetDocumentName(), "Document 3");
+
+	// protein at 51
+	EXPECT_EQ(ISR_protein_OR_bananas->Next()->GetDelta(), 51);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetCurrentPostEntry()->GetDelta(), 51);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetStartLocation(), 51);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetEndLocation(), 51); // ??? what would this be?
+    EXPECT_EQ(ISR_protein_OR_bananas->GetDocumentName(), "Document 4");
+
+	EXPECT_EQ(ISR_protein_OR_bananas->Next(), std::nullopt);
+    EXPECT_EQ(ISR_protein_OR_bananas->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_protein_OR_bananas->Next(), std::nullopt);
+	EXPECT_EQ(ISR_protein_OR_bananas->GetCurrentPostEntry(), std::nullopt);
+}
