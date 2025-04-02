@@ -1,64 +1,56 @@
 #include "ISRWord.hpp"
 
-ISRWord::ISRWord(PostingList* pL) : postingList(pL), currentPostIdx(-1),
-                                    currentPostEntry(), currentPostEntryIdx(-1),
-                                    absoluteLocation(-1), documentName() {}
+ISRWord::ISRWord(PostingList pL) : postingList(pL), currentPostIdx(-1),
+                                    currentPostEntry(std::nullopt), currentPostEntryIdx(-1),
+                                    absoluteLocation(-1), documentName("") {}
 
-size_t ISRWord::GetStartLocation() {
+int ISRWord::GetStartLocation() {
     return this->absoluteLocation;
 }
 
-size_t ISRWord::GetEndLocation() {
+int ISRWord::GetEndLocation() {
     return this->absoluteLocation;
 }
 
-size_t ISRWord::GetDocumentCount() {
-    return postingList->GetPosts().size();
+int ISRWord::GetDocumentCount() {
+    return this->postingList.GetPosts().size();
 }
 
-size_t ISRWord::GetNumberOfOccurrences() {
-    size_t occurrences = 0;
+int ISRWord::GetNumberOfOccurrences() {
+    int occurrences = 0;
 
-    for (auto& post : postingList->GetPosts()) {
+    for (auto& post : this->postingList.GetPosts()) {
         occurrences += post.GetEntries().size();
     }
 
     return occurrences;
 }
 
-PostEntry* ISRWord::GetCurrentPostEntry() {
-    return currentPostEntry;
+std::optional<PostEntry> ISRWord::GetCurrentPostEntry() {
+    return this->currentPostEntry;
 }
 
 std::string ISRWord::GetDocumentName() {
-    return documentName;
+    return this->documentName;
 }
 
-PostEntry* ISRWord::Next() {
+std::optional<PostEntry> ISRWord::Next() {
     // TODO: inefficient because going through one by one
     // one at a time -- is there a fix? (probably)
     
     int outerPost = 0;
     int innerPostEntry = 0;
 
-    for (auto& post : this->postingList->GetPosts()) {
+    for (auto& post : this->postingList.GetPosts()) {
         std::string currDocumentName = post.GetDocumentName();
-        std::cout << "currently going through " << currDocumentName << std::endl;
-        std::cout << this->currentPostEntryIdx << std::endl;
 
         for (auto& postEntry : post.GetEntries()) {
-            std::cout << "currently going through its postentry" << std::endl;
-            std::cout << innerPostEntry << std::endl;
-            std::cout << this->currentPostEntryIdx << std::endl;
             if (innerPostEntry > this->currentPostEntryIdx) {
-                std::cout << "hello??/" << std::endl;
                 this->currentPostIdx = outerPost;
                 this->currentPostEntryIdx = innerPostEntry;
                 this->currentPostEntry = postEntry;
                 this->absoluteLocation = postEntry.GetDelta();
-                std::cout << postEntry.GetDelta() << std::endl;
                 this->documentName = currDocumentName;
-                std::cout << (this->GetCurrentPostEntry())->GetDelta() << std::endl;
                 return this->currentPostEntry;
             }
 
@@ -70,17 +62,17 @@ PostEntry* ISRWord::Next() {
 
     // this->currentPostEntry was already pointing to the very last
     // PostEntry within this PostingList
-    return nullptr;
+    return std::nullopt;
 }
 
-PostEntry* ISRWord::NextDocument() {
+std::optional<PostEntry> ISRWord::NextDocument() {
     // TODO: inefficient because going through one by one
     // one at a time -- is there a fix? (probably)
 
     size_t outerPost = 0;
     size_t innerPostEntry = 0;
 
-    for (auto& post : this->postingList->GetPosts()) {
+    for (auto& post : this->postingList.GetPosts()) {
         std::string currDocumentName = post.GetDocumentName();
 
         if (this->currentPostIdx >= outerPost) {
@@ -95,7 +87,7 @@ PostEntry* ISRWord::NextDocument() {
             this->currentPostEntryIdx = innerPostEntry;
 
             auto& postEntry = post.GetEntries()[0]; // just need to grab the first one
-            this->currentPostEntry = &postEntry;
+            this->currentPostEntry = postEntry;
             this->absoluteLocation = postEntry.GetDelta();
             this->documentName = currDocumentName;
             return this->currentPostEntry;
@@ -104,21 +96,21 @@ PostEntry* ISRWord::NextDocument() {
 
     // the current Post that this ISR was pointing to was
     // already the last one within this PostingList
-    return nullptr;
+    return std::nullopt;
 }
 
-PostEntry* ISRWord::Seek(size_t target) {
+std::optional<PostEntry> ISRWord::Seek(size_t target) {
     size_t outerPost = 0;
     size_t innerPostEntry = 0;
 
-    for (auto& post : this->postingList->GetPosts()) {
+    for (auto& post : this->postingList.GetPosts()) {
         std::string currDocumentName = post.GetDocumentName();
 
         for (auto& postEntry : post.GetEntries()) {
             if (postEntry.GetDelta() >= target) {
                 this->currentPostIdx = outerPost;
                 this->currentPostEntryIdx = innerPostEntry;
-                this->currentPostEntry = &postEntry;
+                this->currentPostEntry = postEntry;
                 this->absoluteLocation = postEntry.GetDelta();
                 this->documentName = currDocumentName;
                 return this->currentPostEntry;
@@ -131,7 +123,7 @@ PostEntry* ISRWord::Seek(size_t target) {
     }
 
     // no PostEntry was found at a location >= target
-    return nullptr;
+    return std::nullopt;
 
     // TODO: implement seeking for PostingList
     // so that we can do something like this?

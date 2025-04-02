@@ -20,14 +20,14 @@ class ISR {
      * 
      * @return The starting location of whatever the ISR is currently on.
      */
-    virtual size_t GetStartLocation() = 0;
+    virtual int GetStartLocation() = 0;
 
     /**
      * @brief Returns the ending location of whatever the ISR is currently on.
      * 
      * @return The ending location of whatever the ISR is currently on.
      */
-    virtual size_t GetEndLocation() = 0;
+    virtual int GetEndLocation() = 0;
 
     /**
      * @brief Returns the current PostEntry this ISR is pointing at.
@@ -56,7 +56,7 @@ class ISR {
      *        that matches the occurrence of this term that this ISR is looking for
      *        and advances the ISR forward.
      * 
-     * @return A std::optional containing the next PostEntry or std::nullopt if there is none.
+     * @return A std::optional containing the next PostEntry in the next document or std::nullopt if there is none.
      */
     virtual std::optional<PostEntry> NextDocument() = 0;
 
@@ -68,7 +68,7 @@ class ISR {
      * @param target The location the ISR will start at to find the first
      *               matching PostEntry.
      * 
-     * @return A std::optional containing the next PostEntry or std::nullopt if there is none.
+     * @return A std::optional containing the next PostEntry located at >= target or std::nullopt if there is none.
      */
     virtual std::optional<PostEntry> Seek(size_t target) = 0;
 };

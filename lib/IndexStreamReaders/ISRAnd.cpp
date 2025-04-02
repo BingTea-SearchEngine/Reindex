@@ -4,15 +4,15 @@ ISRAnd::ISRAnd(std::vector<ISR*> children) : childISRs(children),
                                              nearestTerm(-1), farthestTerm(-1),
                                              nearestStartLocation(-1), nearestEndLocation(-1) {}
 
-size_t ISRAnd::GetStartLocation() {
+int ISRAnd::GetStartLocation() {
     return this->childISRs[nearestTerm]->GetStartLocation();
 }
 
-size_t ISRAnd::GetEndLocation() {
+int ISRAnd::GetEndLocation() {
     return this->childISRs[farthestTerm]->GetEndLocation();
 }
 
-PostEntry* ISRAnd::GetCurrentPostEntry() {
+std::optional<PostEntry> ISRAnd::GetCurrentPostEntry() {
     return this->childISRs[nearestTerm]->GetCurrentPostEntry();
 }
 
@@ -94,7 +94,7 @@ bool ISRAnd::CatchUpStragglerISRs() {
             }
 
             // that means this child ISR is behind on the wrong doc and needs to catch up
-            if ((this->childISRs)[i]->Next() == nullptr) {
+            if ((this->childISRs)[i]->Next() == std::nullopt) {
                 // this child ISR reached the end of its line, thus impossible
                 // to now have all ISRs pointing to the same document
                 return false;
@@ -111,14 +111,14 @@ bool ISRAnd::CatchUpStragglerISRs() {
     }
 }
 
-PostEntry* ISRAnd::Next() {
+std::optional<PostEntry> ISRAnd::Next() {
     // check whether or not this ISROr
     // has ever been used before
     if (nearestStartLocation == -1) {
         // need to do a Next() on all the child ISRs to initialize them
         for (auto& child : childISRs) {
-            if (child->Next() == nullptr) {
-                return nullptr;
+            if (child->Next() == std::nullopt) {
+                return std::nullopt;
             }
         }
     } else {
@@ -126,8 +126,8 @@ PostEntry* ISRAnd::Next() {
         // advance the nearest ISR and look for the first match
 
         // this->nearestTerm points to the childISR that is the earliest
-        if (this->childISRs[this->nearestTerm]->Next() == nullptr) {
-            return nullptr;
+        if (this->childISRs[this->nearestTerm]->Next() == std::nullopt) {
+            return std::nullopt;
         }
     }
 
@@ -141,15 +141,15 @@ PostEntry* ISRAnd::Next() {
     }
 
     if (!this->CatchUpStragglerISRs()) {
-        return nullptr;
+        return std::nullopt;
     }
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
 
-PostEntry* ISRAnd::NextDocument() {
+std::optional<PostEntry> ISRAnd::NextDocument() {
     for (auto& child : childISRs) {
-        if (child->NextDocument() == nullptr) {
-            return nullptr;
+        if (child->NextDocument() == std::nullopt) {
+            return std::nullopt;
         }
     }
 
@@ -163,15 +163,15 @@ PostEntry* ISRAnd::NextDocument() {
     }
 
     if (!this->CatchUpStragglerISRs()) {
-        return nullptr;
+        return std::nullopt;
     }
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
 
-PostEntry* ISRAnd::Seek(size_t target) {
+std::optional<PostEntry> ISRAnd::Seek(size_t target) {
     for (auto& child : childISRs) {
-        if (child->Seek(target) == nullptr) {
-            return nullptr;
+        if (child->Seek(target) == std::nullopt) {
+            return std::nullopt;
         }
     }
 
@@ -182,7 +182,7 @@ PostEntry* ISRAnd::Seek(size_t target) {
     }
 
     if (!this->CatchUpStragglerISRs()) {
-        return nullptr;
+        return std::nullopt;
     }
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
