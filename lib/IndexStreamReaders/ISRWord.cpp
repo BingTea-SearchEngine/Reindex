@@ -1,7 +1,7 @@
 #include "ISRWord.hpp"
 
 ISRWord::ISRWord(PostingList* pL) : postingList(pL), currentPostIdx(-1),
-                                    currentPostEntry(nullptr), currentPostEntryIdx(-1),
+                                    currentPostEntry(), currentPostEntryIdx(-1),
                                     absoluteLocation(-1), documentName() {}
 
 size_t ISRWord::GetStartLocation() {
@@ -38,19 +38,27 @@ PostEntry* ISRWord::Next() {
     // TODO: inefficient because going through one by one
     // one at a time -- is there a fix? (probably)
     
-    size_t outerPost = 0;
-    size_t innerPostEntry = 0;
+    int outerPost = 0;
+    int innerPostEntry = 0;
 
     for (auto& post : this->postingList->GetPosts()) {
         std::string currDocumentName = post.GetDocumentName();
+        std::cout << "currently going through " << currDocumentName << std::endl;
+        std::cout << this->currentPostEntryIdx << std::endl;
 
         for (auto& postEntry : post.GetEntries()) {
+            std::cout << "currently going through its postentry" << std::endl;
+            std::cout << innerPostEntry << std::endl;
+            std::cout << this->currentPostEntryIdx << std::endl;
             if (innerPostEntry > this->currentPostEntryIdx) {
+                std::cout << "hello??/" << std::endl;
                 this->currentPostIdx = outerPost;
                 this->currentPostEntryIdx = innerPostEntry;
-                this->currentPostEntry = &postEntry;
+                this->currentPostEntry = postEntry;
                 this->absoluteLocation = postEntry.GetDelta();
+                std::cout << postEntry.GetDelta() << std::endl;
                 this->documentName = currDocumentName;
+                std::cout << (this->GetCurrentPostEntry())->GetDelta() << std::endl;
                 return this->currentPostEntry;
             }
 
