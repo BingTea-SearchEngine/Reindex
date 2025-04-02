@@ -87,7 +87,7 @@ PostEntry* ISROr::NextDocument() {
         // I'm not actually sure if this works?
         // can't think of a case that disproves
         // but can't 100% say this recursion is correct
-        if (child->NextDocument() == nullptr) {
+        if (child->NextDocument() == nullptr) { // TODO: this is wrong logic!
             return nullptr;
         }
     }
@@ -100,7 +100,7 @@ PostEntry* ISROr::Seek(size_t target) {
     // the target location. Return null if there is no match.
     // The document is the document containing the nearest term.
     for (auto& child : this->childISRs) {
-        if (child->Seek(target) == nullptr) {
+        if (child->Seek(target) == nullptr) { // TODO: this is wrong logic!
             return nullptr;
         }
     }
