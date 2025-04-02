@@ -163,40 +163,45 @@ PostingList{ bananas }: 1 document(s)
                 42 body |
 */
 
-TEST(ISRWord, SimpleNext) {
-    std::unordered_map<std::string, PostingList> index;
+class ISRTest : public ::testing::Test {
+	protected:
+		std::unordered_map<std::string, PostingList> index;
+		
+		struct Document {
+			std::string name;
+			std::vector<std::string> words;
+		};
+	
+		std::vector<Document> documents = {
+			{"Document 1", {"i", "went", "to", "the", "store", "and", "grabbed", "some", "granola", "bar", "and", "then", "i", "went", "to", "another", "store"}},
+			{"Document 2", {"costco", "is", "the", "best", "megastore", "it", "has", "so", "many", "granola", "and", "protein", "bar", "love", "costco"}},
+			{"Document 3", {"i", "think", "the", "amazon", "online", "store", "is", "alright", "amazon", "is", "bananas"}},
+			{"Document 4", {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my", "protein", "goal", "bar", "none"}}
+		};
+	
+		void SetUp() override {
+			uint32_t word_counter = 0;
+			for (const auto& doc : documents) {
+				for (size_t i = 0; i < doc.words.size(); ++i) {
+					const std::string& word = doc.words[i];
+					if (index.find(word) == index.end()) {
+						index[word] = PostingList(word);
+					}
+					index[word].AddWord(doc.name, {word_counter, wordlocation_t::body});
+					word_counter++;
+				}
+			}
+		}
+	};
 
-    struct Document {
-        std::string name;
-        std::vector<std::string> words;
-    };
-
-    std::vector<Document> documents = {
-        {"Document 1", {"i", "went", "to", "the", "store", "and", "grabbed", "some", "granola", "bar", "and", "then", "i", "went", "to", "another", "store"}},
-        {"Document 2", {"costco", "is", "the", "best", "megastore", "it", "has", "so", "many", "granola", "and", "protein", "bar", "love", "costco"}},
-        {"Document 3", {"i", "think", "the", "amazon", "online", "store", "is", "alright", "amazon", "is", "bananas"}},
-        {"Document 4", {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my", "protein", "goal", "bar", "none"}}
-    };
-
-    uint32_t word_counter = 0;
-    for (const auto& doc : documents) {
-        for (size_t i = 0; i < doc.words.size(); ++i) {
-            const std::string& word = doc.words[i];
-            if (index.find(word) == index.end()) {
-                index[word] = PostingList(word);
-            }
-            index[word].AddWord(doc.name, {word_counter, wordlocation_t::body});
-            word_counter++;
-        }
-    }
-
+TEST_F(ISRTest, Word_SimpleNext) {
     ISR* ISR_word_megastore = new ISRWord(index["megastore"]);
 
     EXPECT_EQ(ISR_word_megastore->GetStartLocation(), -1);
     EXPECT_EQ(ISR_word_megastore->GetEndLocation(), -1);
     EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry(), std::nullopt);
     EXPECT_EQ(ISR_word_megastore->GetDocumentName(), "");
-    EXPECT_EQ(static_cast<ISRWord*>(ISR_word_megastore)->GetDocumentCount(), 1);
+    EXPECT_EQ(static_cast<ISRWord*>(ISR_word_megastore)->GetDocumentCount(), 1); // downward cast because polymorphism and ISR_word has these methods but ISR does not
     EXPECT_EQ(static_cast<ISRWord*>(ISR_word_megastore)->GetNumberOfOccurrences(), 1);
 
     EXPECT_EQ(ISR_word_megastore->Next()->GetDelta(), 21);
@@ -213,33 +218,7 @@ TEST(ISRWord, SimpleNext) {
     EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry(), std::nullopt);
 }
 
-TEST(ISRWord, SimpleNextDocument) {
-	std::unordered_map<std::string, PostingList> index;
-
-	struct Document {
-		std::string name;
-		std::vector<std::string> words;
-	};
-
-	std::vector<Document> documents = {
-		{"Document 1", {"i", "went", "to", "the", "store", "and", "grabbed", "some", "granola", "bar", "and", "then", "i", "went", "to", "another", "store"}},
-		{"Document 2", {"costco", "is", "the", "best", "megastore", "it", "has", "so", "many", "granola", "and", "protein", "bar", "love", "costco"}},
-		{"Document 3", {"i", "think", "the", "amazon", "online", "store", "is", "alright", "amazon", "is", "bananas"}},
-		{"Document 4", {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my", "protein", "goal", "bar", "none"}}
-	};
-
-	uint32_t word_counter = 0;
-	for (const auto& doc : documents) {
-		for (size_t i = 0; i < doc.words.size(); ++i) {
-		const std::string& word = doc.words[i];
-		if (index.find(word) == index.end()) {
-				index[word] = PostingList(word);
-		}
-		index[word].AddWord(doc.name, {word_counter, wordlocation_t::body});
-		word_counter++;
-		}
-	}
-
+TEST_F(ISRTest, Word_SimpleNextDocument) {
 	ISR* ISR_word_and = new ISRWord(index["and"]);
 
 	EXPECT_EQ(ISR_word_and->GetStartLocation(), -1);
@@ -279,33 +258,7 @@ TEST(ISRWord, SimpleNextDocument) {
     EXPECT_EQ(ISR_word_and->GetCurrentPostEntry(), std::nullopt);
 }
 
-TEST(ISRWord, SimpleSeekAndNext) {
-	std::unordered_map<std::string, PostingList> index;
-
-	struct Document {
-		std::string name;
-		std::vector<std::string> words;
-	};
-
-	std::vector<Document> documents = {
-		{"Document 1", {"i", "went", "to", "the", "store", "and", "grabbed", "some", "granola", "bar", "and", "then", "i", "went", "to", "another", "store"}},
-		{"Document 2", {"costco", "is", "the", "best", "megastore", "it", "has", "so", "many", "granola", "and", "protein", "bar", "love", "costco"}},
-		{"Document 3", {"i", "think", "the", "amazon", "online", "store", "is", "alright", "amazon", "is", "bananas"}},
-		{"Document 4", {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my", "protein", "goal", "bar", "none"}}
-	};
-
-	uint32_t word_counter = 0;
-	for (const auto& doc : documents) {
-		for (size_t i = 0; i < doc.words.size(); ++i) {
-		const std::string& word = doc.words[i];
-		if (index.find(word) == index.end()) {
-				index[word] = PostingList(word);
-		}
-		index[word].AddWord(doc.name, {word_counter, wordlocation_t::body});
-		word_counter++;
-		}
-	}
-
+TEST_F(ISRTest, Word_SimpleSeekAndNext) {
 	ISR* ISR_word_the = new ISRWord(index["the"]);
 
 	EXPECT_EQ(ISR_word_the->GetStartLocation(), -1);
