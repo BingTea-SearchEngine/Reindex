@@ -1,28 +1,24 @@
-#include "ISRAnd.hpp"
+#include "ISRPhrase.hpp"
 
-ISRAnd::ISRAnd(std::vector<ISR*> children) : childISRs(children),
-                                             nearestTerm(-1), farthestTerm(-1),
-                                             nearestStartLocation(-1), nearestEndLocation(-1) {}
+ISRPhrase::ISRPhrase(std::vector<ISR*> children) : childISRs(children) {}
 
-size_t ISRAnd::GetStartLocation() {
+size_t ISRPhrase::GetStartLocation() {
     return this->childISRs[nearestTerm]->GetStartLocation();
 }
 
-size_t ISRAnd::GetEndLocation() {
+size_t ISRPhrase::GetEndLocation() {
     return this->childISRs[farthestTerm]->GetEndLocation();
 }
 
-PostEntry* ISRAnd::GetCurrentPostEntry() {
+PostEntry* ISRPhrase::GetCurrentPostEntry() {
     return this->childISRs[nearestTerm]->GetCurrentPostEntry();
 }
 
-std::string ISRAnd::GetDocumentName() {
+std::string ISRPhrase::GetDocumentName() {
     return this->childISRs[nearestTerm]->GetDocumentName();
 }
 
-// helper function to update the internal marker variables
-// when any of the ISRs get moved around
-void ISRAnd::UpdateMarkers() {
+void ISRPhrase::UpdateMarkers() {
     size_t whichChildEarliest;
     size_t whichChildLatest;
     size_t nearestStart = SIZE_MAX;
@@ -51,17 +47,26 @@ void ISRAnd::UpdateMarkers() {
 }
 
 // helper function to check if all the current child ISRs
-// are pointing to the same document
-bool ISRAnd::ChildrenOnSameDocument() {
-    std::string prevDocumentName = "";
+// are pointing to the same document AND are all consecutive
+// occurrences in order
+bool ISRPhrase::ChildrenFormPhrase() {
+    std::string prevDocumentName;
+    size_t prevOccurrence;
+    bool first = true;
 
     for (auto& child : childISRs) {
-        if (prevDocumentName == "") {
+        if (first) {
             prevDocumentName = child->GetDocumentName();
+            prevOccurrence = child->GetStartLocation();
+            first = false;
             continue;
         }
 
         if (child->GetDocumentName() != prevDocumentName) {
+            return false;
+        }
+
+        if (child->GetStartLocation() != prevOccurrence + 1) {
             return false;
         }
     }
@@ -69,20 +74,16 @@ bool ISRAnd::ChildrenOnSameDocument() {
     return true;
 }
 
-// helper function used to catch up the child ISRs that
-// are behind another child ISR
-// by the end of this function, all the child ISRs will be
-// pointing to the same document
-// returns True or False for successful or unsuccessful
-bool ISRAnd::CatchUpStragglerISRs() {
-    // not all pointing to the same document
+bool ISRPhrase::CatchUpStragglerISRs() {
+    // child ISRs may not currently form a Phrase
     while (true) {
         // means that among child ISRs x, y, and z...
         // ..........x...............
-        // ..............y...........
-        // .....................z....
-        // move forward the proper stragglers until they're hopefully on the same document as z
+        // .................y........
+        // ....z.....................
+        // move forward the proper stragglers until they're hopefully RIGHT NEXT TO y
         std::string potentialTargetDocument = (this->childISRs)[this->farthestTerm]->GetDocumentName();
+        size_t baselineLocation = (this->childISRs)[this->farthestTerm]->GetStartLocation();
         for (int i = 0; i < childISRs.size(); ++i) {
             if (i == this->farthestTerm) {
                 continue;
@@ -93,50 +94,51 @@ bool ISRAnd::CatchUpStragglerISRs() {
                 continue;
             }
 
-            // that means this child ISR is behind on the wrong doc and needs to catch up
+            size_t currLocation = (this->childISRs)[i]->GetStartLocation();
+            // let's say there are child ISRs a, b, c, and d
+            // c is the one that is the furthest up ahead
+            // this means that a must be 2 locations behind c
+            // b must be 1 location behind c
+            // d must be 1 location ahead c
+            int expectedLocationDifference = i - this->farthestTerm;
+
+            if (currLocation - baselineLocation == expectedLocationDifference) {
+                continue;
+            }
+
+            // that means this child ISR passed none of the checks and needs to move
             if ((this->childISRs)[i]->Next() == nullptr) {
                 // this child ISR reached the end of its line, thus impossible
-                // to now have all ISRs pointing to the same document
+                // to now have all ISRs form a phrase
                 return false;
             }
         }
 
         this->UpdateMarkers();
 
-        // now, after doing that, are these child ISRs all pointing to the same document?
-        if (this->ChildrenOnSameDocument()) {
+        // now, after doing that, do all these child ISRs form a phrase?
+        if (this->ChildrenFormPhrase()) {
             return true;
         }
         // otherwise, try again
     }
 }
 
-PostEntry* ISRAnd::Next() {
-    // check whether or not this ISROr
-    // has ever been used before
-    if (nearestStartLocation == -1) {
-        // need to do a Next() on all the child ISRs to initialize them
-        for (auto& child : childISRs) {
-            if (child->Next() == nullptr) {
-                return nullptr;
-            }
-        }
-    } else {
-        // these ISRs have already been used before and should be pointing at the same document
-        // advance the nearest ISR and look for the first match
-
-        // this->nearestTerm points to the childISR that is the earliest
-        if (this->childISRs[this->nearestTerm]->Next() == nullptr) {
+PostEntry* ISRPhrase::Next() {
+    // doesn't matter if this ISRPhrase has been used before or not
+    // need to do a Next() on all the child ISRs
+    for (auto& child : childISRs) {
+        if (child->Next() == nullptr) {
             return nullptr;
         }
     }
 
     this->UpdateMarkers();
 
-    // are all these child ISRs now pointing to the same document?
-    if (this->ChildrenOnSameDocument()) {
+    // do all these child ISRs now form a phrase?
+    if (this->ChildrenFormPhrase()) {
         // then, we can return if that is the case
-        // TODO: returning the first PostEntry for an AND ISR?
+        // TODO: returning the first PostEntry for a Phrase ISR?
         return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
     }
 
@@ -146,7 +148,7 @@ PostEntry* ISRAnd::Next() {
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
 
-PostEntry* ISRAnd::NextDocument() {
+PostEntry* ISRPhrase::NextDocument() {
     for (auto& child : childISRs) {
         if (child->NextDocument() == nullptr) {
             return nullptr;
@@ -155,10 +157,10 @@ PostEntry* ISRAnd::NextDocument() {
 
     this->UpdateMarkers();
 
-    // are all these child ISRs now pointing to the same document?
-    if (this->ChildrenOnSameDocument()) {
+    // are all these child ISRs forming a phrase?
+    if (this->ChildrenFormPhrase()) {
         // then, we can return if that is the case
-        // TODO: returning the first PostEntry for an AND ISR?
+        // TODO: returning the first PostEntry for Phrase ISR?
         return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
     }
 
@@ -168,16 +170,16 @@ PostEntry* ISRAnd::NextDocument() {
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
 
-PostEntry* ISRAnd::Seek(size_t target) {
+PostEntry* ISRPhrase::Seek(size_t target) {
     for (auto& child : childISRs) {
         if (child->Seek(target) == nullptr) {
             return nullptr;
         }
     }
 
-    if (this->ChildrenOnSameDocument()) {
+    if (this->ChildrenFormPhrase()) {
         // then, we can return if that is the case
-        // TODO: returning the first PostEntry for an AND ISR?
+        // TODO: returning the first PostEntry for Phrase ISR?
         return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
     }
 
