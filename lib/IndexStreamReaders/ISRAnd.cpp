@@ -129,3 +129,38 @@ PostEntry* ISRAnd::Next() {
     }
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
+
+PostEntry* ISRAnd::NextDocument() {
+    for (auto& child : childISRs) {
+        if (child->NextDocument() == nullptr) {
+            return nullptr;
+        }
+    }
+
+    this->UpdateMarkers();
+
+    // are all these child ISRs now pointing to the same document?
+    if (this->ChildrenOnSameDocument()) {
+        // then, we can return if that is the case
+        // TODO: returning the first PostEntry for an AND ISR?
+        return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+    }
+
+    if (!this->CatchUpStragglerISRs()) {
+        return nullptr;
+    }
+    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+}
+
+PostEntry* ISRAnd::Seek(size_t target) {
+    for (auto& child : childISRs) {
+        if (child->Seek(target) == nullptr) {
+            return nullptr;
+        }
+    }
+
+    if (!this->CatchUpStragglerISRs()) {
+        return nullptr;
+    }
+    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+}
