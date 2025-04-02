@@ -2,15 +2,15 @@
 
 ISRPhrase::ISRPhrase(std::vector<ISR*> children) : childISRs(children) {}
 
-size_t ISRPhrase::GetStartLocation() {
+int ISRPhrase::GetStartLocation() {
     return this->childISRs[nearestTerm]->GetStartLocation();
 }
 
-size_t ISRPhrase::GetEndLocation() {
+int ISRPhrase::GetEndLocation() {
     return this->childISRs[farthestTerm]->GetEndLocation();
 }
 
-PostEntry* ISRPhrase::GetCurrentPostEntry() {
+std::optional<PostEntry> ISRPhrase::GetCurrentPostEntry() {
     return this->childISRs[nearestTerm]->GetCurrentPostEntry();
 }
 
@@ -107,7 +107,7 @@ bool ISRPhrase::CatchUpStragglerISRs() {
             }
 
             // that means this child ISR passed none of the checks and needs to move
-            if ((this->childISRs)[i]->Next() == nullptr) {
+            if ((this->childISRs)[i]->Next() == std::nullopt) {
                 // this child ISR reached the end of its line, thus impossible
                 // to now have all ISRs form a phrase
                 return false;
@@ -124,12 +124,12 @@ bool ISRPhrase::CatchUpStragglerISRs() {
     }
 }
 
-PostEntry* ISRPhrase::Next() {
+std::optional<PostEntry> ISRPhrase::Next() {
     // doesn't matter if this ISRPhrase has been used before or not
     // need to do a Next() on all the child ISRs
     for (auto& child : childISRs) {
-        if (child->Next() == nullptr) {
-            return nullptr;
+        if (child->Next() == std::nullopt) {
+            return std::nullopt;
         }
     }
 
@@ -143,15 +143,15 @@ PostEntry* ISRPhrase::Next() {
     }
 
     if (!this->CatchUpStragglerISRs()) {
-        return nullptr;
+        return std::nullopt;
     }
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
 
-PostEntry* ISRPhrase::NextDocument() {
+std::optional<PostEntry> ISRPhrase::NextDocument() {
     for (auto& child : childISRs) {
-        if (child->NextDocument() == nullptr) {
-            return nullptr;
+        if (child->NextDocument() == std::nullopt) {
+            return std::nullopt;
         }
     }
 
@@ -165,15 +165,15 @@ PostEntry* ISRPhrase::NextDocument() {
     }
 
     if (!this->CatchUpStragglerISRs()) {
-        return nullptr;
+        return std::nullopt;
     }
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
 
-PostEntry* ISRPhrase::Seek(size_t target) {
+std::optional<PostEntry> ISRPhrase::Seek(size_t target) {
     for (auto& child : childISRs) {
-        if (child->Seek(target) == nullptr) {
-            return nullptr;
+        if (child->Seek(target) == std::nullopt) {
+            return std::nullopt;
         }
     }
 
@@ -184,7 +184,7 @@ PostEntry* ISRPhrase::Seek(size_t target) {
     }
 
     if (!this->CatchUpStragglerISRs()) {
-        return nullptr;
+        return std::nullopt;
     }
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }

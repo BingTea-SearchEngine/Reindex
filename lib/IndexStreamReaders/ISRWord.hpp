@@ -24,17 +24,17 @@ class ISRWord : public ISR {
      * @brief Returns the absolute location of the earliest occurrence
      *        among the child ISRs at this moment.
      * 
-     * @return size_t
+     * @return int
      */
-    virtual size_t GetStartLocation() override;
+    virtual int GetStartLocation() override;
 
     /**
      * @brief Returns the absolute location of the latest occurrence
      *        among the child ISRs at this moment.
      * 
-     * @return size_t
+     * @return int
      */
-    virtual size_t GetEndLocation() override;
+    virtual int GetEndLocation() override;
 
     /**
      * @brief Returns the current PostEntry this ISR is pointing at.
@@ -54,17 +54,17 @@ class ISRWord : public ISR {
      * @brief Returns the number of documents that this term appears in
      *        (ie the number of Posts).
      * 
-     * @return size_t
+     * @return int
      */
-    size_t GetDocumentCount();
+    int GetDocumentCount();
 
     /**
      * @brief Returns the number of occurrences that this term has
      *        (ie the number of PostEntries).
      * 
-     * @return size_t
+     * @return int
      */
-    size_t GetNumberOfOccurrences();
+    int GetNumberOfOccurrences();
 
     /**
      * @brief Returns the next PostEntry that matches the occurrence of
@@ -79,7 +79,7 @@ class ISRWord : public ISR {
      *        that matches the occurrence of this term that this ISR is looking for
      *        and advances the ISR forward.
      * 
-     * @return A std::optional containing the next PostEntry or std::nullopt if there is none.
+     * @return A std::optional containing the next PostEntry in the next document or std::nullopt if there is none.
      */
     virtual std::optional<PostEntry> NextDocument() override;
 
@@ -91,7 +91,7 @@ class ISRWord : public ISR {
      * @param target The location the ISR will start at to find the first
      *               matching PostEntry.
      * 
-     * @return A std::optional containing the next PostEntry or std::nullopt if there is none.
+     * @return A std::optional containing the next PostEntry located at >= target or std::nullopt if there is none.
      */
     virtual std::optional<PostEntry> Seek(size_t target) override;
 
@@ -100,17 +100,17 @@ class ISRWord : public ISR {
     PostingList postingList;
 
     /// The index of the current Post (document Post).
-    size_t currentPostIdx;
+    int currentPostIdx;
 
     /// The current PostEntry this ISR is pointing at.
     std::optional<PostEntry> currentPostEntry;
 
     /// The index of the current PostEntry within all the PostEntries.
-    size_t currentPostEntryIdx;
+    int currentPostEntryIdx;
 
     /// The absolute location of whatever this ISR is pointing at, relative
     /// to the start of this index chunk.
-    size_t absoluteLocation;
+    int absoluteLocation;
 
     /// The name of the document this ISR is currently pointing at.
     std::string documentName;

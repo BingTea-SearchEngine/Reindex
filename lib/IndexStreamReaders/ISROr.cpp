@@ -3,15 +3,15 @@
 ISROr::ISROr(std::vector<ISR*> children) : childISRs(children), nearestTerm(children.size()),
                                            nearestStartLocation(-1), nearestEndLocation(-1) {}
 
-size_t ISROr::GetStartLocation() {
+int ISROr::GetStartLocation() {
     return this->nearestStartLocation;
 }
 
-size_t ISROr::GetEndLocation() {
+int ISROr::GetEndLocation() {
     return this->nearestEndLocation;
 }
 
-PostEntry* ISROr::GetCurrentPostEntry() {
+std::optional<PostEntry> ISROr::GetCurrentPostEntry() {
     // extract whatever the earliest child ISR is pointing at
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
@@ -48,15 +48,15 @@ void ISROr::UpdateMarkers() {
     this->nearestEndLocation = nearestEnd;
 }
 
-PostEntry* ISROr::Next() {
+std::optional<PostEntry> ISROr::Next() {
     // check whether or not this ISROr
     // has ever been used before
     if (this->nearestStartLocation == -1) {
         // need to do a Next() on all the child ISRs to initialize them
         for (auto& child : childISRs) {
-            if (child->Next() == nullptr) { // TODO: this is wrong logic! Just because one term could not be found, does not
+            if (child->Next() == std::nullopt) { // TODO: this is wrong logic! Just because one term could not be found, does not
                                             // mean we should invalidate the whole OR query
-                return nullptr;
+                return std::nullopt;
             }
         }
     } else {
@@ -70,8 +70,8 @@ PostEntry* ISROr::Next() {
         // the new nearest/earliest match.
 
         // this->nearestTerm points to the childISR that is the earliest
-        if (this->childISRs[this->nearestTerm]->Next() == nullptr) {
-            return nullptr;
+        if (this->childISRs[this->nearestTerm]->Next() == std::nullopt) {
+            return std::nullopt;
         }
     }
 
@@ -79,7 +79,7 @@ PostEntry* ISROr::Next() {
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
 
-PostEntry* ISROr::NextDocument() {
+std::optional<PostEntry> ISROr::NextDocument() {
     // Position all the ISRs to the first occurrence
     // immediately after the current document.
     for (auto& child : this->childISRs) {
@@ -87,21 +87,21 @@ PostEntry* ISROr::NextDocument() {
         // I'm not actually sure if this works?
         // can't think of a case that disproves
         // but can't 100% say this recursion is correct
-        if (child->NextDocument() == nullptr) { // TODO: this is wrong logic!
-            return nullptr;
+        if (child->NextDocument() == std::nullopt) { // TODO: this is wrong logic!
+            return std::nullopt;
         }
     }
     this->UpdateMarkers();
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
 }
 
-PostEntry* ISROr::Seek(size_t target) {
+std::optional<PostEntry> ISROr::Seek(size_t target) {
     // Seek all the ISRs to the first occurrence beginning at
     // the target location. Return null if there is no match.
     // The document is the document containing the nearest term.
     for (auto& child : this->childISRs) {
-        if (child->Seek(target) == nullptr) { // TODO: this is wrong logic!
-            return nullptr;
+        if (child->Seek(target) == std::nullopt) { // TODO: this is wrong logic!
+            return std::nullopt;
         }
     }
     this->UpdateMarkers();
