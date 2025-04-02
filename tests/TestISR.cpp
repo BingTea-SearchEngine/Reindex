@@ -163,7 +163,7 @@ PostingList{ bananas }: 1 document(s)
                 42 body |
 */
 
-TEST(ISRWord, Simple) {
+TEST(ISRWord, SimpleNext) {
     std::unordered_map<std::string, PostingList> index;
 
     struct Document {
@@ -178,38 +178,125 @@ TEST(ISRWord, Simple) {
         {"Document 4", {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my", "protein", "goal", "bar", "none"}}
     };
 
-    size_t word_counter = 0;
+    uint32_t word_counter = 0;
     for (const auto& doc : documents) {
         for (size_t i = 0; i < doc.words.size(); ++i) {
             const std::string& word = doc.words[i];
             if (index.find(word) == index.end()) {
                 index[word] = PostingList(word);
             }
-            index[word].AddWord(doc.name, {static_cast<int>(word_counter), wordlocation_t::body});
+            index[word].AddWord(doc.name, {word_counter, wordlocation_t::body});
             word_counter++;
         }
     }
 
     ISR* ISR_word_megastore = new ISRWord(index["megastore"]);
-    std::cout << "A" << std::endl;
+
     EXPECT_EQ(ISR_word_megastore->GetStartLocation(), -1);
-    std::cout << "B" << std::endl;
     EXPECT_EQ(ISR_word_megastore->GetEndLocation(), -1);
-    std::cout << "C" << std::endl;
-    EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry(), nullptr);
-    std::cout << "D" << std::endl;
+    EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry(), std::nullopt);
     EXPECT_EQ(ISR_word_megastore->GetDocumentName(), "");
-    std::cout << "E" << std::endl;
     EXPECT_EQ(static_cast<ISRWord*>(ISR_word_megastore)->GetDocumentCount(), 1);
-    std::cout << "F" << std::endl;
     EXPECT_EQ(static_cast<ISRWord*>(ISR_word_megastore)->GetNumberOfOccurrences(), 1);
 
-    index["megastore"].Print();
-
-    std::cout << "G" << std::endl;
-    EXPECT_EQ((ISR_word_megastore->Next())->GetDelta(), 21);
-    std::cout << "H" << std::endl;
+    EXPECT_EQ(ISR_word_megastore->Next()->GetDelta(), 21);
     EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry()->GetDelta(), 21);
-    std::cout << "I" << std::endl;
     EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    EXPECT_EQ(ISR_word_megastore->GetStartLocation(), 21);
+    EXPECT_EQ(ISR_word_megastore->GetEndLocation(), 21);
+    EXPECT_EQ(ISR_word_megastore->GetDocumentName(), "Document 2");
+
+    EXPECT_EQ(ISR_word_megastore->Next(), std::nullopt);
+    EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry(), std::nullopt);
+
+    EXPECT_EQ(ISR_word_megastore->Next(), std::nullopt);
+    EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry(), std::nullopt);
+}
+
+TEST(ISRWord, SimpleNextDocument) {
+	std::unordered_map<std::string, PostingList> index;
+
+	struct Document {
+		std::string name;
+		std::vector<std::string> words;
+	};
+
+	std::vector<Document> documents = {
+		{"Document 1", {"i", "went", "to", "the", "store", "and", "grabbed", "some", "granola", "bar", "and", "then", "i", "went", "to", "another", "store"}},
+		{"Document 2", {"costco", "is", "the", "best", "megastore", "it", "has", "so", "many", "granola", "and", "protein", "bar", "love", "costco"}},
+		{"Document 3", {"i", "think", "the", "amazon", "online", "store", "is", "alright", "amazon", "is", "bananas"}},
+		{"Document 4", {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my", "protein", "goal", "bar", "none"}}
+	};
+
+	uint32_t word_counter = 0;
+	for (const auto& doc : documents) {
+		for (size_t i = 0; i < doc.words.size(); ++i) {
+		const std::string& word = doc.words[i];
+		if (index.find(word) == index.end()) {
+				index[word] = PostingList(word);
+		}
+		index[word].AddWord(doc.name, {word_counter, wordlocation_t::body});
+		word_counter++;
+		}
+	}
+
+	// ISR* ISR_word_megastore = new ISRWord(index["megastore"]);
+
+    // EXPECT_EQ(ISR_word_megastore->GetStartLocation(), -1);
+    // EXPECT_EQ(ISR_word_megastore->GetEndLocation(), -1);
+    // EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry(), std::nullopt);
+    // EXPECT_EQ(ISR_word_megastore->GetDocumentName(), "");
+    // EXPECT_EQ(static_cast<ISRWord*>(ISR_word_megastore)->GetDocumentCount(), 1);
+    // EXPECT_EQ(static_cast<ISRWord*>(ISR_word_megastore)->GetNumberOfOccurrences(), 1);
+
+    // EXPECT_EQ(ISR_word_megastore->Next()->GetDelta(), 21);
+    // EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry()->GetDelta(), 21);
+    // EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    // EXPECT_EQ(ISR_word_megastore->GetStartLocation(), 21);
+    // EXPECT_EQ(ISR_word_megastore->GetEndLocation(), 21);
+    // EXPECT_EQ(ISR_word_megastore->GetDocumentName(), "Document 2");
+
+    // EXPECT_EQ(ISR_word_megastore->Next(), std::nullopt);
+    // EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry(), std::nullopt);
+
+    // EXPECT_EQ(ISR_word_megastore->Next(), std::nullopt);
+    // EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry(), std::nullopt);
+
+	ISR* ISR_word_and = new ISRWord(index["and"]);
+
+	EXPECT_EQ(ISR_word_and->GetStartLocation(), -1);
+	EXPECT_EQ(ISR_word_and->GetEndLocation(), -1);
+	EXPECT_EQ(ISR_word_and->GetCurrentPostEntry(), std::nullopt);
+	EXPECT_EQ(ISR_word_and->GetDocumentName(), "");
+	EXPECT_EQ(static_cast<ISRWord*>(ISR_word_and)->GetDocumentCount(), 3);
+    EXPECT_EQ(static_cast<ISRWord*>(ISR_word_and)->GetNumberOfOccurrences(), 4);
+
+	EXPECT_EQ(ISR_word_and->NextDocument()->GetDelta(), 5);
+	EXPECT_EQ(ISR_word_and->GetCurrentPostEntry()->GetDelta(), 5);
+	EXPECT_EQ(ISR_word_and->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+	EXPECT_EQ(ISR_word_and->GetStartLocation(), 5);
+    EXPECT_EQ(ISR_word_and->GetEndLocation(), 5);
+    EXPECT_EQ(ISR_word_and->GetDocumentName(), "Document 1");
+
+	// skipping entry at #10
+
+	EXPECT_EQ(ISR_word_and->NextDocument()->GetDelta(), 27);
+	EXPECT_EQ(ISR_word_and->GetCurrentPostEntry()->GetDelta(), 27);
+	EXPECT_EQ(ISR_word_and->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+	EXPECT_EQ(ISR_word_and->GetStartLocation(), 27);
+    EXPECT_EQ(ISR_word_and->GetEndLocation(), 27);
+    EXPECT_EQ(ISR_word_and->GetDocumentName(), "Document 2");
+
+	EXPECT_EQ(ISR_word_and->NextDocument()->GetDelta(), 48);
+	EXPECT_EQ(ISR_word_and->GetCurrentPostEntry()->GetDelta(), 48);
+	EXPECT_EQ(ISR_word_and->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+	EXPECT_EQ(ISR_word_and->GetStartLocation(), 48);
+    EXPECT_EQ(ISR_word_and->GetEndLocation(), 48);
+    EXPECT_EQ(ISR_word_and->GetDocumentName(), "Document 4");
+
+	EXPECT_EQ(ISR_word_and->Next(), std::nullopt);
+    EXPECT_EQ(ISR_word_and->GetCurrentPostEntry(), std::nullopt);
+
+    EXPECT_EQ(ISR_word_and->Next(), std::nullopt);
+    EXPECT_EQ(ISR_word_and->GetCurrentPostEntry(), std::nullopt);
 }

@@ -41,10 +41,10 @@ std::optional<PostEntry> ISRWord::Next() {
     int outerPost = 0;
     int innerPostEntry = 0;
 
-    for (auto& post : this->postingList.GetPosts()) {
+    for (auto post : this->postingList.GetPosts()) {
         std::string currDocumentName = post.GetDocumentName();
 
-        for (auto& postEntry : post.GetEntries()) {
+        for (auto postEntry : post.GetEntries()) {
             if (innerPostEntry > this->currentPostEntryIdx) {
                 this->currentPostIdx = outerPost;
                 this->currentPostEntryIdx = innerPostEntry;
@@ -62,6 +62,7 @@ std::optional<PostEntry> ISRWord::Next() {
 
     // this->currentPostEntry was already pointing to the very last
     // PostEntry within this PostingList
+    this->currentPostEntry = std::nullopt;
     return std::nullopt;
 }
 
@@ -69,10 +70,10 @@ std::optional<PostEntry> ISRWord::NextDocument() {
     // TODO: inefficient because going through one by one
     // one at a time -- is there a fix? (probably)
 
-    size_t outerPost = 0;
-    size_t innerPostEntry = 0;
+    int outerPost = 0;
+    int innerPostEntry = 0;
 
-    for (auto& post : this->postingList.GetPosts()) {
+    for (auto post : this->postingList.GetPosts()) {
         std::string currDocumentName = post.GetDocumentName();
 
         if (this->currentPostIdx >= outerPost) {
@@ -86,7 +87,7 @@ std::optional<PostEntry> ISRWord::NextDocument() {
             this->currentPostIdx = outerPost;
             this->currentPostEntryIdx = innerPostEntry;
 
-            auto& postEntry = post.GetEntries()[0]; // just need to grab the first one
+            auto postEntry = post.GetEntries()[0]; // just need to grab the first one
             this->currentPostEntry = postEntry;
             this->absoluteLocation = postEntry.GetDelta();
             this->documentName = currDocumentName;
@@ -96,17 +97,18 @@ std::optional<PostEntry> ISRWord::NextDocument() {
 
     // the current Post that this ISR was pointing to was
     // already the last one within this PostingList
+    this->currentPostEntry = std::nullopt;
     return std::nullopt;
 }
 
 std::optional<PostEntry> ISRWord::Seek(size_t target) {
-    size_t outerPost = 0;
-    size_t innerPostEntry = 0;
+    int outerPost = 0;
+    int innerPostEntry = 0;
 
-    for (auto& post : this->postingList.GetPosts()) {
+    for (auto post : this->postingList.GetPosts()) {
         std::string currDocumentName = post.GetDocumentName();
 
-        for (auto& postEntry : post.GetEntries()) {
+        for (auto postEntry : post.GetEntries()) {
             if (postEntry.GetDelta() >= target) {
                 this->currentPostIdx = outerPost;
                 this->currentPostEntryIdx = innerPostEntry;
@@ -123,6 +125,7 @@ std::optional<PostEntry> ISRWord::Seek(size_t target) {
     }
 
     // no PostEntry was found at a location >= target
+    this->currentPostEntry = std::nullopt;
     return std::nullopt;
 
     // TODO: implement seeking for PostingList
