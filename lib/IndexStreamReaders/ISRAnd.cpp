@@ -1,8 +1,11 @@
 #include "ISRAnd.hpp"
 
-ISRAnd::ISRAnd(std::vector<ISR*> children) : childISRs(children),
-                                             nearestTerm(-1), farthestTerm(-1),
-                                             nearestStartLocation(-1), nearestEndLocation(-1) {}
+ISRAnd::ISRAnd(std::vector<ISR*> children)
+    : childISRs(children),
+      nearestTerm(-1),
+      farthestTerm(-1),
+      nearestStartLocation(-1),
+      nearestEndLocation(-1) {}
 
 int ISRAnd::GetStartLocation() {
     return this->childISRs[nearestTerm]->GetStartLocation();
@@ -82,13 +85,15 @@ bool ISRAnd::CatchUpStragglerISRs() {
         // ..............y...........
         // .....................z....
         // move forward the proper stragglers until they're hopefully on the same document as z
-        std::string potentialTargetDocument = (this->childISRs)[this->farthestTerm]->GetDocumentName();
+        std::string potentialTargetDocument =
+            (this->childISRs)[this->farthestTerm]->GetDocumentName();
         for (int i = 0; i < childISRs.size(); ++i) {
             if (i == this->farthestTerm) {
                 continue;
             }
 
-            std::string currentDocument = (this->childISRs)[i]->GetDocumentName();
+            std::string currentDocument =
+                (this->childISRs)[i]->GetDocumentName();
             if (currentDocument == potentialTargetDocument) {
                 continue;
             }

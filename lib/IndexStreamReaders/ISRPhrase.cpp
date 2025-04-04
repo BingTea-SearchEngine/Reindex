@@ -82,14 +82,17 @@ bool ISRPhrase::CatchUpStragglerISRs() {
         // .................y........
         // ....z.....................
         // move forward the proper stragglers until they're hopefully RIGHT NEXT TO y
-        std::string potentialTargetDocument = (this->childISRs)[this->farthestTerm]->GetDocumentName();
-        size_t baselineLocation = (this->childISRs)[this->farthestTerm]->GetStartLocation();
+        std::string potentialTargetDocument =
+            (this->childISRs)[this->farthestTerm]->GetDocumentName();
+        size_t baselineLocation =
+            (this->childISRs)[this->farthestTerm]->GetStartLocation();
         for (int i = 0; i < childISRs.size(); ++i) {
             if (i == this->farthestTerm) {
                 continue;
             }
 
-            std::string currentDocument = (this->childISRs)[i]->GetDocumentName();
+            std::string currentDocument =
+                (this->childISRs)[i]->GetDocumentName();
             if (currentDocument == potentialTargetDocument) {
                 continue;
             }

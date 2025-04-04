@@ -43,33 +43,33 @@ class ISRPhrase : public ISR {
       * 
       * @return A std::optional containing the current PostEntry or std::nullopt if there is none.
       */
-     virtual std::optional<PostEntry> GetCurrentPostEntry() override;
+    virtual std::optional<PostEntry> GetCurrentPostEntry() override;
 
-     /**
+    /**
        * @brief Returns the document name this ISR is pointing at.
        * 
        * @return The name of the document this ISR is currently on.
        */
-     virtual std::string GetDocumentName() override;
- 
-     /**
+    virtual std::string GetDocumentName() override;
+
+    /**
       * @brief Returns the next PostEntry that matches the occurrence of
       * this word that this ISR is looking for and advances the ISR forward.
       * 
       * @return A std::optional containing the next PostEntry or std::nullopt if there is none.
       */
-     virtual std::optional<PostEntry> Next() override;
- 
-     /**
+    virtual std::optional<PostEntry> Next() override;
+
+    /**
       * @brief Returns the next PostEntry that belongs in a brand new document
       *        that matches the occurrence of this term that this ISR is looking for
       *        and advances the ISR forward.
       * 
       * @return A std::optional containing the next PostEntry in the next document or std::nullopt if there is none.
       */
-     virtual std::optional<PostEntry> NextDocument() override;
- 
-     /**
+    virtual std::optional<PostEntry> NextDocument() override;
+
+    /**
       * @brief Returns the first PostEntry that matches the occurrence of
       *        this term that this ISR is looking for located at location >= target
       *        and advances the ISR forward.
@@ -79,7 +79,7 @@ class ISRPhrase : public ISR {
       * 
       * @return A std::optional containing the next PostEntry located at >= target or std::nullopt if there is none.
       */
-     virtual std::optional<PostEntry> Seek(size_t target) override;
+    virtual std::optional<PostEntry> Seek(size_t target) override;
 
    private:
     /// the children ISRs that this ISR OR's on

@@ -1,8 +1,12 @@
 #include "ISRWord.hpp"
 
-ISRWord::ISRWord(PostingList pL) : postingList(pL), currentPostIdx(-1),
-                                    currentPostEntry(std::nullopt), currentPostEntryIdx(-1),
-                                    absoluteLocation(-1), documentName("") {}
+ISRWord::ISRWord(PostingList pL)
+    : postingList(pL),
+      currentPostIdx(-1),
+      currentPostEntry(std::nullopt),
+      currentPostEntryIdx(-1),
+      absoluteLocation(-1),
+      documentName("") {}
 
 int ISRWord::GetStartLocation() {
     return this->absoluteLocation;
@@ -37,7 +41,7 @@ std::string ISRWord::GetDocumentName() {
 std::optional<PostEntry> ISRWord::Next() {
     // TODO: inefficient because going through one by one
     // one at a time -- is there a fix? (probably)
-    
+
     int outerPost = 0;
     int innerPostEntry = 0;
 
@@ -80,14 +84,14 @@ std::optional<PostEntry> ISRWord::NextDocument() {
             // this post is not the immediate next of our current one
             outerPost++;
             innerPostEntry += post.GetEntries().size();
-        }
-        else {
+        } else {
             // found the first Post belonging to the next document
             // now extract the first PostEntry within this Post
             this->currentPostIdx = outerPost;
             this->currentPostEntryIdx = innerPostEntry;
 
-            auto postEntry = post.GetEntries()[0]; // just need to grab the first one
+            auto postEntry =
+                post.GetEntries()[0];  // just need to grab the first one
             this->currentPostEntry = postEntry;
             this->absoluteLocation = postEntry.GetDelta();
             this->documentName = currDocumentName;
