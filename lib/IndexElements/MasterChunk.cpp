@@ -10,15 +10,18 @@ MasterChunk::MasterChunk(std::string outputDir, size_t chunkSize)
     assert(std::filesystem::exists(_metadataDir) && std::filesystem::is_directory(_metadataDir));
 }
 
-void MasterChunk::Serialize(char* baseRegion, size_t& offset, MasterChunk& master) {
+void MasterChunk::Serialize(char* baseRegion, size_t& offset,
+                            MasterChunk& master) {
     assert(offset == 0);
     // Serialize number of documents
-    std::memcpy(baseRegion+offset, &master._numDocuments, sizeof(master._numDocuments));
-    offset+=sizeof(master._numDocuments);
+    std::memcpy(baseRegion + offset, &master._numDocuments,
+                sizeof(master._numDocuments));
+    offset += sizeof(master._numDocuments);
 
     // Serialize threshold chunk size
-    std::memcpy(baseRegion+offset, &master._chunkSize, sizeof(master._chunkSize));
-    offset+=sizeof(master._chunkSize);
+    std::memcpy(baseRegion + offset, &master._chunkSize,
+                sizeof(master._chunkSize));
+    offset += sizeof(master._chunkSize);
 
     // Serialize index output directory
     size_t indexDirectorySize = master._indexDir.size() + 1;
@@ -32,14 +35,14 @@ void MasterChunk::Serialize(char* baseRegion, size_t& offset, MasterChunk& maste
 
     // Serialize size of index chunk list (should be the same for index and master chunks since they are flushed together)
     size_t numChunks = master._indexChunks.size();
-    std::memcpy(baseRegion+offset, &numChunks, sizeof(numChunks));
-    offset+=sizeof(numChunks);
+    std::memcpy(baseRegion + offset, &numChunks, sizeof(numChunks));
+    offset += sizeof(numChunks);
 
     // Serialize chunk list
     for (std::string& chunkName : master._indexChunks) {
-        size_t chunkNameSize = chunkName.size()+1;
-        std::memcpy(baseRegion+offset, chunkName.c_str(), chunkNameSize);
-        offset+=chunkNameSize;
+        size_t chunkNameSize = chunkName.size() + 1;
+        std::memcpy(baseRegion + offset, chunkName.c_str(), chunkNameSize);
+        offset += chunkNameSize;
     }
 
     // Serialize metadata chunk list
@@ -51,15 +54,17 @@ void MasterChunk::Serialize(char* baseRegion, size_t& offset, MasterChunk& maste
 }
 
 MasterChunk MasterChunk::Deserailize(char* baseRegion, size_t& offset) {
-    assert(offset==0);
+    assert(offset == 0);
     MasterChunk master;
     // Read number of documents
-    std::memcpy(&master._numDocuments, baseRegion+offset, sizeof(master._numDocuments));
-    offset+=sizeof(master._numDocuments);
+    std::memcpy(&master._numDocuments, baseRegion + offset,
+                sizeof(master._numDocuments));
+    offset += sizeof(master._numDocuments);
 
     // Read threshold chunk size
-    std::memcpy(&master._chunkSize, baseRegion+offset, sizeof(master._chunkSize));
-    offset+=sizeof(master._chunkSize);
+    std::memcpy(&master._chunkSize, baseRegion + offset,
+                sizeof(master._chunkSize));
+    offset += sizeof(master._chunkSize);
 
     // Read index output directory
     master._indexDir = std::string(baseRegion+offset);
@@ -71,13 +76,13 @@ MasterChunk MasterChunk::Deserailize(char* baseRegion, size_t& offset) {
 
     // Read size of chunk list
     size_t numChunks = 0;
-    std::memcpy(&numChunks, baseRegion+offset, sizeof(numChunks));
-    offset+=sizeof(numChunks);
+    std::memcpy(&numChunks, baseRegion + offset, sizeof(numChunks));
+    offset += sizeof(numChunks);
 
     // Read chunk list
     for (size_t i = 0; i < numChunks; ++i) {
-        std::string chunkName = std::string(baseRegion+offset);
-        offset+=chunkName.size()+1;
+        std::string chunkName = std::string(baseRegion + offset);
+        offset += chunkName.size() + 1;
         master._indexChunks.push_back(chunkName);
     }
 
@@ -126,9 +131,11 @@ void MasterChunk::Flush() {
 }
 
 void MasterChunk::PrintCurrentIndexChunk() const {
-    cout << "---------- Index Chunk " << _indexChunks.size() << " ----------" << endl;
+    cout << "---------- Index Chunk " << _indexChunks.size() << " ----------"
+         << endl;
     _currIndexChunk.Print();
-    cout << "---------- Index Chunk " << _indexChunks.size() << " ----------" << endl;
+    cout << "---------- Index Chunk " << _indexChunks.size() << " ----------"
+         << endl;
 }
 
 void MasterChunk::PrintCurrentMetadataChunk() const {

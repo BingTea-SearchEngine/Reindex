@@ -1,8 +1,8 @@
 #pragma once
 
+#include <optional>
 #include "ISR.hpp"
 #include "PostingList.hpp"
-#include <optional>
 
 /**
  * @class ISRWord

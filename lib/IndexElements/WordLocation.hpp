@@ -19,7 +19,8 @@ struct word_t {
     wordlocation_t location;
 
     friend std::ostream& operator<<(std::ostream& os, const word_t& w) {
-        os << "word_t{ word=" << w.word << " offset=" << w.offset << " location=";
+        os << "word_t{ word=" << w.word << " offset=" << w.offset
+           << " location=";
         switch (w.location) {
             case (wordlocation_t::title):
                 os << "title";

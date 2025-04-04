@@ -1,7 +1,10 @@
 #include "ISROr.hpp"
 
-ISROr::ISROr(std::vector<ISR*> children) : childISRs(children), nearestTerm(children.size()),
-                                           nearestStartLocation(-1), nearestEndLocation(-1) {}
+ISROr::ISROr(std::vector<ISR*> children)
+    : childISRs(children),
+      nearestTerm(children.size()),
+      nearestStartLocation(-1),
+      nearestEndLocation(-1) {}
 
 int ISROr::GetStartLocation() {
     return this->nearestStartLocation;
@@ -12,7 +15,9 @@ int ISROr::GetEndLocation() {
 }
 
 std::optional<PostEntry> ISROr::GetCurrentPostEntry() {
-    if (nearestTerm >= childISRs.size()) { // constructor hacky way of signifying this ISR has never been used before
+    if (nearestTerm >=
+        childISRs
+            .size()) {  // constructor hacky way of signifying this ISR has never been used before
         return std::nullopt;
     }
 
@@ -21,7 +26,9 @@ std::optional<PostEntry> ISROr::GetCurrentPostEntry() {
 }
 
 std::string ISROr::GetDocumentName() {
-    if (nearestTerm >= childISRs.size()) { // constructor hacky way of signifying this ISR has never been used before
+    if (nearestTerm >=
+        childISRs
+            .size()) {  // constructor hacky way of signifying this ISR has never been used before
         return "";
     }
 
@@ -102,7 +109,8 @@ std::optional<PostEntry> ISROr::NextDocument() {
         // I'm not actually sure if this works?
         // can't think of a case that disproves
         // but can't 100% say this recursion is correct
-        if (child->NextDocument() == std::nullopt) { // TODO: this is wrong logic!
+        if (child->NextDocument() ==
+            std::nullopt) {  // TODO: this is wrong logic!
             return std::nullopt;
         }
     }
@@ -115,7 +123,8 @@ std::optional<PostEntry> ISROr::Seek(size_t target) {
     // the target location. Return null if there is no match.
     // The document is the document containing the nearest term.
     for (auto child : this->childISRs) {
-        if (child->Seek(target) == std::nullopt) { // TODO: this is wrong logic!
+        if (child->Seek(target) ==
+            std::nullopt) {  // TODO: this is wrong logic!
             return std::nullopt;
         }
     }

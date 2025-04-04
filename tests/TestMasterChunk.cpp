@@ -2,8 +2,8 @@
 #include <filesystem>
 
 #include "MasterChunk.hpp"
-#include "WordLocation.hpp"
 #include "Util.hpp"
+#include "WordLocation.hpp"
 
 TEST(BasicMasterChunk, SerialiezDeserialize) {
     // low chunk size so it creates a new chunk after every word
@@ -41,7 +41,8 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
     int fd2 = -1;
     void* buf2 = read_mmap_region(fd2, 4098, filePath);
     offset = 0;
-    MasterChunk master2 = MasterChunk::Deserailize(static_cast<char*>(buf2), offset);
+    MasterChunk master2 =
+        MasterChunk::Deserailize(static_cast<char*>(buf2), offset);
     munmap(buf2, 4098);
     close(fd2);
 
