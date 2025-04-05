@@ -1,30 +1,39 @@
+#include <cassert>
+
 #include "ISRAnd.hpp"
 
 ISRAnd::ISRAnd(std::vector<ISR*> children)
     : childISRs(children),
+      currentPostEntry(std::nullopt),
       nearestTerm(-1),
       farthestTerm(-1),
       nearestStartLocation(-1),
       nearestEndLocation(-1) {}
 
 int ISRAnd::GetStartLocation() {
-    return this->childISRs[nearestTerm]->GetStartLocation();
+    assert(this->currentPostEntry.has_value() && "GetStartLocation called when this ISR is not pointing to anything");
+    return this->nearestStartLocation;
 }
 
 int ISRAnd::GetEndLocation() {
-    return this->childISRs[farthestTerm]->GetEndLocation();
+    assert(this->currentPostEntry.has_value() && "GetEndLocation called when this ISR is not pointing to anything");
+    return this->nearestEndLocation;
 }
 
 std::optional<PostEntry> ISRAnd::GetCurrentPostEntry() {
-    return this->childISRs[nearestTerm]->GetCurrentPostEntry();
+    return this->currentPostEntry;
 }
 
 std::string ISRAnd::GetDocumentName() {
+    assert(this->currentPostEntry.has_value() && "GetDocumentName called when this ISR is not pointing to anything");
     return this->childISRs[nearestTerm]->GetDocumentName();
 }
 
 // helper function to update the internal marker variables
 // when any of the ISRs get moved around
+// PRECONDITION: when calling this helper function,
+//               not even a single one of the children
+//               can be finished
 void ISRAnd::UpdateMarkers() {
     size_t whichChildEarliest;
     size_t whichChildLatest;
@@ -51,6 +60,7 @@ void ISRAnd::UpdateMarkers() {
     this->farthestTerm = whichChildLatest;
     this->nearestStartLocation = nearestStart;
     this->nearestEndLocation = nearestEnd;
+    this->currentPostEntry = this->childISRs[nearestTerm]->GetCurrentPostEntry();
 }
 
 // helper function to check if all the current child ISRs
@@ -123,6 +133,7 @@ std::optional<PostEntry> ISRAnd::Next() {
         // need to do a Next() on all the child ISRs to initialize them
         for (auto& child : childISRs) {
             if (child->Next() == std::nullopt) {
+                this->currentPostEntry = std::nullopt;
                 return std::nullopt;
             }
         }
@@ -132,6 +143,7 @@ std::optional<PostEntry> ISRAnd::Next() {
 
         // this->nearestTerm points to the childISR that is the earliest
         if (this->childISRs[this->nearestTerm]->Next() == std::nullopt) {
+            this->currentPostEntry = std::nullopt;
             return std::nullopt;
         }
     }
@@ -146,6 +158,7 @@ std::optional<PostEntry> ISRAnd::Next() {
     }
 
     if (!this->CatchUpStragglerISRs()) {
+        this->currentPostEntry = std::nullopt;
         return std::nullopt;
     }
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
@@ -154,6 +167,7 @@ std::optional<PostEntry> ISRAnd::Next() {
 std::optional<PostEntry> ISRAnd::NextDocument() {
     for (auto& child : childISRs) {
         if (child->NextDocument() == std::nullopt) {
+            this->currentPostEntry = std::nullopt;
             return std::nullopt;
         }
     }
@@ -168,6 +182,7 @@ std::optional<PostEntry> ISRAnd::NextDocument() {
     }
 
     if (!this->CatchUpStragglerISRs()) {
+        this->currentPostEntry = std::nullopt;
         return std::nullopt;
     }
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
@@ -176,6 +191,7 @@ std::optional<PostEntry> ISRAnd::NextDocument() {
 std::optional<PostEntry> ISRAnd::Seek(size_t target) {
     for (auto& child : childISRs) {
         if (child->Seek(target) == std::nullopt) {
+            this->currentPostEntry = std::nullopt;
             return std::nullopt;
         }
     }
@@ -187,6 +203,7 @@ std::optional<PostEntry> ISRAnd::Seek(size_t target) {
     }
 
     if (!this->CatchUpStragglerISRs()) {
+        this->currentPostEntry = std::nullopt;
         return std::nullopt;
     }
     return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();

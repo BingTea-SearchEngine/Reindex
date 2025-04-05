@@ -31,6 +31,8 @@ std::string ISROr::GetDocumentName() {
 
 // helper function to update the internal marker variables
 // when any of the ISRs get moved around
+// PRECONDITION: this helper function must only be called when
+//               NOT ALL of the children are finished
 void ISROr::UpdateMarkers() {
     int whichChild;
     int nearestStart = INT32_MAX;
