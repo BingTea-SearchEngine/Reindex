@@ -43,7 +43,7 @@ std::optional<PostEntry> ISRWord::Next() {
     int innerPostEntry = this->currentPostEntryIdx + 1; // try to initially move to the next entry
 
     const auto& posts = this->postingList.GetPosts();
-    for (; outerPost < posts.size(); ++outerPost) {
+    for (; outerPost < posts.size(); ++outerPost) { // this for loop guaranteed to only run 0, 1, or 2 times
         auto& post = posts[outerPost];
         const auto& entries = post.GetEntries();
         const std::string currDocumentName = post.GetDocumentName();
@@ -68,36 +68,22 @@ std::optional<PostEntry> ISRWord::Next() {
 }
 
 std::optional<PostEntry> ISRWord::NextDocument() {
-    // TODO: inefficient because going through one by one
-    // one at a time -- is there a fix? (probably)
+    const auto& posts = this->postingList.GetPosts();
+    int nextPostIdx = this->currentPostIdx + 1;
+    
+    if (nextPostIdx < posts.size()) {
+        const auto& post = posts[nextPostIdx];
+        const auto& entries = post.GetEntries();
 
-    int outerPost = 0;
-    int innerPostEntry = 0;
-
-    for (auto post : this->postingList.GetPosts()) {
-        std::string currDocumentName = post.GetDocumentName();
-
-        if (this->currentPostIdx >= outerPost) {
-            // this post is not the immediate next of our current one
-            outerPost++;
-            innerPostEntry += post.GetEntries().size();
-        } else {
-            // found the first Post belonging to the next document
-            // now extract the first PostEntry within this Post
-            this->currentPostIdx = outerPost;
-            this->currentPostEntryIdx = innerPostEntry;
-
-            auto postEntry =
-                post.GetEntries()[0];  // just need to grab the first one
-            this->currentPostEntry = postEntry;
-            this->absoluteLocation = postEntry.GetDelta();
-            this->documentName = currDocumentName;
-            return this->currentPostEntry;
-        }
+        this->currentPostIdx = nextPostIdx;
+        this->currentPostEntryIdx = 0;
+        this->currentPostEntry = entries[0];
+        this->absoluteLocation = entries[0].GetDelta();
+        this->documentName = post.GetDocumentName();
+        return this->currentPostEntry;
     }
 
-    // the current Post that this ISR was pointing to was
-    // already the last one within this PostingList
+    // this was already at the last document
     this->currentPostEntry = std::nullopt;
     return std::nullopt;
 }
