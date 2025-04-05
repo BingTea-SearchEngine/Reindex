@@ -24,7 +24,9 @@ class ISRAnd : public ISR {
      * @brief Returns the absolute location of the earliest occurrence
      *        among the child ISRs at this moment.
      * 
-     * @return int or -1 if this ISR is not pointing to anything.
+     * @return int
+     * 
+     * @pre The ISR must currently be pointing to a valid PostEntry.
      */
     virtual int GetStartLocation() override;
 
@@ -32,7 +34,9 @@ class ISRAnd : public ISR {
      * @brief Returns the absolute location of the latest occurrence
      *        among the child ISRs at this moment.
      * 
-     * @return int or -1 if this ISR is not pointing to anything.
+     * @return int
+     * 
+     * @pre The ISR must currently be pointing to a valid PostEntry.
      */
     virtual int GetEndLocation() override;
 
@@ -46,7 +50,9 @@ class ISRAnd : public ISR {
     /**
       * @brief Returns the document name this ISR is pointing at.
       * 
-      * @return The name of the document this ISR is currently on or an empty string if this ISR is not pointing to anything.
+      * @return The name of the document this ISR is currently on
+      * 
+      * @pre The ISR must currently be pointing to a valid PostEntry.
       */
     virtual std::string GetDocumentName() override;
 
@@ -82,6 +88,9 @@ class ISRAnd : public ISR {
    private:
     /// the children ISRs that this ISR OR's on
     std::vector<ISR*> childISRs;
+
+    /// The current PostEntry this ISR is pointing at.
+    std::optional<PostEntry> currentPostEntry;
 
     /// among the children ISRs, which has the smallest absolute location? is it child 0, child 1, etc.?
     int nearestTerm;
