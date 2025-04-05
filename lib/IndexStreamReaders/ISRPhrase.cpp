@@ -82,6 +82,8 @@ bool ISRPhrase::ChildrenFormPhrase() {
         if (child->GetStartLocation() != prevOccurrence + 1) {
             return false;
         }
+
+        prevOccurrence = child->GetStartLocation();
     }
 
     return true;
