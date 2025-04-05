@@ -1,28 +1,40 @@
+#include <cassert>
+
 #include "ISRPhrase.hpp"
 
-ISRPhrase::ISRPhrase(std::vector<ISR*> children) : childISRs(children) {}
+ISRPhrase::ISRPhrase(std::vector<ISR*> children) : childISRs(children),
+                                                   currentPostEntry(std::nullopt),
+                                                   nearestTerm(-1),
+                                                   farthestTerm(-1),
+                                                   nearestStartLocation(-1),
+                                                   nearestEndLocation(-1) {}
 
 int ISRPhrase::GetStartLocation() {
-    return this->childISRs[nearestTerm]->GetStartLocation();
+    assert(this->currentPostEntry.has_value() && "GetStartLocation called when this ISR is not pointing to anything");
+    return this->nearestStartLocation;
 }
 
 int ISRPhrase::GetEndLocation() {
-    return this->childISRs[farthestTerm]->GetEndLocation();
+    assert(this->currentPostEntry.has_value() && "GetEndLocation called when this ISR is not pointing to anything");
+    return this->nearestEndLocation;
 }
 
 std::optional<PostEntry> ISRPhrase::GetCurrentPostEntry() {
-    return this->childISRs[nearestTerm]->GetCurrentPostEntry();
+    return this->currentPostEntry;
 }
 
 std::string ISRPhrase::GetDocumentName() {
+    assert(this->currentPostEntry.has_value() && "GetDocumentName called when this ISR is not pointing to anything");
     return this->childISRs[nearestTerm]->GetDocumentName();
 }
 
+// PRECONDITION: for this helper function to be called,
+//               ALL of the children must be valid still
 void ISRPhrase::UpdateMarkers() {
-    size_t whichChildEarliest;
-    size_t whichChildLatest;
-    size_t nearestStart = SIZE_MAX;
-    size_t nearestEnd = 0;
+    int whichChildEarliest;
+    int whichChildLatest;
+    int nearestStart = INT32_MAX;
+    int nearestEnd = 0;
 
     // figure out who is now the newest earliest occurrence and other variables
     for (int i = 0; i < this->childISRs.size(); ++i) {
@@ -44,6 +56,7 @@ void ISRPhrase::UpdateMarkers() {
     this->farthestTerm = whichChildLatest;
     this->nearestStartLocation = nearestStart;
     this->nearestEndLocation = nearestEnd;
+    this->currentPostEntry = this->childISRs[nearestTerm]->GetCurrentPostEntry();
 }
 
 // helper function to check if all the current child ISRs
@@ -51,7 +64,7 @@ void ISRPhrase::UpdateMarkers() {
 // occurrences in order
 bool ISRPhrase::ChildrenFormPhrase() {
     std::string prevDocumentName;
-    size_t prevOccurrence;
+    int prevOccurrence;
     bool first = true;
 
     for (auto& child : childISRs) {
@@ -132,6 +145,7 @@ std::optional<PostEntry> ISRPhrase::Next() {
     // need to do a Next() on all the child ISRs
     for (auto& child : childISRs) {
         if (child->Next() == std::nullopt) {
+            this->currentPostEntry = std::nullopt;
             return std::nullopt;
         }
     }
@@ -142,18 +156,20 @@ std::optional<PostEntry> ISRPhrase::Next() {
     if (this->ChildrenFormPhrase()) {
         // then, we can return if that is the case
         // TODO: returning the first PostEntry for a Phrase ISR?
-        return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+        return this->currentPostEntry;
     }
 
     if (!this->CatchUpStragglerISRs()) {
+        this->currentPostEntry = std::nullopt;
         return std::nullopt;
     }
-    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+    return this->currentPostEntry;
 }
 
 std::optional<PostEntry> ISRPhrase::NextDocument() {
     for (auto& child : childISRs) {
         if (child->NextDocument() == std::nullopt) {
+            this->currentPostEntry = std::nullopt;
             return std::nullopt;
         }
     }
@@ -164,30 +180,35 @@ std::optional<PostEntry> ISRPhrase::NextDocument() {
     if (this->ChildrenFormPhrase()) {
         // then, we can return if that is the case
         // TODO: returning the first PostEntry for Phrase ISR?
-        return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+        return this->currentPostEntry;
     }
 
     if (!this->CatchUpStragglerISRs()) {
+        this->currentPostEntry = std::nullopt;
         return std::nullopt;
     }
-    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+    return this->currentPostEntry;
 }
 
 std::optional<PostEntry> ISRPhrase::Seek(size_t target) {
     for (auto& child : childISRs) {
         if (child->Seek(target) == std::nullopt) {
+            this->currentPostEntry = std::nullopt;
             return std::nullopt;
         }
     }
 
+    this->UpdateMarkers();
+
     if (this->ChildrenFormPhrase()) {
         // then, we can return if that is the case
         // TODO: returning the first PostEntry for Phrase ISR?
-        return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+        return this->currentPostEntry;
     }
 
     if (!this->CatchUpStragglerISRs()) {
+        this->currentPostEntry = std::nullopt;
         return std::nullopt;
     }
-    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+    return this->currentPostEntry;
 }

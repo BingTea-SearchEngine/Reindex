@@ -91,6 +91,9 @@ class ISRPhrase : public ISR {
     /// the children ISRs that this ISR OR's on
     std::vector<ISR*> childISRs;
 
+    /// The current PostEntry this ISR is pointing at.
+    std::optional<PostEntry> currentPostEntry;
+
     /// among the children ISRs, which has the smallest absolute location? is it child 0, child 1, etc.?
     int nearestTerm;
 
