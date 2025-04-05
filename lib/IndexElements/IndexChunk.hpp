@@ -1,13 +1,13 @@
 #pragma once
 
+#include <iostream>
 #include <unordered_map>
 #include <unordered_set>
-#include <iostream>
 
 using std::cout, std::endl;
 
-#include "PostingList.hpp"
 #include "PostEntry.hpp"
+#include "PostingList.hpp"
 
 class IndexChunk {
    public:
