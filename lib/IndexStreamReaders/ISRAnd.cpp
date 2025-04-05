@@ -35,10 +35,10 @@ std::string ISRAnd::GetDocumentName() {
 //               not even a single one of the children
 //               can be finished
 void ISRAnd::UpdateMarkers() {
-    size_t whichChildEarliest;
-    size_t whichChildLatest;
-    size_t nearestStart = SIZE_MAX;
-    size_t nearestEnd = 0;
+    int whichChildEarliest;
+    int whichChildLatest;
+    int nearestStart = INT32_MAX;
+    int nearestEnd = 0;
 
     // figure out who is now the newest earliest occurrence and other variables
     for (int i = 0; i < this->childISRs.size(); ++i) {
@@ -154,14 +154,14 @@ std::optional<PostEntry> ISRAnd::Next() {
     if (this->ChildrenOnSameDocument()) {
         // then, we can return if that is the case
         // TODO: returning the first PostEntry for an AND ISR?
-        return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+        return this->currentPostEntry;
     }
 
     if (!this->CatchUpStragglerISRs()) {
         this->currentPostEntry = std::nullopt;
         return std::nullopt;
     }
-    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+    return this->currentPostEntry;
 }
 
 std::optional<PostEntry> ISRAnd::NextDocument() {
@@ -178,14 +178,14 @@ std::optional<PostEntry> ISRAnd::NextDocument() {
     if (this->ChildrenOnSameDocument()) {
         // then, we can return if that is the case
         // TODO: returning the first PostEntry for an AND ISR?
-        return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+        return this->currentPostEntry;
     }
 
     if (!this->CatchUpStragglerISRs()) {
         this->currentPostEntry = std::nullopt;
         return std::nullopt;
     }
-    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+    return this->currentPostEntry;
 }
 
 std::optional<PostEntry> ISRAnd::Seek(size_t target) {
@@ -199,12 +199,12 @@ std::optional<PostEntry> ISRAnd::Seek(size_t target) {
     if (this->ChildrenOnSameDocument()) {
         // then, we can return if that is the case
         // TODO: returning the first PostEntry for an AND ISR?
-        return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+        return this->currentPostEntry;
     }
 
     if (!this->CatchUpStragglerISRs()) {
         this->currentPostEntry = std::nullopt;
         return std::nullopt;
     }
-    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+    return this->currentPostEntry;
 }
