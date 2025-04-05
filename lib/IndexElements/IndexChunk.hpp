@@ -40,6 +40,14 @@ class IndexChunk {
     std::vector<std::string> GetDocuments();
 
     /*
+     * @brief Get the posting list for a word
+     * 
+     * @param The word to look for
+     * @return PostingList for that word
+     * */
+    PostingList GetPostingList(std::string word);
+
+    /*
      * @brief Prints the contents of the IndexChunk
      * */
     void Print() const;

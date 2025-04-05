@@ -40,6 +40,10 @@ std::vector<std::string> IndexChunk::GetDocuments() {
     return _documents;
 }
 
+PostingList IndexChunk::GetPostingList(std::string word) {
+    return _postingLists[word];
+}
+
 void IndexChunk::Serialize(char* base_region, size_t& offset, IndexChunk& index) {
     assert(offset == 0);
 
