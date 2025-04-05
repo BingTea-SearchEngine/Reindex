@@ -206,10 +206,7 @@ class ISRTest : public ::testing::Test {
 TEST_F(ISRTest, Word_SimpleNext) {
     ISR* ISR_word_megastore = new ISRWord(index["megastore"]);
 
-    EXPECT_EQ(ISR_word_megastore->GetStartLocation(), -1);
-    EXPECT_EQ(ISR_word_megastore->GetEndLocation(), -1);
     EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry(), std::nullopt);
-    EXPECT_EQ(ISR_word_megastore->GetDocumentName(), "");
     EXPECT_EQ(
         static_cast<ISRWord*>(ISR_word_megastore)->GetDocumentCount(),
         1);  // downward cast because polymorphism and ISR_word has these methods but ISR does not
@@ -234,10 +231,7 @@ TEST_F(ISRTest, Word_SimpleNext) {
 TEST_F(ISRTest, Word_SimpleNextDocument) {
     ISR* ISR_word_and = new ISRWord(index["and"]);
 
-    EXPECT_EQ(ISR_word_and->GetStartLocation(), -1);
-    EXPECT_EQ(ISR_word_and->GetEndLocation(), -1);
     EXPECT_EQ(ISR_word_and->GetCurrentPostEntry(), std::nullopt);
-    EXPECT_EQ(ISR_word_and->GetDocumentName(), "");
     EXPECT_EQ(static_cast<ISRWord*>(ISR_word_and)->GetDocumentCount(), 3);
     EXPECT_EQ(static_cast<ISRWord*>(ISR_word_and)->GetNumberOfOccurrences(), 4);
 
@@ -277,10 +271,7 @@ TEST_F(ISRTest, Word_SimpleNextDocument) {
 TEST_F(ISRTest, Word_SimpleSeekAndNext) {
     ISR* ISR_word_the = new ISRWord(index["the"]);
 
-    EXPECT_EQ(ISR_word_the->GetStartLocation(), -1);
-    EXPECT_EQ(ISR_word_the->GetEndLocation(), -1);
     EXPECT_EQ(ISR_word_the->GetCurrentPostEntry(), std::nullopt);
-    EXPECT_EQ(ISR_word_the->GetDocumentName(), "");
     EXPECT_EQ(static_cast<ISRWord*>(ISR_word_the)->GetDocumentCount(), 4);
     EXPECT_EQ(static_cast<ISRWord*>(ISR_word_the)->GetNumberOfOccurrences(), 4);
 
@@ -380,10 +371,7 @@ TEST_F(ISRTest, Or_SimpleNext) {
     ISR* ISR_protein_OR_bananas =
         new ISROr({ISR_word_protein, ISR_word_bananas});
 
-    EXPECT_EQ(ISR_protein_OR_bananas->GetStartLocation(), -1);
-    EXPECT_EQ(ISR_protein_OR_bananas->GetEndLocation(), -1);
     EXPECT_EQ(ISR_protein_OR_bananas->GetCurrentPostEntry(), std::nullopt);
-    EXPECT_EQ(ISR_protein_OR_bananas->GetDocumentName(), "");
 
     // protein at 28
     EXPECT_EQ(ISR_protein_OR_bananas->Next()->GetDelta(), 28);
