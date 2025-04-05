@@ -39,33 +39,30 @@ std::string ISRWord::GetDocumentName() {
 }
 
 std::optional<PostEntry> ISRWord::Next() {
-    // TODO: inefficient because going through one by one
-    // one at a time -- is there a fix? (probably)
+    int outerPost = this->currentPostIdx;
+    int innerPostEntry = this->currentPostEntryIdx + 1; // try to initially move to the next entry
 
-    int outerPost = 0;
-    int innerPostEntry = 0;
+    const auto& posts = this->postingList.GetPosts();
+    for (; outerPost < posts.size(); ++outerPost) {
+        auto& post = posts[outerPost];
+        const auto& entries = post.GetEntries();
+        const std::string currDocumentName = post.GetDocumentName();
 
-    for (auto post : this->postingList.GetPosts()) {
-        std::string currDocumentName = post.GetDocumentName();
+        if (innerPostEntry < entries.size()) {
+            const auto& postEntry = entries[innerPostEntry];
 
-        for (auto postEntry : post.GetEntries()) {
-            if (innerPostEntry > this->currentPostEntryIdx) {
-                this->currentPostIdx = outerPost;
-                this->currentPostEntryIdx = innerPostEntry;
-                this->currentPostEntry = postEntry;
-                this->absoluteLocation = postEntry.GetDelta();
-                this->documentName = currDocumentName;
-                return this->currentPostEntry;
-            }
-
-            innerPostEntry++;
+            this->currentPostIdx = outerPost;
+            this->currentPostEntryIdx = innerPostEntry;
+            this->currentPostEntry = postEntry;
+            this->absoluteLocation = postEntry.GetDelta();
+            this->documentName = currDocumentName;
+            return this->currentPostEntry;
         }
 
-        outerPost++;
+        innerPostEntry = 0; // reset for next post
     }
 
-    // this->currentPostEntry was already pointing to the very last
-    // PostEntry within this PostingList
+    // no more entries found at all
     this->currentPostEntry = std::nullopt;
     return std::nullopt;
 }

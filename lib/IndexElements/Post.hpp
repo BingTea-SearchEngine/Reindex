@@ -31,14 +31,14 @@ class Post {
          * 
          * @return A std::string of the document's name.
          */
-    std::string GetDocumentName();
+    std::string GetDocumentName() const;
 
     /**
          * @brief Returns a vector containing all word occurrences (PostEntry objects) in the post.
          * 
          * @return A vector of PostEntry objects.
          */
-    std::vector<PostEntry> GetEntries();
+    std::vector<PostEntry> GetEntries() const;
 
     /**
          * @brief Adds a word occurrence (PostEntry) to the post.
