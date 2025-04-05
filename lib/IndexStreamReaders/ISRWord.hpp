@@ -18,13 +18,13 @@ class ISRWord : public ISR {
      *
      * @param pL A posting list for a particular word.
      */
-    ISRWord(PostingList pL);
+    ISRWord(const PostingList& pL);
 
     /**
      * @brief Returns the absolute location of the earliest occurrence
      *        among the child ISRs at this moment.
      * 
-     * @return int
+     * @return int or -1 if this ISR is not pointing to anything.
      */
     virtual int GetStartLocation() override;
 
@@ -32,7 +32,7 @@ class ISRWord : public ISR {
      * @brief Returns the absolute location of the latest occurrence
      *        among the child ISRs at this moment.
      * 
-     * @return int
+     * @return int or -1 if this ISR is not pointing to anything.
      */
     virtual int GetEndLocation() override;
 
@@ -46,7 +46,7 @@ class ISRWord : public ISR {
     /**
      * @brief Returns the document name this ISR is pointing at.
      * 
-     * @return The name of the document this ISR is currently on.
+     * @return The name of the document this ISR is currently on or an empty string if this ISR is not pointing to anything.
      */
     virtual std::string GetDocumentName() override;
 
@@ -97,7 +97,7 @@ class ISRWord : public ISR {
 
    private:
     /// The postingList associated with this ISRWord
-    PostingList postingList;
+    const PostingList& postingList;
 
     /// The index of the current Post (document Post).
     int currentPostIdx;
@@ -114,4 +114,10 @@ class ISRWord : public ISR {
 
     /// The name of the document this ISR is currently pointing at.
     std::string documentName;
+
+    /// The amount of documents that this word appears in.
+    int documentCount;
+
+    /// The number of appearances that this word has across the whole collection.
+    int numOccurrences;
 };

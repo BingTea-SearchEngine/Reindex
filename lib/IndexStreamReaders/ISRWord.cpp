@@ -1,12 +1,18 @@
 #include "ISRWord.hpp"
 
-ISRWord::ISRWord(PostingList pL)
+ISRWord::ISRWord(const PostingList& pL)
     : postingList(pL),
       currentPostIdx(-1),
       currentPostEntry(std::nullopt),
       currentPostEntryIdx(-1),
       absoluteLocation(-1),
-      documentName("") {}
+      documentName("") {
+    this->documentCount = this->postingList.GetPosts().size();
+
+    for (auto& post : this->postingList.GetPosts()) {
+        this->numOccurrences += post.GetEntries().size();
+    }
+}
 
 int ISRWord::GetStartLocation() {
     return this->absoluteLocation;
@@ -17,17 +23,11 @@ int ISRWord::GetEndLocation() {
 }
 
 int ISRWord::GetDocumentCount() {
-    return this->postingList.GetPosts().size();
+    return this->documentCount;
 }
 
 int ISRWord::GetNumberOfOccurrences() {
-    int occurrences = 0;
-
-    for (auto& post : this->postingList.GetPosts()) {
-        occurrences += post.GetEntries().size();
-    }
-
-    return occurrences;
+    return this->numOccurrences;
 }
 
 std::optional<PostEntry> ISRWord::GetCurrentPostEntry() {
