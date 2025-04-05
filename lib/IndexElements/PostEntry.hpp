@@ -39,7 +39,7 @@ class PostEntry {
          * 
          * @return A uint32_t of this PostEntry's delta.
          */
-    uint32_t GetDelta();
+    uint32_t GetDelta() const;
 
     /**
          * @brief Returns the location of where this word occurred.
