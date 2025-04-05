@@ -1,38 +1,31 @@
+#include <cassert>
+
 #include "ISROr.hpp"
 
 ISROr::ISROr(std::vector<ISR*> children)
     : childISRs(children),
+      whichChildFinished(children.size(), false),
       nearestTerm(children.size()),
+      currentPostEntry(std::nullopt),
       nearestStartLocation(-1),
       nearestEndLocation(-1) {}
 
 int ISROr::GetStartLocation() {
+    assert(this->currentPostEntry.has_value() && "GetStartLocation called when this ISR is not pointing to anything");
     return this->nearestStartLocation;
 }
 
 int ISROr::GetEndLocation() {
+    assert(this->currentPostEntry.has_value() && "GetEndLocation called when this ISR is not pointing to anything");
     return this->nearestEndLocation;
 }
 
 std::optional<PostEntry> ISROr::GetCurrentPostEntry() {
-    if (nearestTerm >=
-        childISRs
-            .size()) {  // constructor hacky way of signifying this ISR has never been used before
-        return std::nullopt;
-    }
-
-    // extract whatever the earliest child ISR is pointing at
-    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+    return this->currentPostEntry;
 }
 
 std::string ISROr::GetDocumentName() {
-    if (nearestTerm >=
-        childISRs
-            .size()) {  // constructor hacky way of signifying this ISR has never been used before
-        return "";
-    }
-
-    // extract the name of the document that the earliest child ISR is pointing at
+    assert(this->currentPostEntry.has_value() && "GetDocumentName called when this ISR is not pointing to anything");
     return (this->childISRs)[this->nearestTerm]->GetDocumentName();
 }
 
@@ -44,7 +37,11 @@ void ISROr::UpdateMarkers() {
     int nearestEnd = 0;
 
     // figure out who is now the newest earliest occurrence and other variables
+    // whilst making sure to ignore those that are already finished
     for (int i = 0; i < this->childISRs.size(); ++i) {
+        if (this->whichChildFinished[i]) {
+            continue;
+        }
         auto& child = this->childISRs[i];
 
         if (child->GetStartLocation() < nearestStart) {
@@ -61,10 +58,24 @@ void ISROr::UpdateMarkers() {
     this->nearestTerm = whichChild;
     this->nearestStartLocation = nearestStart;
     this->nearestEndLocation = nearestEnd;
+    this->currentPostEntry = this->childISRs[this->nearestTerm]->GetCurrentPostEntry();
+}
+
+// internal helper function to determine if
+// all the child ISRs have finished
+bool ISROr::AllChildrenFinished() {
+    for (auto b : this->whichChildFinished) {
+        if (!b) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 std::optional<PostEntry> ISROr::Next() {
-    if (childISRs.size() == 0) {
+    if (this->AllChildrenFinished()) {
+        this->currentPostEntry = std::nullopt;
         return std::nullopt;
     }
 
@@ -72,9 +83,9 @@ std::optional<PostEntry> ISROr::Next() {
     // has ever been used before
     if (this->nearestStartLocation == -1) {
         // need to do a Next() on all the child ISRs to initialize them
-        for (int i = childISRs.size() - 1; i >= 0; --i) {
-            if (childISRs[i]->Next() == std::nullopt) {
-                childISRs.erase(childISRs.begin() + i);
+        for (int i = 0; i < this->childISRs.size(); ++i) {
+            if (this->childISRs[i]->Next() == std::nullopt) {
+                this->whichChildFinished[i] = true;
             }
         }
     } else {
@@ -86,48 +97,65 @@ std::optional<PostEntry> ISROr::Next() {
         // if x is at the earliest location,
         // do a Next() on x, and then return
         // the new nearest/earliest match.
-
         // this->nearestTerm points to the childISR that is the earliest
         if (this->childISRs[this->nearestTerm]->Next() == std::nullopt) {
-            childISRs.erase(childISRs.begin() + this->nearestTerm);
+            this->whichChildFinished[this->nearestTerm] = true;
         }
     }
 
-    if (childISRs.size() == 0) {
+    if (this->AllChildrenFinished()) {
+        this->currentPostEntry = std::nullopt;
         return std::nullopt;
     }
 
     this->UpdateMarkers();
-    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+    return this->currentPostEntry;
 }
 
 std::optional<PostEntry> ISROr::NextDocument() {
+    if (this->AllChildrenFinished()) {
+        this->currentPostEntry = std::nullopt;
+        return std::nullopt;
+    }
+
     // Position all the ISRs to the first occurrence
     // immediately after the current document.
-    for (auto child : this->childISRs) {
-        // need to double check logic on this
-        // I'm not actually sure if this works?
-        // can't think of a case that disproves
-        // but can't 100% say this recursion is correct
-        if (child->NextDocument() ==
-            std::nullopt) {  // TODO: this is wrong logic!
-            return std::nullopt;
+
+    for (int i = 0; i < this->childISRs.size(); ++i) {
+        if (this->childISRs[i]->NextDocument() == std::nullopt) {
+            this->whichChildFinished[i] = true;
         }
     }
+
+    if (this->AllChildrenFinished()) {
+        this->currentPostEntry = std::nullopt;
+        return std::nullopt;
+    }
+
     this->UpdateMarkers();
-    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+    return this->currentPostEntry;
 }
 
 std::optional<PostEntry> ISROr::Seek(size_t target) {
+    // reset the whichChildFinished bool container to allow arbitrary seeking at any point
+    for (int i = 0; i < this->whichChildFinished.size(); ++i) {
+        this->whichChildFinished[i] = false;
+    }
+
     // Seek all the ISRs to the first occurrence beginning at
     // the target location. Return null if there is no match.
     // The document is the document containing the nearest term.
-    for (auto child : this->childISRs) {
-        if (child->Seek(target) ==
-            std::nullopt) {  // TODO: this is wrong logic!
-            return std::nullopt;
+    for (int i = 0; i < this->childISRs.size(); ++i) {
+        if (this->childISRs[i]->Seek(target) == std::nullopt) {
+            this->whichChildFinished[i] = true;
         }
     }
+
+    if (this->AllChildrenFinished()) {
+        this->currentPostEntry = std::nullopt;
+        return std::nullopt;
+    }
+
     this->UpdateMarkers();
-    return (this->childISRs)[this->nearestTerm]->GetCurrentPostEntry();
+    return this->currentPostEntry;
 }

@@ -18,14 +18,18 @@ class ISR {
     /**
      * @brief Returns the starting location of whatever the ISR is currently on.
      * 
-     * @return The starting location of whatever the ISR is currently on or -1 if this ISR is not pointing to anything.
+     * @return The starting location of whatever the ISR is currently on.
+     * 
+     * @pre The ISR must currently be pointing to a valid PostEntry.
      */
     virtual int GetStartLocation() = 0;
 
     /**
      * @brief Returns the ending location of whatever the ISR is currently on.
      * 
-     * @return The ending location of whatever the ISR is currently on or -1 if this ISR is not pointing to anything.
+     * @return The ending location of whatever the ISR is currently on.
+     * 
+     * @pre The ISR must currently be pointing to a valid PostEntry.
      */
     virtual int GetEndLocation() = 0;
 
@@ -39,7 +43,9 @@ class ISR {
     /**
      * @brief Returns the document name this ISR is pointing at.
      * 
-     * @return The name of the document this ISR is currently on or an empty string if this ISR is not pointing to anything.
+     * @return The name of the document this ISR is currently on.
+     * 
+     * @pre The ISR must currently be pointing to a valid PostEntry.
      */
     virtual std::string GetDocumentName() = 0;
 
