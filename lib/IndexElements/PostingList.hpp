@@ -55,7 +55,7 @@ class PostingList {
          *
          * @return A vector of Post objects associated with this PostingList.
          */
-    std::vector<Post> GetPosts();
+    std::vector<Post> GetPosts() const;
 
     /*
      * @brief Prints the contents of the PostingList
