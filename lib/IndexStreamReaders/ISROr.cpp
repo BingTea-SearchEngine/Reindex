@@ -120,21 +120,40 @@ std::optional<PostEntry> ISROr::NextDocument() {
         return std::nullopt;
     }
 
-    // Position all the ISRs to the first occurrence
-    // immediately after the current document.
-
-    for (int i = 0; i < this->childISRs.size(); ++i) {
-        if (this->childISRs[i]->NextDocument() == std::nullopt) {
-            this->whichChildFinished[i] = true;
+    // check whether or not this ISROr
+    // has ever been used before
+    if (this->nearestStartLocation == -1) {
+        // need to do a NextDocument() on all the child ISRs to initialize them
+        for (int i = 0; i < this->childISRs.size(); ++i) {
+            if (this->childISRs[i]->NextDocument() == std::nullopt) {
+                this->whichChildFinished[i] = true;
+            }
         }
+
+        if (this->AllChildrenFinished()) {
+            this->currentPostEntry = std::nullopt;
+            return std::nullopt;
+        }
+    
+        this->UpdateMarkers();
+        return this->currentPostEntry;
     }
 
-    if (this->AllChildrenFinished()) {
-        this->currentPostEntry = std::nullopt;
-        return std::nullopt;
+    std::string prevDocumentName = this->GetDocumentName();
+
+    while (this->GetDocumentName() == prevDocumentName) {
+        if (this->childISRs[this->nearestTerm]->NextDocument() == std::nullopt) {
+            this->whichChildFinished[this->nearestTerm] = true;
+        }
+    
+        if (this->AllChildrenFinished()) {
+            this->currentPostEntry = std::nullopt;
+            return std::nullopt;
+        }
+
+        this->UpdateMarkers();
     }
 
-    this->UpdateMarkers();
     return this->currentPostEntry;
 }
 

@@ -85,6 +85,11 @@ add_executable(TestMetadataChunk tests/TestMetadataChunk.cpp)
 target_link_libraries(TestMetadataChunk PRIVATE GTest::gtest_main IndexElements)
 add_executable(TestISR tests/TestISR.cpp)
 target_link_libraries(TestISR PRIVATE GTest::gtest_main IndexStreamReaders)
+add_executable(TestISRWord tests/TestISRWord.cpp)
+target_link_libraries(TestISRWord PRIVATE GTest::gtest_main IndexStreamReaders)
+
+add_executable(TestISROr tests/TestISROr.cpp)
+target_link_libraries(TestISROr PRIVATE GTest::gtest_main IndexStreamReaders)
 
 include(GoogleTest)
 gtest_discover_tests(TestExample)
@@ -94,4 +99,6 @@ gtest_discover_tests(TestIndexChunk)
 gtest_discover_tests(TestMetadataChunk)
 
 gtest_discover_tests(TestISR)
+gtest_discover_tests(TestISRWord)
+gtest_discover_tests(TestISROr)
 
