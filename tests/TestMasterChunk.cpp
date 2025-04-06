@@ -8,7 +8,7 @@
 TEST(BasicMasterChunk, SerialiezDeserialize) {
     // low chunk size so it creates a new chunk after every word
     std::filesystem::path cwd = std::filesystem::current_path();
-    MasterChunk master(cwd.string()+"/temp", 1);
+    MasterChunk master(cwd.string(), 1);
     std::vector<word_t> w;
     w.push_back(word_t{"w", 0, wordlocation_t::title});
 
