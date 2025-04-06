@@ -380,4 +380,42 @@ TEST_F(OrISR, SimpleSeekAndNext) {
     EXPECT_EQ(ISR_granola_OR_protein->Seek(60), std::nullopt);
     EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry(), std::nullopt);
     EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry(), std::nullopt);
+
+	// TESTING the reset with seek
+	// granola at 8
+	EXPECT_EQ(ISR_granola_OR_protein->Seek(8)->GetDelta(), 8);
+	EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetDelta(), 8);
+	EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+	EXPECT_EQ(ISR_granola_OR_protein->GetStartLocation(), 8);
+	EXPECT_EQ(ISR_granola_OR_protein->GetEndLocation(), 28);
+	EXPECT_EQ(ISR_granola_OR_protein->GetDocumentName(), "Document 1");
+
+	// protein at 28
+	EXPECT_EQ(ISR_granola_OR_protein->Seek(27)->GetDelta(), 28);
+	EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetDelta(), 28);
+	EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+	EXPECT_EQ(ISR_granola_OR_protein->GetStartLocation(), 28);
+	EXPECT_EQ(ISR_granola_OR_protein->GetEndLocation(), 28);
+	EXPECT_EQ(ISR_granola_OR_protein->GetDocumentName(), "Document 2");
+
+	// protein at 51
+	EXPECT_EQ(ISR_granola_OR_protein->Seek(51)->GetDelta(), 51);
+	EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetDelta(), 51);
+	EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+	EXPECT_EQ(ISR_granola_OR_protein->GetStartLocation(), 51);
+	EXPECT_EQ(ISR_granola_OR_protein->GetEndLocation(), 51);
+	EXPECT_EQ(ISR_granola_OR_protein->GetDocumentName(), "Document 4");
+
+	// protein at 51
+	EXPECT_EQ(ISR_granola_OR_protein->Seek(51)->GetDelta(), 51);
+	EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetDelta(), 51);
+	EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+	EXPECT_EQ(ISR_granola_OR_protein->GetStartLocation(), 51);
+	EXPECT_EQ(ISR_granola_OR_protein->GetEndLocation(), 51);
+	EXPECT_EQ(ISR_granola_OR_protein->GetDocumentName(), "Document 4");
+
+	// EOF
+	EXPECT_EQ(ISR_granola_OR_protein->Seek(60), std::nullopt);
+	EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry(), std::nullopt);
+	EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry(), std::nullopt);
 }
