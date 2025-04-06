@@ -167,7 +167,9 @@ std::optional<PostEntry> ISROr::Seek(size_t target) {
     // the target location. Return null if there is no match.
     // The document is the document containing the nearest term.
     for (int i = 0; i < this->childISRs.size(); ++i) {
+        assert(i >= 0 && i < this->childISRs.size());
         if (this->childISRs[i]->Seek(target) == std::nullopt) {
+            assert(i >= 0 && i < this->whichChildFinished.size());
             this->whichChildFinished[i] = true;
         }
     }
