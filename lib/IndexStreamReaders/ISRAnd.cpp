@@ -58,7 +58,6 @@ void ISRAnd::UpdateMarkers() {
         }
     }
 
-    // whichChild is now the value of whatever child is at the earliest location
     this->nearestTerm = whichChildEarliest;
     this->farthestTerm = whichChildLatest;
     this->nearestStartLocation = nearestStart;
