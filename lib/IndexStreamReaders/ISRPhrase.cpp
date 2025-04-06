@@ -95,12 +95,13 @@ bool ISRPhrase::CatchUpStragglerISRs() {
         // means that among child ISRs x, y, and z...
         // ..........x...............
         // .................y........
-        // ....z.....................
-        // move forward the proper stragglers until they're hopefully RIGHT NEXT TO y
+        // .........................z
+        // move forward the proper stragglers until they're hopefully RIGHT NEXT TO z
         std::string potentialTargetDocument =
             (this->childISRs)[this->farthestTerm]->GetDocumentName();
         size_t baselineLocation =
             (this->childISRs)[this->farthestTerm]->GetStartLocation();
+
         for (int i = 0; i < childISRs.size(); ++i) {
             if (i == this->farthestTerm) {
                 continue;
@@ -108,11 +109,8 @@ bool ISRPhrase::CatchUpStragglerISRs() {
 
             std::string currentDocument =
                 (this->childISRs)[i]->GetDocumentName();
-            if (currentDocument == potentialTargetDocument) {
-                continue;
-            }
-
             size_t currLocation = (this->childISRs)[i]->GetStartLocation();
+
             // let's say there are child ISRs a, b, c, and d
             // c is the one that is the furthest up ahead
             // this means that a must be 2 locations behind c
@@ -120,7 +118,7 @@ bool ISRPhrase::CatchUpStragglerISRs() {
             // d must be 1 location ahead c
             int expectedLocationDifference = i - this->farthestTerm;
 
-            if (currLocation - baselineLocation == expectedLocationDifference) {
+            if ((currentDocument == potentialTargetDocument) && (currLocation - baselineLocation == expectedLocationDifference)) {
                 continue;
             }
 
