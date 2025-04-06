@@ -2,20 +2,23 @@
 
 #include "ISRPhrase.hpp"
 
-ISRPhrase::ISRPhrase(std::vector<ISR*> children) : childISRs(children),
-                                                   currentPostEntry(std::nullopt),
-                                                   nearestTerm(-1),
-                                                   farthestTerm(-1),
-                                                   nearestStartLocation(-1),
-                                                   nearestEndLocation(-1) {}
+ISRPhrase::ISRPhrase(std::vector<ISR*> children)
+    : childISRs(children),
+      currentPostEntry(std::nullopt),
+      nearestTerm(-1),
+      farthestTerm(-1),
+      nearestStartLocation(-1),
+      nearestEndLocation(-1) {}
 
 int ISRPhrase::GetStartLocation() {
-    assert(this->currentPostEntry.has_value() && "GetStartLocation called when this ISR is not pointing to anything");
+    assert(this->currentPostEntry.has_value() &&
+           "GetStartLocation called when this ISR is not pointing to anything");
     return this->nearestStartLocation;
 }
 
 int ISRPhrase::GetEndLocation() {
-    assert(this->currentPostEntry.has_value() && "GetEndLocation called when this ISR is not pointing to anything");
+    assert(this->currentPostEntry.has_value() &&
+           "GetEndLocation called when this ISR is not pointing to anything");
     return this->nearestEndLocation;
 }
 
@@ -24,7 +27,8 @@ std::optional<PostEntry> ISRPhrase::GetCurrentPostEntry() {
 }
 
 std::string ISRPhrase::GetDocumentName() {
-    assert(this->currentPostEntry.has_value() && "GetDocumentName called when this ISR is not pointing to anything");
+    assert(this->currentPostEntry.has_value() &&
+           "GetDocumentName called when this ISR is not pointing to anything");
     return this->childISRs[nearestTerm]->GetDocumentName();
 }
 
@@ -56,7 +60,8 @@ void ISRPhrase::UpdateMarkers() {
     this->farthestTerm = whichChildLatest;
     this->nearestStartLocation = nearestStart;
     this->nearestEndLocation = nearestEnd;
-    this->currentPostEntry = this->childISRs[nearestTerm]->GetCurrentPostEntry();
+    this->currentPostEntry =
+        this->childISRs[nearestTerm]->GetCurrentPostEntry();
 }
 
 // helper function to check if all the current child ISRs
@@ -118,7 +123,9 @@ bool ISRPhrase::CatchUpStragglerISRs() {
             // d must be 1 location ahead c
             int expectedLocationDifference = i - this->farthestTerm;
 
-            if ((currentDocument == potentialTargetDocument) && (currLocation - baselineLocation == expectedLocationDifference)) {
+            if ((currentDocument == potentialTargetDocument) &&
+                (currLocation - baselineLocation ==
+                 expectedLocationDifference)) {
                 continue;
             }
 

@@ -85,7 +85,7 @@ class ISROr : public ISR {
      */
     virtual std::optional<PostEntry> Seek(size_t target) override;
 
-   private: 
+   private:
     /// the children ISRs that this ISR OR's on
     std::vector<ISR*> childISRs;
 
