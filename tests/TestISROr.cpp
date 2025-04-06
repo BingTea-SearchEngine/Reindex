@@ -337,3 +337,49 @@ TEST_F(OrISR, ComplexNextDocument) {
     EXPECT_EQ(ISR_bar_OR_amazon->NextDocument(), std::nullopt);
     EXPECT_EQ(ISR_bar_OR_amazon->GetCurrentPostEntry(), std::nullopt);
 }
+
+TEST_F(OrISR, SimpleSeekAndNext) {
+    ISR* ISR_word_granola = new ISRWord(index["granola"]);
+    ISR* ISR_word_protein = new ISRWord(index["protein"]);
+
+    ISR* ISR_granola_OR_protein = new ISROr({ISR_word_granola, ISR_word_protein});
+
+    EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry(), std::nullopt);
+
+    // granola at 8
+    EXPECT_EQ(ISR_granola_OR_protein->Seek(8)->GetDelta(), 8);
+    EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetDelta(), 8);
+    EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    EXPECT_EQ(ISR_granola_OR_protein->GetStartLocation(), 8);
+    EXPECT_EQ(ISR_granola_OR_protein->GetEndLocation(), 28);
+    EXPECT_EQ(ISR_granola_OR_protein->GetDocumentName(), "Document 1");
+
+    // protein at 28
+    EXPECT_EQ(ISR_granola_OR_protein->Seek(27)->GetDelta(), 28);
+    EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetDelta(), 28);
+    EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    EXPECT_EQ(ISR_granola_OR_protein->GetStartLocation(), 28);
+    EXPECT_EQ(ISR_granola_OR_protein->GetEndLocation(), 28);
+    EXPECT_EQ(ISR_granola_OR_protein->GetDocumentName(), "Document 2");
+
+    // protein at 51
+    EXPECT_EQ(ISR_granola_OR_protein->Seek(51)->GetDelta(), 51);
+    EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetDelta(), 51);
+    EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    EXPECT_EQ(ISR_granola_OR_protein->GetStartLocation(), 51);
+    EXPECT_EQ(ISR_granola_OR_protein->GetEndLocation(), 51);
+    EXPECT_EQ(ISR_granola_OR_protein->GetDocumentName(), "Document 4");
+
+    // protein at 51
+    EXPECT_EQ(ISR_granola_OR_protein->Seek(51)->GetDelta(), 51);
+    EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetDelta(), 51);
+    EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    EXPECT_EQ(ISR_granola_OR_protein->GetStartLocation(), 51);
+    EXPECT_EQ(ISR_granola_OR_protein->GetEndLocation(), 51);
+    EXPECT_EQ(ISR_granola_OR_protein->GetDocumentName(), "Document 4");
+
+    // EOF
+    EXPECT_EQ(ISR_granola_OR_protein->Seek(60), std::nullopt);
+    EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_granola_OR_protein->GetCurrentPostEntry(), std::nullopt);
+}
