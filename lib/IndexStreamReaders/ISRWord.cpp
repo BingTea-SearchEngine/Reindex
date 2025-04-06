@@ -17,12 +17,14 @@ ISRWord::ISRWord(const PostingList& pL)
 }
 
 int ISRWord::GetStartLocation() {
-    assert(this->currentPostEntry.has_value() && "GetStartLocation called when this ISR is not pointing to anything");
+    assert(this->currentPostEntry.has_value() &&
+           "GetStartLocation called when this ISR is not pointing to anything");
     return this->absoluteLocation;
 }
 
 int ISRWord::GetEndLocation() {
-    assert(this->currentPostEntry.has_value() && "GetEndLocation called when this ISR is not pointing to anything");
+    assert(this->currentPostEntry.has_value() &&
+           "GetEndLocation called when this ISR is not pointing to anything");
     return this->absoluteLocation;
 }
 
@@ -39,7 +41,8 @@ std::optional<PostEntry> ISRWord::GetCurrentPostEntry() {
 }
 
 std::string ISRWord::GetDocumentName() {
-    assert(this->currentPostEntry.has_value() && "GetDocumentName called when this ISR is not pointing to anything");
+    assert(this->currentPostEntry.has_value() &&
+           "GetDocumentName called when this ISR is not pointing to anything");
     return this->documentName;
 }
 
@@ -49,10 +52,13 @@ std::optional<PostEntry> ISRWord::Next() {
         outerPost++;
     }
 
-    int innerPostEntry = this->currentPostEntryIdx + 1; // try to move to the next adjacent entry at first
+    int innerPostEntry = this->currentPostEntryIdx +
+                         1;  // try to move to the next adjacent entry at first
 
     const auto posts = this->postingList.GetPosts();
-    for (; outerPost < posts.size(); ++outerPost) { // this for loop guaranteed to only run 0, 1, or 2 times
+    for (
+        ; outerPost < posts.size();
+        ++outerPost) {  // this for loop guaranteed to only run 0, 1, or 2 times
         assert(outerPost >= 0 && outerPost < posts.size());
         auto post = posts[outerPost];
         const auto entries = post.GetEntries();
@@ -70,7 +76,7 @@ std::optional<PostEntry> ISRWord::Next() {
             return this->currentPostEntry;
         }
 
-        innerPostEntry = 0; // reset for next post
+        innerPostEntry = 0;  // reset for next post
     }
 
     // no more entries found at all
@@ -81,7 +87,7 @@ std::optional<PostEntry> ISRWord::Next() {
 std::optional<PostEntry> ISRWord::NextDocument() {
     const auto posts = this->postingList.GetPosts();
     int nextPostIdx = this->currentPostIdx + 1;
-    
+
     if (nextPostIdx < posts.size()) {
         assert(nextPostIdx >= 0 && nextPostIdx < posts.size());
         const auto post = posts[nextPostIdx];

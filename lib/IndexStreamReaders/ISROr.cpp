@@ -11,12 +11,14 @@ ISROr::ISROr(std::vector<ISR*> children)
       nearestEndLocation(-1) {}
 
 int ISROr::GetStartLocation() {
-    assert(this->currentPostEntry.has_value() && "GetStartLocation called when this ISR is not pointing to anything");
+    assert(this->currentPostEntry.has_value() &&
+           "GetStartLocation called when this ISR is not pointing to anything");
     return this->nearestStartLocation;
 }
 
 int ISROr::GetEndLocation() {
-    assert(this->currentPostEntry.has_value() && "GetEndLocation called when this ISR is not pointing to anything");
+    assert(this->currentPostEntry.has_value() &&
+           "GetEndLocation called when this ISR is not pointing to anything");
     return this->nearestEndLocation;
 }
 
@@ -25,7 +27,8 @@ std::optional<PostEntry> ISROr::GetCurrentPostEntry() {
 }
 
 std::string ISROr::GetDocumentName() {
-    assert(this->currentPostEntry.has_value() && "GetDocumentName called when this ISR is not pointing to anything");
+    assert(this->currentPostEntry.has_value() &&
+           "GetDocumentName called when this ISR is not pointing to anything");
     return (this->childISRs)[this->nearestTerm]->GetDocumentName();
 }
 
@@ -60,7 +63,8 @@ void ISROr::UpdateMarkers() {
     this->nearestTerm = whichChild;
     this->nearestStartLocation = nearestStart;
     this->nearestEndLocation = nearestEnd;
-    this->currentPostEntry = this->childISRs[this->nearestTerm]->GetCurrentPostEntry();
+    this->currentPostEntry =
+        this->childISRs[this->nearestTerm]->GetCurrentPostEntry();
 }
 
 // internal helper function to determine if
@@ -134,7 +138,7 @@ std::optional<PostEntry> ISROr::NextDocument() {
             this->currentPostEntry = std::nullopt;
             return std::nullopt;
         }
-    
+
         this->UpdateMarkers();
         return this->currentPostEntry;
     }
@@ -142,10 +146,11 @@ std::optional<PostEntry> ISROr::NextDocument() {
     std::string prevDocumentName = this->GetDocumentName();
 
     while (this->GetDocumentName() == prevDocumentName) {
-        if (this->childISRs[this->nearestTerm]->NextDocument() == std::nullopt) {
+        if (this->childISRs[this->nearestTerm]->NextDocument() ==
+            std::nullopt) {
             this->whichChildFinished[this->nearestTerm] = true;
         }
-    
+
         if (this->AllChildrenFinished()) {
             this->currentPostEntry = std::nullopt;
             return std::nullopt;

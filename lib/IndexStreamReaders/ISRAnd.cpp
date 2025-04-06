@@ -11,12 +11,14 @@ ISRAnd::ISRAnd(std::vector<ISR*> children)
       nearestEndLocation(-1) {}
 
 int ISRAnd::GetStartLocation() {
-    assert(this->currentPostEntry.has_value() && "GetStartLocation called when this ISR is not pointing to anything");
+    assert(this->currentPostEntry.has_value() &&
+           "GetStartLocation called when this ISR is not pointing to anything");
     return this->nearestStartLocation;
 }
 
 int ISRAnd::GetEndLocation() {
-    assert(this->currentPostEntry.has_value() && "GetEndLocation called when this ISR is not pointing to anything");
+    assert(this->currentPostEntry.has_value() &&
+           "GetEndLocation called when this ISR is not pointing to anything");
     return this->nearestEndLocation;
 }
 
@@ -25,7 +27,8 @@ std::optional<PostEntry> ISRAnd::GetCurrentPostEntry() {
 }
 
 std::string ISRAnd::GetDocumentName() {
-    assert(this->currentPostEntry.has_value() && "GetDocumentName called when this ISR is not pointing to anything");
+    assert(this->currentPostEntry.has_value() &&
+           "GetDocumentName called when this ISR is not pointing to anything");
     return this->childISRs[nearestTerm]->GetDocumentName();
 }
 
@@ -60,7 +63,8 @@ void ISRAnd::UpdateMarkers() {
     this->farthestTerm = whichChildLatest;
     this->nearestStartLocation = nearestStart;
     this->nearestEndLocation = nearestEnd;
-    this->currentPostEntry = this->childISRs[nearestTerm]->GetCurrentPostEntry();
+    this->currentPostEntry =
+        this->childISRs[nearestTerm]->GetCurrentPostEntry();
 }
 
 // helper function to check if all the current child ISRs
