@@ -86,6 +86,9 @@ target_link_libraries(TestISROr PRIVATE GTest::gtest_main IndexStreamReaders)
 add_executable(TestISRAnd tests/TestISRAnd.cpp)
 target_link_libraries(TestISRAnd PRIVATE GTest::gtest_main IndexStreamReaders)
 
+add_executable(TestISRPhrase tests/TestISRPhrase.cpp)
+target_link_libraries(TestISRPhrase PRIVATE GTest::gtest_main IndexStreamReaders)
+
 include(GoogleTest)
 gtest_discover_tests(TestExample)
 gtest_discover_tests(TestMasterChunk)
@@ -93,5 +96,6 @@ gtest_discover_tests(TestPostingList)
 gtest_discover_tests(TestISRWord)
 gtest_discover_tests(TestISROr)
 gtest_discover_tests(TestISRAnd)
+gtest_discover_tests(TestISRPhrase)
 
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type")

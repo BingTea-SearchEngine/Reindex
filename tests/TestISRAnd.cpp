@@ -356,3 +356,18 @@ TEST_F(AndISR, SimpleSeekAndNext) {
     EXPECT_EQ(ISR_bar_AND_and->Seek(49), std::nullopt);
     EXPECT_EQ(ISR_bar_AND_and->GetCurrentPostEntry(), std::nullopt);
 }
+
+TEST_F(AndISR, SimpleBoundaryAvoidance) {
+    ISR* ISR_word_bananas = new ISRWord(index["bananas"]);
+    ISR* ISR_word_mcdonalds = new ISRWord(index["mcdonalds"]);
+
+    ISR* ISR_bananas_AND_mcdonalds = new ISRAnd({ISR_word_bananas, ISR_word_mcdonalds});
+
+    EXPECT_EQ(ISR_bananas_AND_mcdonalds->GetCurrentPostEntry(), std::nullopt);
+
+    EXPECT_EQ(ISR_bananas_AND_mcdonalds->Next(), std::nullopt);
+    EXPECT_EQ(ISR_bananas_AND_mcdonalds->GetCurrentPostEntry(), std::nullopt);
+
+    EXPECT_EQ(ISR_bananas_AND_mcdonalds->Next(), std::nullopt);
+    EXPECT_EQ(ISR_bananas_AND_mcdonalds->GetCurrentPostEntry(), std::nullopt);
+}
