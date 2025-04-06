@@ -5,18 +5,18 @@
 
 #include "DocStream.hpp"
 #include "MasterChunk.hpp"
-#include "WordLocation.hpp"
 #include "Util.hpp"
+#include "WordLocation.hpp"
 
 int main(int argc, char** argv) {
     argparse::ArgumentParser program("reindex");
     program.add_argument("-i", "--input")
-      .required()
-      .help("Specify the input directory.");
+        .required()
+        .help("Specify the input directory.");
 
     program.add_argument("-o", "--output")
-      .required()
-      .help("Specify the output directory.");
+        .required()
+        .help("Specify the output directory.");
 
     program.add_argument("-s", "--size")
         .default_value(500)
@@ -45,7 +45,8 @@ int main(int argc, char** argv) {
     MasterChunk master(outputDir, chunkSizeBytes);
 
     while (docStream.size() > 0) {
-        std::pair<std::string, std::vector<word_t>> nextDoc = docStream.nextFile();
+        std::pair<std::string, std::vector<word_t>> nextDoc =
+            docStream.nextFile();
         auto [document, words] = nextDoc;
         if (words.empty()) {
             spdlog::error("Error parsing {}", document);
@@ -72,4 +73,3 @@ int main(int argc, char** argv) {
     }
     close(fd);
 }
-

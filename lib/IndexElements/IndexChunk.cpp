@@ -30,11 +30,13 @@ void IndexChunk::AddDocument(std::string doc, std::vector<word_t> words) {
 
     // Iterate over words
     for (word_t& word : words) {
-        if(_postingLists.find(word.word) == _postingLists.end()){
+        if (_postingLists.find(word.word) == _postingLists.end()) {
             _postingLists.insert(make_pair(word.word, PostingList(word.word)));
-            _bytesRequired += _postingLists.at(word.word).GetOverheadBytesRequired();
+            _bytesRequired +=
+                _postingLists.at(word.word).GetOverheadBytesRequired();
         }
-        _bytesRequired+=_postingLists[word.word].AddWord(doc, PostEntry(_offset, word.location));
+        _bytesRequired += _postingLists[word.word].AddWord(
+            doc, PostEntry(_offset, word.location));
         _offset++;
     }
 }
@@ -47,25 +49,26 @@ PostingList IndexChunk::GetPostingList(std::string word) {
     return _postingLists[word];
 }
 
-void IndexChunk::Serialize(char* base_region, size_t& offset, IndexChunk& index) {
+void IndexChunk::Serialize(char* base_region, size_t& offset,
+                           IndexChunk& index) {
     assert(offset == 0);
 
     // Serialize document list size
     size_t num_documents = index._documents.size();
-    std::memcpy(base_region+offset, &num_documents, sizeof(num_documents));
-    offset+=sizeof(num_documents);
+    std::memcpy(base_region + offset, &num_documents, sizeof(num_documents));
+    offset += sizeof(num_documents);
 
     // Serialize document list
     for (std::string& docname : index._documents) {
-        size_t docname_size = docname.size()+1;
-        std::memcpy(base_region+offset, docname.c_str(), docname_size);
-        offset+=docname_size;
+        size_t docname_size = docname.size() + 1;
+        std::memcpy(base_region + offset, docname.c_str(), docname_size);
+        offset += docname_size;
     }
 
     // Serialize number of words
     size_t num_words = index._postingLists.size();
-    std::memcpy(base_region+offset, &num_words, sizeof(num_words));
-    offset+=sizeof(num_words);
+    std::memcpy(base_region + offset, &num_words, sizeof(num_words));
+    offset += sizeof(num_words);
 
     // Serailize each posting list
     for (auto& [word, posting_list] : index._postingLists) {
@@ -73,26 +76,26 @@ void IndexChunk::Serialize(char* base_region, size_t& offset, IndexChunk& index)
     }
 }
 
-IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset){
+IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
     assert(offset == 0);
     IndexChunk index;
 
     // Read document list size
     size_t num_documents = 0;
-    std::memcpy(&num_documents, base_region+offset, sizeof(num_documents));
-    offset+=sizeof(num_documents);
+    std::memcpy(&num_documents, base_region + offset, sizeof(num_documents));
+    offset += sizeof(num_documents);
 
     // Read chunk list
     for (size_t i = 0; i < num_documents; ++i) {
-        std::string docname = std::string(base_region+offset);
-        offset+=docname.size()+1;
+        std::string docname = std::string(base_region + offset);
+        offset += docname.size() + 1;
         index._documents.push_back(docname);
     }
 
     // Read number of words
     size_t num_words = 0;
-    std::memcpy(&num_words, base_region+offset, sizeof(num_words));
-    offset+=sizeof(num_words);
+    std::memcpy(&num_words, base_region + offset, sizeof(num_words));
+    offset += sizeof(num_words);
 
     //Read each posting list
     for (size_t i = 0; i < num_words; ++i) {

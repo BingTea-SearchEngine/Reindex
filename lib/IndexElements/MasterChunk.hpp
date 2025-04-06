@@ -1,8 +1,8 @@
 #pragma once
 
+#include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 #include <unistd.h>
 
 #include <cassert>
@@ -11,8 +11,8 @@
 #include <vector>
 
 #include "IndexChunk.hpp"
-#include "WordLocation.hpp"
 #include "Util.hpp"
+#include "WordLocation.hpp"
 
 /**
  * @class MasterChunk
@@ -22,7 +22,6 @@
  */
 class MasterChunk {
    public:
-    
     /*
      * @brief Constructs a master chunk with the output directory of all index chunks and the
      * threshold size in bytes of each chunk before it is written to disk
@@ -82,7 +81,8 @@ class MasterChunk {
      * @post Writes the bytes of the MasterChunk object into memory at the calculated region.
      * @post Updates `offset` to the next available memory location.
      * */
-    static void Serialize(char* baseRegion, size_t& offset, MasterChunk& master);
+    static void Serialize(char* baseRegion, size_t& offset,
+                          MasterChunk& master);
 
     /**
      * @brief Deserializes a MasterChunk object from a specific region of memory.
@@ -97,9 +97,9 @@ class MasterChunk {
      * @pre `base_region + offset` must point to a valid serialized MasterChunk object.
      * @post A MasterChunk object is created and the offset is updated.
      * */
-    static MasterChunk Deserailize(char* baseRegion, size_t &offset);
+    static MasterChunk Deserailize(char* baseRegion, size_t& offset);
 
-private:
+   private:
     /*
      * @brief Default constructor only to be used in the Deserialize method
      * */

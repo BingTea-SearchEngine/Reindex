@@ -1,16 +1,15 @@
 #pragma once
 
-#include <unordered_map>
 #include <iostream>
+#include <unordered_map>
 
 using std::cout, std::endl;
 
-#include "PostingList.hpp"
 #include "PostEntry.hpp"
+#include "PostingList.hpp"
 
 class IndexChunk {
    public:
-
     /*
      * @brief Default constructor for an Index Chunk
      * */

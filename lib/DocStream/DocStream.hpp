@@ -26,7 +26,6 @@ struct BatchNumCompare {
     }
 };
 
-
 class DocStream {
    public:
     // Populate _documents with file path to documents. Sort by batch number where a document is

@@ -36,6 +36,18 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(argparse)
 
+FetchContent_Declare(
+    Gateway
+    GIT_REPOSITORY https://github.com/BingTea-SearchEngine/Gateway.git
+    GIT_TAG main
+)
+FetchContent_MakeAvailable(Gateway)
+
+set(GATEWAY_SOURCE_DIR ${gateway_SOURCE_DIR})
+set(GATEWAY_INCLUDE_DIR "${gateway_SOURCE_DIR}/lib")
+message(STATUS "Gateway project source directory: ${GATEWAY_SOURCE_DIR}")
+message(STATUS "Gateway include directory: ${GATEWAY_INCLUDE_DIR}")
+
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
 add_library(IndexElements STATIC 
@@ -54,10 +66,13 @@ add_library(DocStream STATIC ${LIB_DIR}/DocStream/DocStream.cpp)
 target_include_directories(DocStream PUBLIC ${LIB_DIR}/DocStream)
 target_link_libraries(DocStream PUBLIC IndexElements)
 
-
 add_executable(${THIS} src/reindex.cpp)
 target_link_libraries(${THIS} PUBLIC spdlog::spdlog argparse DocStream IndexElements)
 target_include_directories(${THIS} PRIVATE ${LIB_DIR}/DocStream ${LIB_DIR}/IndexElements)
+
+add_executable(IndexServer src/IndexServer.cpp)
+target_link_libraries(IndexServer PUBLIC spdlog::spdlog argparse IndexElements GatewayServer)
+target_include_directories(IndexServer PUBLIC ${LIB_DIR}/IndexElements ${GATEWAY_INCLUDE_DIR})
 
 add_executable(TestExample tests/TestExample.cpp)
 target_link_libraries(TestExample PRIVATE GTest::gtest_main)
