@@ -196,6 +196,8 @@ std::optional<PostEntry> ISRAnd::Seek(size_t target) {
         }
     }
 
+    this->UpdateMarkers();
+
     if (this->ChildrenOnSameDocument()) {
         // then, we can return if that is the case
         // TODO: returning the first PostEntry for an AND ISR?
