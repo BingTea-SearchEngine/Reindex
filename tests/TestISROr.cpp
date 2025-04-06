@@ -1,9 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "ISR.hpp"
-#include "ISRAnd.hpp"
 #include "ISROr.hpp"
-#include "ISRPhrase.hpp"
 #include "ISRWord.hpp"
 #include "PostingList.hpp"
 
@@ -237,7 +235,7 @@ TEST_F(OrISR, SimpleNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_protein_OR_bananas->GetStartLocation(), 51);
     EXPECT_EQ(ISR_protein_OR_bananas->GetEndLocation(),
-              51);  // ??? what would this be?
+              51);
     EXPECT_EQ(ISR_protein_OR_bananas->GetDocumentName(), "Document 4");
 
     EXPECT_EQ(ISR_protein_OR_bananas->Next(), std::nullopt);

@@ -1,9 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "ISR.hpp"
-#include "ISRAnd.hpp"
-#include "ISROr.hpp"
-#include "ISRPhrase.hpp"
 #include "ISRWord.hpp"
 #include "PostingList.hpp"
 
