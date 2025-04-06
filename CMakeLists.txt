@@ -17,7 +17,7 @@ include(FetchContent)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        release-1.11.0
+  GIT_TAG        v1.13.0
 )
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
@@ -68,9 +68,13 @@ target_link_libraries(TestMasterChunk PRIVATE GTest::gtest_main IndexElements)
 add_executable(TestPostingList tests/TestPostingList.cpp)
 target_link_libraries(TestPostingList PRIVATE GTest::gtest_main IndexElements)
 
+add_executable(TestIndexChunk tests/TestIndexChunk.cpp)
+target_link_libraries(TestIndexChunk PRIVATE GTest::gtest_main IndexElements)
+
 include(GoogleTest)
 gtest_discover_tests(TestExample)
 gtest_discover_tests(TestMasterChunk)
 gtest_discover_tests(TestPostingList)
+gtest_discover_tests(TestIndexChunk)
 
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type")

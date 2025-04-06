@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <filesystem>
 
 #include "MasterChunk.hpp"
 #include "WordLocation.hpp"
@@ -6,7 +7,8 @@
 
 TEST(BasicMasterChunk, SerialiezDeserialize) {
     // low chunk size so it creates a new chunk after every word
-    MasterChunk master("tmp", 1);
+    std::filesystem::path cwd = std::filesystem::current_path();
+    MasterChunk master(cwd.string(), 1);
     std::vector<word_t> w;
     w.push_back(word_t{"w", 0, wordlocation_t::title});
 

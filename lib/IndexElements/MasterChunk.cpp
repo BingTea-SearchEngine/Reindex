@@ -95,7 +95,19 @@ void MasterChunk::PrintCurrentIndexChunk() const {
     
 void MasterChunk::_serializeCurrIndexChunk() {
     std::string chunkFilePath = _outputDir + "/" + std::to_string(_indexChunks.size());
+    cout << chunkFilePath << endl;
     _indexChunks.push_back(chunkFilePath);
-    // Allocate mmap buffer and serialize Index chunk
-    // IndexChunk::Serialize(buf, _currIndexChunk);
+
+    int fd = -1;
+    // Allocate times two of chunk size to be safe
+    void* base_region = create_mmap_region(fd, _chunkSize*2, chunkFilePath);
+    assert(fd != -1);
+
+    size_t offset = 0;
+    IndexChunk::Serialize(static_cast<char*>(base_region), offset, _currIndexChunk);
+    munmap(base_region, _chunkSize*2);
+    if (ftruncate(fd, offset) == -1) {
+        perror("Error truncating file");
+    }
+    close(fd);
 }
