@@ -72,7 +72,7 @@ int MasterChunk::GetNumDocuments() {
     return _numDocuments;
 }
 
-void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words) {
+void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words, metadata_t metadata) {
     _numDocuments++;
     // Check if index will become too big
     // If too big write to disk and reinitialize _currIndexChunk
@@ -80,6 +80,7 @@ void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words) {
         Flush();
     }
     _currIndexChunk.AddDocument(doc, words);
+    _currMetadataChunk.AddDocument(doc, metadata);
 }
 
 void MasterChunk::Flush() {

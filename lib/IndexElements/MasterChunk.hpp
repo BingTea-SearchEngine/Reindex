@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "IndexChunk.hpp"
+#include "MetadataChunk.hpp"
 #include "WordLocation.hpp"
 #include "Util.hpp"
 
@@ -43,7 +44,7 @@ class MasterChunk {
      * @param doc The name of the document
      * @param words The words in the document in a vector
      * */
-    void AddDocument(std::string doc, std::vector<word_t> words);
+    void AddDocument(std::string doc, std::vector<word_t> words, metadata_t metadata);
 
     /*
      * @brief Gets the number of documents stored by this index
@@ -117,6 +118,8 @@ private:
     std::string _outputDir;
     // The current index chunk being built
     IndexChunk _currIndexChunk;
+    // The current metadata chunk being built
+    MetadataChunk _currMetadataChunk;
     // The threshold size of an index chunk
     size_t _chunkSize;
     // The number of documents indexed

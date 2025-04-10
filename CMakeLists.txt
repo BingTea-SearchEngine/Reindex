@@ -41,6 +41,7 @@ set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 add_library(IndexElements STATIC 
     ${LIB_DIR}/IndexElements/MasterChunk.cpp
     ${LIB_DIR}/IndexElements/IndexChunk.cpp
+    ${LIB_DIR}/IndexElements/MetadataChunk.cpp
     ${LIB_DIR}/IndexElements/PostingList.cpp
     ${LIB_DIR}/IndexElements/Post.cpp
     ${LIB_DIR}/IndexElements/PostEntry.cpp

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <iostream>
 
 enum class wordlocation_t {
@@ -39,4 +40,40 @@ struct word_t {
         // 1 for null terminator
         return word.size() + 1 + sizeof(offset) + sizeof(location);
     }
+};
+
+struct metadata_t {
+    size_t numWords;
+    size_t numTitleWords;
+    float pageRank;
+    float cheiRank;
+    size_t numOutLinks;
+    std::vector<std::string> outLinks;
+
+
+    friend std::ostream& operator<<(std::ostream& os, const metadata_t& m) {
+        os  << "metadata_t\n{\n\t# of words=" << m.numWords 
+            << "\n\t# of title words=" << m.numTitleWords 
+            << "\n\tpageRank score=" << m.pageRank
+            << "\n\tcheiRank score=" << m.cheiRank;
+        os  << "\n\t}\n";
+
+        std::cout << m.numOutLinks << " outward links: \n{\n";
+        for (const auto &link : m.outLinks) {
+            std::cout << "\t" << link << "\n";
+        }
+        std::cout << "}";
+
+        return os;
+    }
+
+    size_t getBytes() {
+        size_t bytes = sizeof(numWords) + sizeof(numTitleWords) + sizeof(pageRank) + sizeof(cheiRank) + sizeof(numOutLinks);
+        for(const auto &link : outLinks) {
+            bytes += link.size() + 1;
+        }
+
+        return bytes;
+    }
+
 };

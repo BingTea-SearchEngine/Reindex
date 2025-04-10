@@ -12,8 +12,10 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
     std::vector<word_t> w;
     w.push_back(word_t{"w", 0, wordlocation_t::title});
 
-    master.AddDocument("doc1", w);
-    master.AddDocument("doc2", w);
+    metadata_t m;
+
+    master.AddDocument("doc1", w, m);
+    master.AddDocument("doc2", w, m);
     master.Flush();
 
     std::string filePath = "test_master_chunk";
