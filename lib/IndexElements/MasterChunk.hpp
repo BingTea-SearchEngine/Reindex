@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+#include <filesystem>
+
 #include "IndexChunk.hpp"
 #include "MetadataChunk.hpp"
 #include "WordLocation.hpp"
@@ -38,6 +40,13 @@ class MasterChunk {
     std::vector<std::string> GetChunkList();
 
     /*
+     * @brief Gets the file paths of metadadta chunks in a vector
+     *
+     * @return Vector of file paths to metadata chunks
+     * */
+    std::vector<std::string> GetMetadataChunkList();
+
+    /*
      * @brief Adds a document to the index. The document and words in the document are propogated
      * into the current index chunk that is being built
      *
@@ -63,6 +72,11 @@ class MasterChunk {
      * @brief Prints the current index chunk
      * */
     void PrintCurrentIndexChunk() const;
+
+    /*
+     * @brief Prints the current metadata chunk
+     * */
+    void PrintCurrentMetadataChunk() const;
 
     /**
      * @brief Serializes a given MasterChunk object into a specific region of memory.
@@ -105,6 +119,7 @@ private:
      * @brief Default constructor only to be used in the Deserialize method
      * */
     MasterChunk();
+    
 
     /*
      * @brief Serialize the current index chunk being built by calling the Serialize method on
@@ -112,10 +127,17 @@ private:
      * */
     void _serializeCurrIndexChunk();
 
+    void _serializeCurrMetadataChunk();
+
+
     // List of index chunks and their file paths
     std::vector<std::string> _indexChunks;
+    // List of metadata chunks and their file paths
+    std::vector<std::string> _metadataChunks;
     // The output directory of the index chunks
-    std::string _outputDir;
+    // std::string _outputDir;
+    std::string _indexDir;
+    std::string _metadataDir;
     // The current index chunk being built
     IndexChunk _currIndexChunk;
     // The current metadata chunk being built

@@ -53,6 +53,7 @@ int main(int argc, char** argv) {
         master.AddDocument(nextDoc.url, nextDoc.words, nextDoc.metadata);
     }
     master.PrintCurrentIndexChunk();
+    master.PrintCurrentMetadataChunk();
     master.Flush();
 
     // Open file and mmap
