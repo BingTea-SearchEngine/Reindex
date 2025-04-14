@@ -40,7 +40,7 @@ std::string ISRContainer::GetDocumentName() {
 std::optional<PostEntry> ISRContainer::Next() {
     while (this->included->Next() != std::nullopt) {
         this->currentPostEntry = this->included->GetCurrentPostEntry();
-        if (!this->excludedDocuments.contains(this->included->GetDocumentName())) {
+        if (this->excludedDocuments.find(this->included->GetDocumentName()) == this->excludedDocuments.end()) {
             return this->currentPostEntry;
         }
     }
@@ -52,7 +52,7 @@ std::optional<PostEntry> ISRContainer::Next() {
 std::optional<PostEntry> ISRContainer::NextDocument() {
     while (this->included->NextDocument() != std::nullopt) {
         this->currentPostEntry = this->included->GetCurrentPostEntry();
-        if (!this->excludedDocuments.contains(this->included->GetDocumentName())) {
+        if (this->excludedDocuments.find(this->included->GetDocumentName()) == this->excludedDocuments.end()) {
             return this->currentPostEntry;
         }
     }
@@ -69,7 +69,7 @@ std::optional<PostEntry> ISRContainer::Seek(size_t target) {
 
     this->currentPostEntry = this->included->GetCurrentPostEntry();
 
-    if (!this->excludedDocuments.contains(this->included->GetDocumentName())) {
+    if (this->excludedDocuments.find(this->included->GetDocumentName()) == this->excludedDocuments.end()) {
         return this->currentPostEntry;
     }
 
