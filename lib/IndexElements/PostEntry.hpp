@@ -39,14 +39,14 @@ class PostEntry {
          * 
          * @return A uint32_t of this PostEntry's delta.
          */
-    uint32_t GetDelta();
+    uint32_t GetDelta() const;
 
     /**
          * @brief Returns the location of where this word occurred.
          * 
          * @return A wordlocation_t of where this word occurred.
          */
-    wordlocation_t GetLocationFound();
+    wordlocation_t GetLocationFound() const;
 
     /*
         * @brief Returns the bytes required to serialize this post entry
