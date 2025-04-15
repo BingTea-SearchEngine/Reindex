@@ -9,6 +9,68 @@
 #include "WordLocation.hpp"
 #include "Util.hpp"
 
+std::vector<uint8_t> encode(uint32_t n) {
+    std::vector<uint8_t> bytes;
+    do {
+        uint8_t byte = n & 0x7F; // get 7 LSB
+        bytes.push_back(byte);
+        n >>= 7;
+    } while (n > 0);
+
+    std::reverse(bytes.begin(), bytes.end());
+
+    // Set stop bit (MSB) in last byte
+    bytes.back() |= 0x80;
+    return bytes;
+}
+
+uint32_t decode(const std::vector<uint8_t>& bytes, size_t& index) {
+    uint32_t n = 0;
+    while (index < bytes.size()) {
+        uint8_t byte = bytes[index++];
+        n = (n << 7) | (byte & 0x7F);
+        if (byte & 0x80) {
+            break; // this is the last byte
+        }
+    }
+    return n;
+}
+
+TEST(BasicCompression, EncodeDecodeVB) {
+    // test that encoding and decoding with variable bytes actually works
+    std::vector<uint32_t> values = {1, 127, 128, 255, 1024, 16384, 1 << 24};
+    for (uint32_t val : values) {
+        std::vector<uint8_t> encoded = encode(val);
+        size_t index = 0;
+        uint32_t decoded = decode(encoded, index);
+        EXPECT_EQ(decoded, val);
+        EXPECT_EQ(index, encoded.size()); // Make sure all bytes consumed
+    }
+}
+
+TEST(BasicCompression, CompressedVsNaiveSizeBenefit) {
+    // test that using VB compression actually does indeed give size benefits
+    std::vector<uint32_t> abs_positions = {4, 5, 10, 18};
+    std::vector<uint32_t> deltas;
+    deltas.push_back(abs_positions[0]);
+    for (size_t i = 1; i < abs_positions.size(); ++i) {
+        deltas.push_back(abs_positions[i] - abs_positions[i - 1]);
+    }
+
+    // Naive method: 4 bytes per int
+    size_t naive_bytes = abs_positions.size() * sizeof(uint32_t);
+
+    // VB-compressed size
+    size_t compressed_bytes = 0;
+    for (uint32_t d : deltas) {
+        compressed_bytes += encode(d).size();
+    }
+
+    std::cout << "Compressed takes " << compressed_bytes << " bytes" << std::endl;
+    std::cout << "Naive takes " << naive_bytes << " bytes" << std::endl;
+
+    EXPECT_LT(compressed_bytes, naive_bytes);
+}
 
 TEST(BasicPostingList, TestAddWord) {
     PostingList pl("test");

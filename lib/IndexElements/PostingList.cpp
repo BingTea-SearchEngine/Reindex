@@ -69,31 +69,29 @@ void PostingList::OldSerialize(char* base_region, size_t& offset,
 
 std::vector<uint8_t> encodeVB(uint32_t number) {
     std::vector<uint8_t> bytes;
-
-    while (true) {
-        uint8_t byte = number & 0x7F; // take 7 bits
+    do {
+        uint8_t byte = number & 0x7F; // get 7 LSB
+        bytes.push_back(byte);
         number >>= 7;
-        if (number == 0) {
-            byte |= 0x80; // set MSB to 1 to mark last byte
-            bytes.push_back(byte);
-            break;
-        } else {
-            bytes.push_back(byte); // MSB remains 0
-        }
-    }
+    } while (number > 0);
 
-    std::reverse(bytes.begin(), bytes.end()); // correct the byte order
+    std::reverse(bytes.begin(), bytes.end());
+
+    // Set stop bit (MSB) in last byte
+    bytes.back() |= 0x80;
     return bytes;
 }
 
-uint32_t decodeVB(const std::vector<uint8_t>& input, size_t& index) {
-    uint32_t number = 0;
-    while (index < input.size()) {
-        uint8_t byte = input[index++];
-        number = (number << 7) | (byte & 0x7F); // shift & append 7 bits
-        if (byte & 0x80) break; // MSB is 1 = last byte
+uint32_t decodeVB(const std::vector<uint8_t>& bytes, size_t& index) {
+    uint32_t n = 0;
+    while (index < bytes.size()) {
+        uint8_t byte = bytes[index++];
+        n = (n << 7) | (byte & 0x7F);
+        if (byte & 0x80) {
+            break; // this is the last byte
+        }
     }
-    return number;
+    return n;
 }
 
 void PostingList::NewSerialize(char* base_region, size_t& offset,
@@ -144,7 +142,7 @@ void PostingList::NewSerialize(char* base_region, size_t& offset,
 }
 
 PostingList PostingList::Deserialize(char* base_region, size_t& offset) {
-    PostingList::OldDeserialize(base_region, offset);
+    return PostingList::OldDeserialize(base_region, offset);
 }
 
 PostingList PostingList::OldDeserialize(char* base_region, size_t& offset) {
