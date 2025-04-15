@@ -103,6 +103,10 @@ class PostingList {
          */
     static PostingList Deserialize(char* base_region, size_t& offset);
 
+    static PostingList OldDeserialize(char* base_region, size_t& offset);
+
+    static PostingList NewDeserialize(char* base_region, size_t& offset);
+
    private:
     /// The word associated with this PostingList
     std::string word;

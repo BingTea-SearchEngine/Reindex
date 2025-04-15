@@ -26,11 +26,11 @@ std::ostream& operator<<(std::ostream& os, const PostEntry& obj) {
     return os;
 }
 
-uint32_t PostEntry::GetDelta() {
+uint32_t PostEntry::GetDelta() const {
     return delta;
 }
 
-wordlocation_t PostEntry::GetLocationFound() {
+wordlocation_t PostEntry::GetLocationFound() const {
     return location_found;
 }
 

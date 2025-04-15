@@ -144,6 +144,10 @@ void PostingList::NewSerialize(char* base_region, size_t& offset,
 }
 
 PostingList PostingList::Deserialize(char* base_region, size_t& offset) {
+    PostingList::OldDeserialize(base_region, offset);
+}
+
+PostingList PostingList::OldDeserialize(char* base_region, size_t& offset) {
     PostingList postingList;
 
     // Deserialize the word associated with the PostingList
@@ -162,4 +166,57 @@ PostingList PostingList::Deserialize(char* base_region, size_t& offset) {
     }
 
     return postingList;
+}
+
+PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
+    PostingList list;
+    
+    // Deserialize the word
+    list.word = std::string(base_region + offset);
+    offset += list.word.size() + 1;
+
+    // Read number of posts
+    size_t num_posts;
+    std::memcpy(&num_posts, base_region + offset, sizeof(num_posts));
+    offset += sizeof(num_posts);
+    list.posts.resize(num_posts);
+
+    uint32_t prev_pos = 0;
+    for (size_t i = 0; i < num_posts; ++i) {
+        std::string docName(base_region + offset);
+
+        Post post(docName);
+        offset += post.GetDocumentName().size() + 1;
+
+        uint32_t num_entries;
+        std::memcpy(&num_entries, base_region + offset, sizeof(num_entries));
+        offset += sizeof(num_entries);
+
+        for (uint32_t j = 0; j < num_entries; ++j) {
+            uint8_t length;
+            std::memcpy(&length, base_region + offset, sizeof(length));
+            offset += sizeof(length);
+
+            std::vector<uint8_t> vb_bytes(length);
+            std::memcpy(vb_bytes.data(), base_region + offset, length);
+            offset += length;
+
+            size_t idx = 0;
+            uint32_t delta = decodeVB(vb_bytes, idx);
+            uint32_t abs_pos = prev_pos + delta;
+            prev_pos = abs_pos;
+
+            uint8_t location_raw;
+            std::memcpy(&location_raw, base_region + offset, sizeof(location_raw));
+            offset += sizeof(location_raw);
+
+            wordlocation_t location = static_cast<wordlocation_t>(location_raw);
+            PostEntry entry(abs_pos, location);
+            post.AddWord(entry);
+        }
+
+        list.posts[i] = post;
+    }
+
+    return list;
 }
