@@ -94,6 +94,7 @@ DocStreamOutput DocStream::nextFile() {
     if (!checkTagExists(line, "</words>")) {
         return out;
     }
+    out.words = output;
 
     // Check <links>  tag
     std::getline(document, line);
@@ -141,7 +142,6 @@ DocStreamOutput DocStream::nextFile() {
 
     out.metadata = {output.size(), numTitleWords, pageRank, cheiRank, outLinks};
     out.url = url;
-    out.words = output;
 
     return out;
 }
