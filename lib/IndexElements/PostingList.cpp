@@ -67,79 +67,98 @@ void PostingList::OldSerialize(char* base_region, size_t& offset,
     }
 }
 
-std::vector<uint8_t> encodeVB(uint32_t number) {
+std::vector<uint8_t> encodeVB(uint32_t value) {
     std::vector<uint8_t> bytes;
     do {
-        uint8_t byte = number & 0x7F; // get 7 LSB
-        bytes.push_back(byte);
-        number >>= 7;
-    } while (number > 0);
+        uint8_t byte = value & 0x7F;  // Get the lowest 7 bits
+        value >>= 7;
+        if (value != 0) {
+            bytes.push_back(byte);    // More bytes to come
+        } else {
+            byte |= 0x80;             // Set MSB = 1 to mark end
+            bytes.push_back(byte);
+            break;
+        }
+    } while (true);
 
-    std::reverse(bytes.begin(), bytes.end());
-
-    // Set stop bit (MSB) in last byte
-    bytes.back() |= 0x80;
     return bytes;
 }
 
-uint32_t decodeVB(const std::vector<uint8_t>& bytes, size_t& index) {
-    uint32_t n = 0;
-    while (index < bytes.size()) {
-        uint8_t byte = bytes[index++];
-        n = (n << 7) | (byte & 0x7F);
-        if (byte & 0x80) {
-            break; // this is the last byte
-        }
+uint32_t decodeVB(const uint8_t* data, size_t& consumed_bytes) {
+    uint32_t result = 0;
+    int shift = 0;
+    consumed_bytes = 0;
+
+    while (true) {
+        uint8_t byte = data[consumed_bytes++];
+        result |= (byte & 0x7F) << shift;
+        if (byte & 0x80) break;
+        shift += 7;
     }
-    return n;
+
+    return result;
 }
 
 void PostingList::NewSerialize(char* base_region, size_t& offset,
                                const PostingList& postingList) {
     // Serialize the word
+    std::cout << "A: " << offset << std::endl;
     size_t word_len = postingList.word.size() + 1;
     std::memcpy(base_region + offset, postingList.word.c_str(), word_len);
     offset += word_len;
+    std::cout << "B: " << offset << std::endl;
 
     // Serialize the number of posts (documents)
     size_t num_posts = postingList.posts.size();
     std::memcpy(base_region + offset, &num_posts, sizeof(num_posts));
     offset += sizeof(num_posts);
-
+    std::cout << "C: " << offset << std::endl;
     uint32_t prev_position = 0;
     for (auto& post : postingList.posts) {
         // Serialize the document name
         size_t document_name_size = post.GetDocumentName().size() + 1;  // account for null terminator
         std::memcpy(base_region + offset, post.GetDocumentName().c_str(), document_name_size);
         offset += document_name_size;
+        std::cout << "D: " << offset << std::endl;
 
         const auto& entries = post.GetEntries();
         size_t num_entries = entries.size();
         std::memcpy(base_region + offset, &num_entries, sizeof(num_entries));
         offset += sizeof(num_entries);
+        std::cout << "E: " << offset << std::endl;
 
         // Delta + VB encoding for each PostEntry
         for (const auto& entry : entries) {
             uint32_t abs_pos = entry.GetDelta();  // assume this is absolute
             uint32_t delta = abs_pos - prev_position;
+            std::cout << "Abs_pos = " << abs_pos << " - prev_position = " << prev_position << " = " << delta << std::endl;
             prev_position = abs_pos;
 
             // Variable Byte encode the delta
+            std::cout << "Writing delta " << delta << ": ";
             std::vector<uint8_t> encoded = encodeVB(delta);
-            uint8_t length = encoded.size();
-            std::memcpy(base_region + offset, &length, sizeof(length));
-            offset += sizeof(length);
-
-            std::memcpy(base_region + offset, encoded.data(), length);
-            offset += length;
+            for (uint8_t b : encoded) {
+                std::cout << std::hex << int(b) << " " << std::endl;
+                std::cout << std::dec;
+                std::memcpy(base_region + offset, &b, sizeof(b));
+                offset += sizeof(b);
+                std::cout << "F: " << offset << std::endl;
+            }
+            std::cout << "\n";
+            std::cout << std::dec;
 
             // Serialize location_found (it is an enum so fits in a byte)
             uint8_t location = static_cast<uint8_t>(entry.GetLocationFound());
             std::memcpy(base_region + offset, &location, sizeof(location));
             offset += sizeof(location);
+            std::cout << "G: " << offset << std::endl;
         }
     }
+    std::cout << "H: " << offset << std::endl;
 }
+
+// 10000101
+// 0001000 1000101
 
 PostingList PostingList::Deserialize(char* base_region, size_t& offset) {
     return PostingList::OldDeserialize(base_region, offset);
@@ -167,16 +186,19 @@ PostingList PostingList::OldDeserialize(char* base_region, size_t& offset) {
 }
 
 PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
+    std::cout << "a: " << offset << std::endl;
     PostingList list;
     
     // Deserialize the word
     list.word = std::string(base_region + offset);
     offset += list.word.size() + 1;
+    std::cout << "b: " << offset << std::endl;
 
     // Read number of posts
     size_t num_posts;
     std::memcpy(&num_posts, base_region + offset, sizeof(num_posts));
     offset += sizeof(num_posts);
+    std::cout << "c: " << offset << std::endl;
     list.posts.resize(num_posts);
 
     uint32_t prev_pos = 0;
@@ -185,28 +207,26 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
 
         Post post(docName);
         offset += post.GetDocumentName().size() + 1;
+        std::cout << "d: " << offset << std::endl;
 
-        uint32_t num_entries;
+        size_t num_entries;
         std::memcpy(&num_entries, base_region + offset, sizeof(num_entries));
         offset += sizeof(num_entries);
+        std::cout << "e: " << offset << std::endl;
 
         for (uint32_t j = 0; j < num_entries; ++j) {
-            uint8_t length;
-            std::memcpy(&length, base_region + offset, sizeof(length));
-            offset += sizeof(length);
-
-            std::vector<uint8_t> vb_bytes(length);
-            std::memcpy(vb_bytes.data(), base_region + offset, length);
-            offset += length;
-
-            size_t idx = 0;
-            uint32_t delta = decodeVB(vb_bytes, idx);
+            size_t bytes_read = 0;
+            uint32_t delta = decodeVB(reinterpret_cast<const uint8_t*>(base_region + offset), bytes_read);
+            offset += bytes_read;
+            std::cout << "f: " << offset << std::endl;
             uint32_t abs_pos = prev_pos + delta;
+            std::cout << "Prev_pos was " << prev_pos << " and delta is " << delta << std::endl;
             prev_pos = abs_pos;
 
             uint8_t location_raw;
             std::memcpy(&location_raw, base_region + offset, sizeof(location_raw));
             offset += sizeof(location_raw);
+            std::cout << "g: " << offset << std::endl;
 
             wordlocation_t location = static_cast<wordlocation_t>(location_raw);
             PostEntry entry(abs_pos, location);
@@ -215,6 +235,7 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
 
         list.posts[i] = post;
     }
+    std::cout << "h: " << offset << std::endl;
 
     return list;
 }

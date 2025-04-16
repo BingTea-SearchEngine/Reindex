@@ -9,48 +9,54 @@
 #include "WordLocation.hpp"
 #include "Util.hpp"
 
-std::vector<uint8_t> encode(uint32_t n) {
+std::vector<uint8_t> encode(uint32_t value) {
     std::vector<uint8_t> bytes;
     do {
-        uint8_t byte = n & 0x7F; // get 7 LSB
-        bytes.push_back(byte);
-        n >>= 7;
-    } while (n > 0);
+        uint8_t byte = value & 0x7F;  // Get the lowest 7 bits
+        value >>= 7;
+        if (value != 0) {
+            bytes.push_back(byte);    // More bytes to come
+        } else {
+            byte |= 0x80;             // Set MSB = 1 to mark end
+            bytes.push_back(byte);
+            break;
+        }
+    } while (true);
 
-    std::reverse(bytes.begin(), bytes.end());
-
-    // Set stop bit (MSB) in last byte
-    bytes.back() |= 0x80;
     return bytes;
 }
 
-uint32_t decode(const std::vector<uint8_t>& bytes, size_t& index) {
-    uint32_t n = 0;
-    while (index < bytes.size()) {
-        uint8_t byte = bytes[index++];
-        n = (n << 7) | (byte & 0x7F);
-        if (byte & 0x80) {
-            break; // this is the last byte
-        }
+uint32_t decode(const uint8_t* base, size_t& offset) {
+    uint32_t result = 0;
+    int shift = 0;
+    while (true) {
+        uint8_t byte = *(base + offset);
+        offset++;
+
+        result |= (byte & 0x7F) << shift;
+
+        if (byte & 0x80) break;  // MSB = 1 means done
+        shift += 7;
     }
-    return n;
+    return result;
 }
 
 TEST(BasicCompression, EncodeDecodeVB) {
-    // test that encoding and decoding with variable bytes actually works
     std::vector<uint32_t> values = {1, 127, 128, 255, 1024, 16384, 1 << 24};
     for (uint32_t val : values) {
         std::vector<uint8_t> encoded = encode(val);
-        size_t index = 0;
-        uint32_t decoded = decode(encoded, index);
+        size_t offset = 0;
+        uint32_t decoded = decode(encoded.data(), offset);
+
+        std::cout << "Original: " << val << " | Decoded: " << decoded << "\n";
         EXPECT_EQ(decoded, val);
-        EXPECT_EQ(index, encoded.size()); // Make sure all bytes consumed
+        EXPECT_EQ(offset, encoded.size());
     }
 }
 
 TEST(BasicCompression, CompressedVsNaiveSizeBenefit) {
-    // test that using VB compression actually does indeed give size benefits
-    std::vector<uint32_t> abs_positions = {4, 5, 10, 18};
+    // test that using VB compression along with relative deltas actually does indeed give size benefits
+    std::vector<uint32_t> abs_positions = {4, 5, 10, 18, 300, 900, 6000};
     std::vector<uint32_t> deltas;
     deltas.push_back(abs_positions[0]);
     for (size_t i = 1; i < abs_positions.size(); ++i) {
@@ -132,10 +138,11 @@ void test_serializiation() {
     postingList->AddWord(fox_doc, word_occurrence_7);
 
     size_t offset = 0;
-    PostingList::Serialize(static_cast<char*>(base_region), offset,
+    PostingList::NewSerialize(static_cast<char*>(base_region), offset,
                            *postingList);
 
     std::cout << "PostingList serialized to mmap.\n";
+    std::cout << "This many bytes were used: " << offset << std::endl;
 
     munmap(base_region, REGION_SIZE);
     close(fd);
@@ -149,7 +156,7 @@ void test_deserialization() {
     size_t offset = 0;
 
     PostingList postingList =
-        PostingList::Deserialize(static_cast<char*>(base_region), offset);
+        PostingList::NewDeserialize(static_cast<char*>(base_region), offset);
 
     if (postingList.GetWord() == "cat") {
         std::cout << "Passed!" << std::endl;
@@ -181,6 +188,8 @@ void test_deserialization() {
         cnn_word_occurrence_1.GetLocationFound() == wordlocation_t::body) {
         std::cout << "Passed!" << std::endl;
     } else {
+        std::cout << "FAILURE INCOMING" << std::endl;
+        std::cout << cnn_word_occurrence_1.GetDelta();
         std::cout << "Failed!" << std::endl;
         exit(1);
     }
