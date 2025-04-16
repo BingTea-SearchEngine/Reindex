@@ -2,27 +2,36 @@
 // Parse and batch documents to feed into index
 #pragma once
 
-#include <queue>
-#include <string>
 #include <filesystem>
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <queue>
 #include <regex>
-
+#include <sstream>
+#include <string>
 
 using std::cout;
 using std::endl;
 
-#include "Types.hpp"
+#include "PostEntry.hpp"
+#include "WordLocation.hpp"
 
 bool checkTagExists(std::string line, std::string tag);
 
 struct BatchNumCompare {
     bool operator()(std::string a, std::string b) {
-        return a[0] > b[0]; // Min-heap (smallest element at top)
+        int anum = std::stoi(a.substr(0, a.find('.')));
+        int bnum = std::stoi(b.substr(0, b.find('.')));
+        return anum > bnum;  // Min-heap (smallest element at top)
     }
 };
+
+struct DocStreamOutput {
+    std::string url;
+    std::vector<word_t> words;
+    metadata_t metadata;
+};
+
 
 class DocStream {
    public:
@@ -31,12 +40,12 @@ class DocStream {
     DocStream(std::string dirPath);
 
     // Parse next file in _documents priority queue
-    std::pair<docname, words> nextFile();
+    DocStreamOutput nextFile();
 
     size_t size();
 
    private:
-    std::priority_queue<std::string, std::vector<std::string>, BatchNumCompare> _documents;
+    std::priority_queue<std::string, std::vector<std::string>, BatchNumCompare>
+        _documents;
     std::string _dirPath;
 };
-

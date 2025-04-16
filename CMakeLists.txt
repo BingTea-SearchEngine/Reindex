@@ -41,11 +41,15 @@ set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 add_library(IndexElements STATIC 
     ${LIB_DIR}/IndexElements/MasterChunk.cpp
     ${LIB_DIR}/IndexElements/IndexChunk.cpp
+    ${LIB_DIR}/IndexElements/MetadataChunk.cpp
     ${LIB_DIR}/IndexElements/PostingList.cpp
     ${LIB_DIR}/IndexElements/Post.cpp
-    ${LIB_DIR}/IndexElements/Types.hpp
+    ${LIB_DIR}/IndexElements/PostEntry.cpp
+    ${LIB_DIR}/IndexElements/WordLocation.cpp
+    ${LIB_DIR}/IndexElements/Util.cpp
 )
 target_include_directories(IndexElements PUBLIC ${LIB_DIR}/IndexElements)
+target_link_libraries(IndexElements PUBLIC spdlog::spdlog)
 
 add_library(DocStream STATIC ${LIB_DIR}/DocStream/DocStream.cpp)
 target_include_directories(DocStream PUBLIC ${LIB_DIR}/DocStream)
@@ -59,7 +63,24 @@ target_include_directories(${THIS} PRIVATE ${LIB_DIR}/DocStream ${LIB_DIR}/Index
 add_executable(TestExample tests/TestExample.cpp)
 target_link_libraries(TestExample PRIVATE GTest::gtest_main)
 
+add_executable(TestMasterChunk tests/TestMasterChunk.cpp)
+target_link_libraries(TestMasterChunk PRIVATE GTest::gtest_main IndexElements)
+
+add_executable(TestPostingList tests/TestPostingList.cpp)
+target_link_libraries(TestPostingList PRIVATE GTest::gtest_main IndexElements)
+
+add_executable(TestIndexChunk tests/TestIndexChunk.cpp)
+target_link_libraries(TestIndexChunk PRIVATE GTest::gtest_main IndexElements)
+
+add_executable(TestMetadataChunk tests/TestMetadataChunk.cpp)
+target_link_libraries(TestMetadataChunk PRIVATE GTest::gtest_main IndexElements)
+
 include(GoogleTest)
 gtest_discover_tests(TestExample)
+gtest_discover_tests(TestMasterChunk)
+gtest_discover_tests(TestPostingList)
+gtest_discover_tests(TestIndexChunk)
+gtest_discover_tests(TestMetadataChunk)
+
 
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type")
