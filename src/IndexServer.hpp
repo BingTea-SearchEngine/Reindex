@@ -5,14 +5,23 @@
 #include <spdlog/spdlog.h>
 #include <argparse/argparse.hpp>
 
+#include "Expression.hpp"
 #include "GatewayServer.hpp"
+#include "Parser.hpp"
+#include "IndexChunk.hpp"
+#include "MasterChunk.hpp"
 
 class IndexServer {
    public:
-    IndexServer(int port, int maxClients);
+    IndexServer(int port, int maxClients, std::string indexPath, MasterChunk master);
 
     void Start();
 
    private:
+    std::string _handleSearch(std::string query);
+
     Server _server;
+
+    MasterChunk _master;
+    IndexChunk _primaryIndexChunk;
 };

@@ -1,8 +1,8 @@
 #include "IndexServer.hpp"
 
-IndexServer::IndexServer(int port, int maxClients)
-    : _server(Server(port, maxClients)) {
-
+IndexServer::IndexServer(int port, int maxClients, std::string indexaPath, MasterChunk master)
+    : _server(Server(port, maxClients)), _master(master) {
+    
 }
 
 void IndexServer::Start() {
@@ -10,9 +10,21 @@ void IndexServer::Start() {
         std::vector<Message> messages = _server.GetMessagesBlocking();
         for (const auto& m : messages) {
             spdlog::info("Request from {}:{}", m.senderIp, m.senderPort);
-            spdlog::info(m.msg);
+
+            Message msg;
+            msg.receiverSock = m.senderSock;
+            msg.msg = _handleSearch(m.msg);
+            _server.SendMessage(msg);
         }
     }
+}
+
+std::string IndexServer::_handleSearch(std::string query) {
+    spdlog::info("Query: {}", query);
+    Parser parser(query);
+    Expression* expr = parser.Parse();
+    std::cout << expr->Eval() << std::endl;
+    return "Hi from server";
 }
 
 int main(int argc, char** argv) {
@@ -27,6 +39,10 @@ int main(int argc, char** argv) {
         .help("Max number of clients")
         .scan<'i', int>();
 
+    program.add_argument("-i", "--input")
+        .required()
+        .help("Directory index files are located");
+
     try {
         program.parse_args(argc, argv);
     } catch (const std::exception& err) {
@@ -37,11 +53,21 @@ int main(int argc, char** argv) {
 
     int port = program.get<int>("-p");
     int maxClients = program.get<int>("-m");
+    std::string indexPath = program.get<std::string>("-i");
 
     spdlog::info("Port {}", port);
     spdlog::info("Max clients {}", maxClients);
+    spdlog::info("Index Path {}", indexPath);
 
-    IndexServer indexServer(port, maxClients);
+    int fd = -1;
+    auto [buf, size] = read_mmap_region(fd, indexPath + "/masterchunk");
+    size_t offset = 0;
+    MasterChunk master =
+        MasterChunk::Deserailize(static_cast<char*>(buf), offset);
+    munmap(buf, 4098);
+    close(fd);
+
+    IndexServer indexServer(port, maxClients, indexPath, master);
     spdlog::info("======= Index Server Started =======");
     indexServer.Start();
 }

@@ -83,7 +83,7 @@ void test_serializiation() {
 void test_deserialization() {
     int fd;
     const size_t REGION_SIZE = 4096;
-    void* base_region = read_mmap_region(fd, REGION_SIZE, "test_posting_list");
+    auto [base_region, size] = read_mmap_region(fd, "test_posting_list");
     size_t offset = 0;
 
     PostingList postingList =

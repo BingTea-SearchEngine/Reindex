@@ -6,7 +6,7 @@ void* create_mmap_region(int& fd, size_t size, std::string filename) {
     return mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 }
 
-void* read_mmap_region(int& fd, size_t size, std::string filename) {
+std::pair<void*, size_t> read_mmap_region(int& fd, std::string filename) {
     fd = open(filename.c_str(), O_RDONLY);
     if (fd == -1) {
         throw std::runtime_error("Failed to open file");
@@ -27,5 +27,5 @@ void* read_mmap_region(int& fd, size_t size, std::string filename) {
         throw std::runtime_error("Error: Failed to memory-map file");
     }
 
-    return mappedRegion;
+    return {mappedRegion, fileSize};
 }

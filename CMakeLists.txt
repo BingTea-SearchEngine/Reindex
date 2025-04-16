@@ -29,7 +29,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(spdlog)
 
-include(FetchContent)
+FetchContent_Declare(
+    ExpressionParser
+    GIT_REPOSITORY https://github.com/BingTea-SearchEngine/ExpressionParser.git
+    GIT_TAG main
+)
+FetchContent_MakeAvailable(ExpressionParser)
+
 FetchContent_Declare(
     argparse
     GIT_REPOSITORY https://github.com/p-ranav/argparse.git
@@ -47,6 +53,9 @@ set(GATEWAY_SOURCE_DIR ${gateway_SOURCE_DIR})
 set(GATEWAY_INCLUDE_DIR "${gateway_SOURCE_DIR}/lib")
 message(STATUS "Gateway project source directory: ${GATEWAY_SOURCE_DIR}")
 message(STATUS "Gateway include directory: ${GATEWAY_INCLUDE_DIR}")
+
+set(EXPRESSIONPARSER_SOURCE_DIR ${expressionparser_SOURCE_DIR})
+set(EXPRESSIONPARSER_INCLUDE_DIR "${expressionparser_SOURCE_DIR}/lib")
 
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
@@ -71,8 +80,9 @@ target_link_libraries(${THIS} PUBLIC spdlog::spdlog argparse DocStream IndexElem
 target_include_directories(${THIS} PRIVATE ${LIB_DIR}/DocStream ${LIB_DIR}/IndexElements)
 
 add_executable(IndexServer src/IndexServer.cpp)
-target_link_libraries(IndexServer PUBLIC spdlog::spdlog argparse IndexElements GatewayServer)
-target_include_directories(IndexServer PUBLIC ${LIB_DIR}/IndexElements ${GATEWAY_INCLUDE_DIR})
+target_link_libraries(IndexServer PUBLIC spdlog::spdlog argparse IndexElements GatewayServer
+    ExpressionParser)
+target_include_directories(IndexServer PUBLIC ${LIB_DIR}/IndexElements ${GATEWAY_INCLUDE_DIR} ${EXPRESSIONPARSER_INCLUDE_DIR})
 
 add_executable(TestExample tests/TestExample.cpp)
 target_link_libraries(TestExample PRIVATE GTest::gtest_main)
@@ -92,4 +102,3 @@ gtest_discover_tests(TestMasterChunk)
 gtest_discover_tests(TestPostingList)
 gtest_discover_tests(TestIndexChunk)
 
-set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type")

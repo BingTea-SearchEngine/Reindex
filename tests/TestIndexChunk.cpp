@@ -27,11 +27,11 @@ TEST(BasicIndexChunk, SerialiezDeserialize) {
     close(fd);
 
     int fd2 = -1;
-    void* buf2 = read_mmap_region(fd2, 4098, filePath);
+    auto [buf2, size] = read_mmap_region(fd2, filePath);
     offset = 0;
     IndexChunk chunk2 =
         IndexChunk::Deserailize(static_cast<char*>(buf2), offset);
-    munmap(buf2, 4098);
+    munmap(buf2, size);
     close(fd2);
 
     EXPECT_EQ(chunk.GetDocuments(), chunk2.GetDocuments());

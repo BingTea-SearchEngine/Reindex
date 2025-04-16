@@ -4,6 +4,7 @@
 #include <sys/mman.h>  // For shm_open, mmap, PROT_READ, PROT_WRITE, MAP_SHARED, munmap
 #include <sys/stat.h>  // For mode constants
 #include <unistd.h>    // For ftruncate, close
+#include <utility>
 
 #include <stdexcept>
 #include <string>
@@ -14,4 +15,4 @@
  * */
 void* create_mmap_region(int& fd, size_t size, std::string filename);
 
-void* read_mmap_region(int& fd, size_t size, std::string filename);
+std::pair<void*, size_t> read_mmap_region(int& fd, std::string filename);
