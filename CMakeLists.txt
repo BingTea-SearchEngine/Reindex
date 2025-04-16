@@ -76,6 +76,17 @@ add_library(DocStream STATIC ${LIB_DIR}/DocStream/DocStream.cpp)
 target_include_directories(DocStream PUBLIC ${LIB_DIR}/DocStream)
 target_link_libraries(DocStream PUBLIC IndexElements)
 
+
+add_library(IndexStreamReaders STATIC 
+    ${LIB_DIR}/IndexStreamReaders/ISRAnd.cpp
+    ${LIB_DIR}/IndexStreamReaders/ISROr.cpp
+    ${LIB_DIR}/IndexStreamReaders/ISRPhrase.cpp
+    ${LIB_DIR}/IndexStreamReaders/ISRWord.cpp
+    ${LIB_DIR}/IndexStreamReaders/ISRContainer.cpp
+)
+target_include_directories(IndexStreamReaders PUBLIC ${LIB_DIR}/IndexStreamReaders)
+target_link_libraries(IndexStreamReaders PUBLIC IndexElements)
+
 add_executable(${THIS} src/reindex.cpp)
 target_link_libraries(${THIS} PUBLIC spdlog::spdlog argparse DocStream IndexElements)
 target_include_directories(${THIS} PRIVATE ${LIB_DIR}/DocStream ${LIB_DIR}/IndexElements)
@@ -100,6 +111,21 @@ target_link_libraries(TestIndexChunk PRIVATE GTest::gtest_main IndexElements)
 add_executable(TestMetadataChunk tests/TestMetadataChunk.cpp)
 target_link_libraries(TestMetadataChunk PRIVATE GTest::gtest_main IndexElements)
 
+add_executable(TestISRWord tests/TestISRWord.cpp)
+target_link_libraries(TestISRWord PRIVATE GTest::gtest_main IndexStreamReaders)
+
+add_executable(TestISROr tests/TestISROr.cpp)
+target_link_libraries(TestISROr PRIVATE GTest::gtest_main IndexStreamReaders)
+
+add_executable(TestISRAnd tests/TestISRAnd.cpp)
+target_link_libraries(TestISRAnd PRIVATE GTest::gtest_main IndexStreamReaders)
+
+add_executable(TestISRPhrase tests/TestISRPhrase.cpp)
+target_link_libraries(TestISRPhrase PRIVATE GTest::gtest_main IndexStreamReaders)
+
+add_executable(TestISRContainer tests/TestISRContainer.cpp)
+target_link_libraries(TestISRContainer PRIVATE GTest::gtest_main IndexStreamReaders)
+
 include(GoogleTest)
 gtest_discover_tests(TestExample)
 gtest_discover_tests(TestMasterChunk)
@@ -107,4 +133,9 @@ gtest_discover_tests(TestPostingList)
 gtest_discover_tests(TestIndexChunk)
 gtest_discover_tests(TestMetadataChunk)
 
+gtest_discover_tests(TestISRWord)
+gtest_discover_tests(TestISROr)
+gtest_discover_tests(TestISRAnd)
+gtest_discover_tests(TestISRPhrase)
+gtest_discover_tests(TestISRContainer)
 

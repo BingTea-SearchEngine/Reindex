@@ -40,7 +40,7 @@ void PostingList::Print() const {
     }
 }
 
-std::vector<Post> PostingList::GetPosts() {
+std::vector<Post> PostingList::GetPosts() const {
     return posts;
 }
 
