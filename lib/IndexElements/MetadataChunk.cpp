@@ -76,14 +76,15 @@ void MetadataChunk::Serialize(char* base_region, size_t& offset, MetadataChunk& 
         std::memcpy(base_region+offset, &metadata.cheiRank, sizeof(metadata.cheiRank));
         offset+=sizeof(metadata.cheiRank);
 
-        std::memcpy(base_region+offset, &metadata.numOutLinks, sizeof(metadata.numOutLinks));
-        offset+=sizeof(metadata.numOutLinks);
+        size_t numOutLinks = metadata.outLinks.size();
+        std::memcpy(base_region+offset, &numOutLinks, sizeof(numOutLinks));
+        offset+=sizeof(numOutLinks);
 
 
-        for (size_t j = 0; j < metadata.numOutLinks; ++j) {
+        for (size_t j = 0; j < metadata.outLinks.size(); ++j) {
             size_t link_size = metadata.outLinks[j].size()+1;
             // std::string link = std::string(base_region+offset);
-            std::memcpy(base_region+offset, &metadata.outLinks[j], link_size);
+            std::memcpy(base_region+offset, metadata.outLinks[j].c_str(), link_size);
             offset+=link_size;
         }
 
@@ -133,6 +134,7 @@ MetadataChunk MetadataChunk::Deserailize(char* base_region, size_t& offset){
 
         //Read outward links
         std::vector<std::string> outLinks;
+        outLinks.reserve(numOutLinks);
         for (size_t j = 0; j < numOutLinks; ++j) {
             std::string link = std::string(base_region+offset);
             // std::memcpy(&numOutLinks, base_region+offset, sizeof(numOutLinks));
@@ -140,7 +142,7 @@ MetadataChunk MetadataChunk::Deserailize(char* base_region, size_t& offset){
             outLinks.push_back(link);
         }
 
-        metadata_t metadata{numWords, numTitleWords, pageRank, cheiRank, numOutLinks, outLinks};
+        metadata_t metadata{numWords, numTitleWords, pageRank, cheiRank, outLinks};
         chunk._docMetadata.insert(make_pair(docname, metadata));
     }
 

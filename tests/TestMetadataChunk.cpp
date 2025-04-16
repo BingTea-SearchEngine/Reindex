@@ -4,7 +4,7 @@
 #include "WordLocation.hpp"
 #include "Util.hpp"
 
-TEST(BasicIndexChunk, SerializeDeserialize) {
+TEST(BasicMetadataChunk, SerializeDeserialize) {
     MetadataChunk chunk;
     
     // size_t numWords;
@@ -14,9 +14,9 @@ TEST(BasicIndexChunk, SerializeDeserialize) {
     // size_t numOutLinks;
     // std::vector<std::string> outLinks;
     
-    metadata_t d1{1, 2, 0.1, 0.2, 1, std::vector<std::string>{"a"}};
-    metadata_t d2{3, 4, 0.3, 0.4, 2, std::vector<std::string>{"b", "c"}};
-    metadata_t d3{5, 6, 0.5, 0.6, 3, std::vector<std::string>{"d", "e", "f"}};
+    metadata_t d1{1, 2, 0.1, 0.2, std::vector<std::string>{"a"}};
+    metadata_t d2{3, 4, 0.3, 0.4, std::vector<std::string>{"b", "c"}};
+    metadata_t d3{5, 6, 0.5, 0.6, std::vector<std::string>{"d", "e", "f"}};
 
     chunk.AddDocument("doc1", d1);
     chunk.AddDocument("doc2", d2);

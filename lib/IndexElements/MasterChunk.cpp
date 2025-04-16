@@ -135,7 +135,6 @@ void MasterChunk::PrintCurrentMetadataChunk() const {
     
 void MasterChunk::_serializeCurrIndexChunk() {
     std::string chunkFilePath = _indexDir + std::to_string(_indexChunks.size());
-    cout << chunkFilePath << endl;
     _indexChunks.push_back(chunkFilePath);
 
     int fd = -1;
@@ -153,8 +152,7 @@ void MasterChunk::_serializeCurrIndexChunk() {
 }
 
 void MasterChunk::_serializeCurrMetadataChunk() {
-    std::string chunkFilePath = _metadataDir + std::to_string(_metadataChunks.size());
-    cout << chunkFilePath << endl;
+    std::string chunkFilePath = _metadataDir + std::to_string(_metadataChunks.size()) + "metadata";
     _metadataChunks.push_back(chunkFilePath);
 
     int fd = -1;

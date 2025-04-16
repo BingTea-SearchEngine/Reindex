@@ -24,8 +24,6 @@ DocStreamOutput DocStream::nextFile() {
     //TODO
     //Parse the next file in the priority queue. Populate the file type struct with words in the
     //title section and normal words.
-
-
     std::string documentName = _documents.top();
     DocStreamOutput out{documentName, std::vector<word_t>{}, {}};
 
@@ -104,7 +102,7 @@ DocStreamOutput DocStream::nextFile() {
     }
 
     std::vector<std::string> outLinks;
-    while (!checkTagExists(line, "</links>")) {
+    while (line != "</links>") {
         std::getline(document, line);
         outLinks.push_back(line);
     }
@@ -141,7 +139,7 @@ DocStreamOutput DocStream::nextFile() {
         return out;
     }
 
-    out.metadata = {output.size(), numTitleWords, pageRank, cheiRank, outLinks.size(), outLinks};
+    out.metadata = {output.size(), numTitleWords, pageRank, cheiRank, outLinks};
     out.url = url;
     out.words = output;
 

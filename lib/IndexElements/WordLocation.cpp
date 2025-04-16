@@ -25,11 +25,11 @@ std::ostream& operator<<(std::ostream& os, const metadata_t& m) {
         << "\n\tcheiRank score=" << m.cheiRank;
     os  << "\n\t}\n";
 
-    std::cout << m.numOutLinks << " outward links: \n{\n";
+    os << m.outLinks.size() << " outward links: \n{\n";
     for (const auto &link : m.outLinks) {
-        std::cout << "\t" << link << "\n";
+        os << "\t" << link << "\n";
     }
-    std::cout << "}";
+    os << "}";
 
     return os;
 }
@@ -39,7 +39,6 @@ bool operator==(const metadata_t& lhs, const metadata_t& rhs) {
         && lhs.numTitleWords == rhs.numTitleWords
         && lhs.pageRank == rhs.pageRank
         && lhs.cheiRank == rhs.cheiRank
-        && lhs.numOutLinks == rhs.numOutLinks
         && lhs.outLinks.size() == rhs.outLinks.size())) 
     {
         return false;
@@ -47,7 +46,7 @@ bool operator==(const metadata_t& lhs, const metadata_t& rhs) {
 
     assert(lhs.outLinks.size() == lhs.numOutLinks && rhs.outLinks.size() == rhs.numOutLinks);
 
-    for(int i = 0; i < lhs.numOutLinks; ++i) {
+    for(int i = 0; i < lhs.outLinks.size(); ++i) {
         if(lhs.outLinks[i] != rhs.outLinks[i]) return false;
     }
 

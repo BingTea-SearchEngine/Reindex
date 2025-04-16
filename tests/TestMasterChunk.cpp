@@ -14,6 +14,8 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
 
     metadata_t m;
 
+    std::cout << "Before adding documents" << std::endl;
+
     master.AddDocument("doc1", w, m);
     master.AddDocument("doc2", w, m);
     master.Flush();
