@@ -44,8 +44,6 @@ bool operator==(const metadata_t& lhs, const metadata_t& rhs) {
         return false;
     }
 
-    assert(lhs.outLinks.size() == lhs.numOutLinks && rhs.outLinks.size() == rhs.numOutLinks);
-
     for(int i = 0; i < lhs.outLinks.size(); ++i) {
         if(lhs.outLinks[i] != rhs.outLinks[i]) return false;
     }
