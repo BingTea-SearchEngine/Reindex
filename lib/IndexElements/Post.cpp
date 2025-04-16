@@ -6,11 +6,11 @@ Post::Post() {}
 
 Post::Post(std::string name) : document_name(name), entries() {}
 
-std::string Post::GetDocumentName() {
+std::string Post::GetDocumentName() const {
     return document_name;
 }
 
-std::vector<PostEntry> Post::GetEntries() {
+std::vector<PostEntry> Post::GetEntries() const {
     return entries;
 }
 
@@ -19,7 +19,8 @@ void Post::AddWord(PostEntry word) {
 }
 
 void Post::Print() const {
-    cout << "\tPost{ " << document_name << " }: " << entries.size() << " entries" << endl;
+    cout << "\tPost{ " << document_name << " }: " << entries.size()
+         << " entries" << endl;
     cout << "\t\t";
     for (const PostEntry& entry : entries) {
         entry.Print();

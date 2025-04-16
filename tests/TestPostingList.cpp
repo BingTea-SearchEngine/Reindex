@@ -6,9 +6,8 @@
 #include <unistd.h>    // For ftruncate, close
 
 #include "PostingList.hpp"
-#include "WordLocation.hpp"
 #include "Util.hpp"
-
+#include "WordLocation.hpp"
 
 TEST(BasicPostingList, TestAddWord) {
     PostingList pl("test");
@@ -42,7 +41,8 @@ TEST(BasicPostingList, TestAddWord) {
 void test_serializiation() {
     int fd;
     const size_t REGION_SIZE = 4096;
-    void* base_region = create_mmap_region(fd, REGION_SIZE, "test_posting_list");
+    void* base_region =
+        create_mmap_region(fd, REGION_SIZE, "test_posting_list");
 
     PostingList* postingList = new PostingList("cat");
 

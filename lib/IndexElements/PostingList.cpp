@@ -8,7 +8,7 @@ PostingList::PostingList() {}
 PostingList::PostingList(const std::string& word) : word(word) {}
 
 size_t PostingList::GetOverheadBytesRequired() {
-    return word.size()+1+sizeof(posts.size());
+    return word.size() + 1 + sizeof(posts.size());
 }
 
 std::string PostingList::GetWord() {
@@ -19,16 +19,16 @@ size_t PostingList::AddWord(std::string doc, PostEntry word) {
     size_t bytesRequired = 0;
     if (posts.empty()) {
         posts.emplace_back(doc);
-        bytesRequired+=doc.size()+1;
+        bytesRequired += doc.size() + 1;
     }
 
     if (doc != posts.back().GetDocumentName()) {
         posts.emplace_back(doc);
-        bytesRequired+=doc.size()+1;
+        bytesRequired += doc.size() + 1;
     }
 
     posts.back().AddWord(word);
-    bytesRequired+=word.GetBytesRequired();
+    bytesRequired += word.GetBytesRequired();
     return bytesRequired;
 }
 
@@ -40,7 +40,7 @@ void PostingList::Print() const {
     }
 }
 
-std::vector<Post> PostingList::GetPosts() {
+std::vector<Post> PostingList::GetPosts() const {
     return posts;
 }
 

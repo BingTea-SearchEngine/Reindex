@@ -26,7 +26,7 @@ std::ostream& operator<<(std::ostream& os, const PostEntry& obj) {
     return os;
 }
 
-uint32_t PostEntry::GetDelta() {
+uint32_t PostEntry::GetDelta() const {
     return delta;
 }
 
