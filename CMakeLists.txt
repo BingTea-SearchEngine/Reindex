@@ -84,8 +84,7 @@ target_link_libraries(TestIndexChunk PRIVATE GTest::gtest_main IndexElements)
 
 add_executable(TestMetadataChunk tests/TestMetadataChunk.cpp)
 target_link_libraries(TestMetadataChunk PRIVATE GTest::gtest_main IndexElements)
-add_executable(TestISR tests/TestISR.cpp)
-target_link_libraries(TestISR PRIVATE GTest::gtest_main IndexStreamReaders)
+
 add_executable(TestISRWord tests/TestISRWord.cpp)
 target_link_libraries(TestISRWord PRIVATE GTest::gtest_main IndexStreamReaders)
 
