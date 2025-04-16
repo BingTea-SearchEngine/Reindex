@@ -117,16 +117,16 @@ void test_serializiation() {
     // let's say there is a document named cnn/index.html
     std::string cnn_doc = "cnn/index.html";
     // and on this document, there are a couple occurrences of the word "cat" in the body
-    PostEntry word_occurrence_1 = {5, wordlocation_t::body};
-    PostEntry word_occurrence_2 = {10, wordlocation_t::title};
-    PostEntry word_occurrence_3 = {17, wordlocation_t::body};
+    PostEntry word_occurrence_1 = {123456, wordlocation_t::body};
+    PostEntry word_occurrence_2 = {123457, wordlocation_t::title};
+    PostEntry word_occurrence_3 = {123458, wordlocation_t::body};
 
     // and let's say there is another document called fox/index.html
     std::string fox_doc = "fox/index.html";
-    PostEntry word_occurrence_4 = {20, wordlocation_t::body};
-    PostEntry word_occurrence_5 = {25, wordlocation_t::title};
-    PostEntry word_occurrence_6 = {29, wordlocation_t::title};
-    PostEntry word_occurrence_7 = {40, wordlocation_t::body};
+    PostEntry word_occurrence_4 = {200000, wordlocation_t::body};
+    PostEntry word_occurrence_5 = {200005, wordlocation_t::title};
+    PostEntry word_occurrence_6 = {200010, wordlocation_t::title};
+    PostEntry word_occurrence_7 = {200015, wordlocation_t::body};
 
     postingList->AddWord(cnn_doc, word_occurrence_1);
     postingList->AddWord(cnn_doc, word_occurrence_2);
@@ -141,8 +141,14 @@ void test_serializiation() {
     PostingList::NewSerialize(static_cast<char*>(base_region), offset,
                            *postingList);
 
-    std::cout << "PostingList serialized to mmap.\n";
-    std::cout << "This many bytes were used: " << offset << std::endl;
+    std::cout << "Compressed PostingList serialized to mmap.\n";
+    std::cout << "This many bytes were used for COMPRESSED RELATIVE DELTAS: " << offset << std::endl;
+
+    size_t new_offset = offset;
+    PostingList::OldSerialize(static_cast<char*>(base_region), new_offset, *postingList);
+
+    std::cout << "Naive PostingList serialized to mmap.\n";
+    std::cout << "This many bytes were used for NAIVE: " << new_offset - offset << std::endl;
 
     munmap(base_region, REGION_SIZE);
     close(fd);
@@ -184,18 +190,16 @@ void test_deserialization() {
     auto entries = cnnPost.GetEntries();
 
     PostEntry cnn_word_occurrence_1 = entries[0];
-    if (cnn_word_occurrence_1.GetDelta() == 5 &&
+    if (cnn_word_occurrence_1.GetDelta() == 123456 &&
         cnn_word_occurrence_1.GetLocationFound() == wordlocation_t::body) {
         std::cout << "Passed!" << std::endl;
     } else {
-        std::cout << "FAILURE INCOMING" << std::endl;
-        std::cout << cnn_word_occurrence_1.GetDelta();
         std::cout << "Failed!" << std::endl;
         exit(1);
     }
 
     PostEntry cnn_word_occurrence_2 = entries[1];
-    if (cnn_word_occurrence_2.GetDelta() == 10 &&
+    if (cnn_word_occurrence_2.GetDelta() == 123457 &&
         cnn_word_occurrence_2.GetLocationFound() == wordlocation_t::title) {
         std::cout << "Passed!" << std::endl;
     } else {
@@ -204,7 +208,7 @@ void test_deserialization() {
     }
 
     PostEntry cnn_word_occurrence_3 = entries[2];
-    if (cnn_word_occurrence_3.GetDelta() == 17 &&
+    if (cnn_word_occurrence_3.GetDelta() == 123458 &&
         cnn_word_occurrence_3.GetLocationFound() == wordlocation_t::body) {
         std::cout << "Passed!" << std::endl;
     } else {
@@ -223,7 +227,7 @@ void test_deserialization() {
     entries = foxPost.GetEntries();
 
     PostEntry fox_word_occurrence_1 = entries[0];
-    if (fox_word_occurrence_1.GetDelta() == 20 &&
+    if (fox_word_occurrence_1.GetDelta() == 200000 &&
         fox_word_occurrence_1.GetLocationFound() == wordlocation_t::body) {
         std::cout << "Passed!" << std::endl;
     } else {
@@ -232,7 +236,7 @@ void test_deserialization() {
     }
 
     PostEntry fox_word_occurrence_2 = entries[1];
-    if (fox_word_occurrence_2.GetDelta() == 25 &&
+    if (fox_word_occurrence_2.GetDelta() == 200005 &&
         fox_word_occurrence_2.GetLocationFound() == wordlocation_t::title) {
         std::cout << "Passed!" << std::endl;
     } else {
@@ -241,7 +245,7 @@ void test_deserialization() {
     }
 
     PostEntry fox_word_occurrence_3 = entries[2];
-    if (fox_word_occurrence_3.GetDelta() == 29 &&
+    if (fox_word_occurrence_3.GetDelta() == 200010 &&
         fox_word_occurrence_3.GetLocationFound() == wordlocation_t::title) {
         std::cout << "Passed!" << std::endl;
     } else {
@@ -250,7 +254,108 @@ void test_deserialization() {
     }
 
     PostEntry fox_word_occurrence_4 = entries[3];
-    if (fox_word_occurrence_4.GetDelta() == 40 &&
+    if (fox_word_occurrence_4.GetDelta() == 200015 &&
+        fox_word_occurrence_4.GetLocationFound() == wordlocation_t::body) {
+        std::cout << "Passed!" << std::endl;
+    } else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    postingList =
+        PostingList::OldDeserialize(static_cast<char*>(base_region), offset);
+
+    if (postingList.GetWord() == "cat") {
+        std::cout << "Passed!" << std::endl;
+    } else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    if (postingList.GetPosts().size() == 2) {  // one for cnn and one for fox
+        std::cout << "Passed!" << std::endl;
+    } else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    catPostingList = postingList.GetPosts();
+    cnnPost = catPostingList[0];
+    if (cnnPost.GetDocumentName() == "cnn/index.html") {
+        std::cout << "Passed!" << std::endl;
+    } else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    entries = cnnPost.GetEntries();
+
+    cnn_word_occurrence_1 = entries[0];
+    if (cnn_word_occurrence_1.GetDelta() == 123456 &&
+        cnn_word_occurrence_1.GetLocationFound() == wordlocation_t::body) {
+        std::cout << "Passed!" << std::endl;
+    } else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    cnn_word_occurrence_2 = entries[1];
+    if (cnn_word_occurrence_2.GetDelta() == 123457 &&
+        cnn_word_occurrence_2.GetLocationFound() == wordlocation_t::title) {
+        std::cout << "Passed!" << std::endl;
+    } else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    cnn_word_occurrence_3 = entries[2];
+    if (cnn_word_occurrence_3.GetDelta() == 123458 &&
+        cnn_word_occurrence_3.GetLocationFound() == wordlocation_t::body) {
+        std::cout << "Passed!" << std::endl;
+    } else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    foxPost = catPostingList[1];
+    if (foxPost.GetDocumentName() == "fox/index.html") {
+        std::cout << "Passed!" << std::endl;
+    } else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    entries = foxPost.GetEntries();
+
+    fox_word_occurrence_1 = entries[0];
+    if (fox_word_occurrence_1.GetDelta() == 200000 &&
+        fox_word_occurrence_1.GetLocationFound() == wordlocation_t::body) {
+        std::cout << "Passed!" << std::endl;
+    } else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    fox_word_occurrence_2 = entries[1];
+    if (fox_word_occurrence_2.GetDelta() == 200005 &&
+        fox_word_occurrence_2.GetLocationFound() == wordlocation_t::title) {
+        std::cout << "Passed!" << std::endl;
+    } else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    fox_word_occurrence_3 = entries[2];
+    if (fox_word_occurrence_3.GetDelta() == 200010 &&
+        fox_word_occurrence_3.GetLocationFound() == wordlocation_t::title) {
+        std::cout << "Passed!" << std::endl;
+    } else {
+        std::cout << "Failed!" << std::endl;
+        exit(1);
+    }
+
+    fox_word_occurrence_4 = entries[3];
+    if (fox_word_occurrence_4.GetDelta() == 200015 &&
         fox_word_occurrence_4.GetLocationFound() == wordlocation_t::body) {
         std::cout << "Passed!" << std::endl;
     } else {
