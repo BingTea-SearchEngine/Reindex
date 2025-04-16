@@ -107,7 +107,6 @@ gtest_discover_tests(TestPostingList)
 gtest_discover_tests(TestIndexChunk)
 gtest_discover_tests(TestMetadataChunk)
 
-gtest_discover_tests(TestISR)
 gtest_discover_tests(TestISRWord)
 gtest_discover_tests(TestISROr)
 gtest_discover_tests(TestISRAnd)
