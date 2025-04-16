@@ -62,6 +62,7 @@ set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 add_library(IndexElements STATIC 
     ${LIB_DIR}/IndexElements/MasterChunk.cpp
     ${LIB_DIR}/IndexElements/IndexChunk.cpp
+    ${LIB_DIR}/IndexElements/MetadataChunk.cpp
     ${LIB_DIR}/IndexElements/PostingList.cpp
     ${LIB_DIR}/IndexElements/Post.cpp
     ${LIB_DIR}/IndexElements/PostEntry.cpp
@@ -96,9 +97,14 @@ target_link_libraries(TestPostingList PRIVATE GTest::gtest_main IndexElements)
 add_executable(TestIndexChunk tests/TestIndexChunk.cpp)
 target_link_libraries(TestIndexChunk PRIVATE GTest::gtest_main IndexElements)
 
+add_executable(TestMetadataChunk tests/TestMetadataChunk.cpp)
+target_link_libraries(TestMetadataChunk PRIVATE GTest::gtest_main IndexElements)
+
 include(GoogleTest)
 gtest_discover_tests(TestExample)
 gtest_discover_tests(TestMasterChunk)
 gtest_discover_tests(TestPostingList)
 gtest_discover_tests(TestIndexChunk)
+gtest_discover_tests(TestMetadataChunk)
+
 

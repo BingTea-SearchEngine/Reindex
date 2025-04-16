@@ -45,16 +45,15 @@ int main(int argc, char** argv) {
     MasterChunk master(outputDir, chunkSizeBytes);
 
     while (docStream.size() > 0) {
-        std::pair<std::string, std::vector<word_t>> nextDoc =
-            docStream.nextFile();
-        auto [document, words] = nextDoc;
-        if (words.empty()) {
-            spdlog::error("Error parsing {}", document);
+        DocStreamOutput nextDoc = docStream.nextFile();
+        if (nextDoc.words.empty() || nextDoc.url.empty()) {
+            spdlog::error("Error parsing {}", nextDoc.url);
             continue;
         }
-        master.AddDocument(document, words);
+        master.AddDocument(nextDoc.url, nextDoc.words, nextDoc.metadata);
     }
-
+    // master.PrintCurrentIndexChunk();
+    // master.PrintCurrentMetadataChunk();
     master.Flush();
 
     // Open file and mmap

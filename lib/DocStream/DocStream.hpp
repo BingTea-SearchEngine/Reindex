@@ -26,6 +26,13 @@ struct BatchNumCompare {
     }
 };
 
+struct DocStreamOutput {
+    std::string url;
+    std::vector<word_t> words;
+    metadata_t metadata;
+};
+
+
 class DocStream {
    public:
     // Populate _documents with file path to documents. Sort by batch number where a document is
@@ -33,7 +40,7 @@ class DocStream {
     DocStream(std::string dirPath);
 
     // Parse next file in _documents priority queue
-    std::pair<std::string, std::vector<word_t>> nextFile();
+    DocStreamOutput nextFile();
 
     size_t size();
 

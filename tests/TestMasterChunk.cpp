@@ -12,9 +12,15 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
     std::vector<word_t> w;
     w.push_back(word_t{"w", 0, wordlocation_t::title});
 
-    master.AddDocument("doc1", w);
-    master.AddDocument("doc2", w);
+    metadata_t m;
+
+    std::cout << "Before adding documents" << std::endl;
+
+    master.AddDocument("doc1", w, m);
+    master.AddDocument("doc2", w, m);
     master.Flush();
+
+    std::cout << "flushed everything" << std::endl;
 
     std::string filePath = "test_master_chunk";
     int fd = -1;
@@ -22,11 +28,15 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
 
     size_t offset = 0;
     MasterChunk::Serialize(static_cast<char*>(base_region), offset, master);
+
     munmap(base_region, 4098);
     if (ftruncate(fd, offset) == -1) {
         perror("Error truncating file");
     }
     close(fd);
+
+    std::cout << "serialized" << std::endl;
+
 
     int fd2 = -1;
     auto [buf2, size] = read_mmap_region(fd2, filePath);
@@ -36,6 +46,11 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
     munmap(buf2, size);
     close(fd2);
 
+    std::cout << "deserialized" << std::endl;
+
+
     EXPECT_EQ(master.GetNumDocuments(), master2.GetNumDocuments());
     EXPECT_EQ(master.GetChunkList(), master2.GetChunkList());
+    EXPECT_EQ(master.GetMetadataChunkList(), master2.GetMetadataChunkList());
+
 }
