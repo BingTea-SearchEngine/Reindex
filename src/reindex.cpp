@@ -46,14 +46,14 @@ int main(int argc, char** argv) {
 
     while (docStream.size() > 0) {
         DocStreamOutput nextDoc = docStream.nextFile();
-        if (nextDoc.words.empty()) {
+        if (nextDoc.words.empty() || nextDoc.url.empty()) {
             spdlog::error("Error parsing {}", nextDoc.url);
             continue;
         }
         master.AddDocument(nextDoc.url, nextDoc.words, nextDoc.metadata);
     }
-    master.PrintCurrentIndexChunk();
-    master.PrintCurrentMetadataChunk();
+    // master.PrintCurrentIndexChunk();
+    // master.PrintCurrentMetadataChunk();
     master.Flush();
 
     // Open file and mmap
