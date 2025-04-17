@@ -64,7 +64,7 @@ DocStreamOutput DocStream::nextFile() {
     std::getline(document, line);
     std::istringstream titleIss(line);
     std::string word;
-    size_t numTitleWords = 0;
+    uint32_t numTitleWords = 0;
     while (titleIss >> word) {
         output.push_back(word_t{word, offset, wordlocation_t::title});
         ++offset;
@@ -109,7 +109,7 @@ DocStreamOutput DocStream::nextFile() {
         std::getline(document, line);
     }
 
-    out.metadata = {output.size(), numTitleWords, 0.0, 0.0, outLinks};
+    out.metadata = {static_cast<uint32_t>(output.size()), numTitleWords, 0.0, 0.0, outLinks};
 
     //Check <prank> tag
     std::getline(document, line);
@@ -143,7 +143,8 @@ DocStreamOutput DocStream::nextFile() {
         return out;
     }
 
-    out.metadata = {output.size(), numTitleWords, pageRank, cheiRank, outLinks};
+    out.metadata.pageRank = pageRank;
+    out.metadata.cheiRank = cheiRank;
 
     return out;
 }

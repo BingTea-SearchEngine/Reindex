@@ -49,6 +49,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Gateway)
 
+FetchContent_Declare(
+    IndexInterface
+    GIT_REPOSITORY https://github.com/BingTea-SearchEngine/IndexInterface.git
+    GIT_TAG main
+)
+FetchContent_MakeAvailable(IndexInterface)
+
 set(GATEWAY_SOURCE_DIR ${gateway_SOURCE_DIR})
 set(GATEWAY_INCLUDE_DIR "${gateway_SOURCE_DIR}/lib")
 message(STATUS "Gateway project source directory: ${GATEWAY_SOURCE_DIR}")
@@ -93,7 +100,7 @@ target_include_directories(${THIS} PRIVATE ${LIB_DIR}/DocStream ${LIB_DIR}/Index
 
 add_executable(IndexServer src/IndexServer.cpp)
 target_link_libraries(IndexServer PUBLIC spdlog::spdlog argparse IndexElements GatewayServer
-    ExpressionParser)
+    ExpressionParser IndexInterface)
 target_include_directories(IndexServer PUBLIC ${LIB_DIR}/IndexElements ${GATEWAY_INCLUDE_DIR} ${EXPRESSIONPARSER_INCLUDE_DIR})
 
 add_executable(TestExample tests/TestExample.cpp)

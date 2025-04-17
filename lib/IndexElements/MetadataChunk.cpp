@@ -116,7 +116,7 @@ MetadataChunk MetadataChunk::Deserailize(char* base_region, size_t& offset) {
         chunk._documents.push_back(docname);
 
         // Read number of words
-        size_t numWords = 0, numTitleWords = 0, numOutLinks = 0;
+        uint32_t numWords = 0, numTitleWords = 0;
         float pageRank = 0.0, cheiRank = 0.0;
 
         std::memcpy(&numWords, base_region + offset, sizeof(numWords));
@@ -132,6 +132,7 @@ MetadataChunk MetadataChunk::Deserailize(char* base_region, size_t& offset) {
         std::memcpy(&cheiRank, base_region + offset, sizeof(cheiRank));
         offset += sizeof(cheiRank);
 
+        size_t numOutLinks;
         std::memcpy(&numOutLinks, base_region + offset, sizeof(numOutLinks));
         offset += sizeof(numOutLinks);
 

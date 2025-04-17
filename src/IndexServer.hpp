@@ -10,6 +10,7 @@
 #include "IndexChunk.hpp"
 #include "MasterChunk.hpp"
 #include "Parser.hpp"
+#include "IndexInterface.hpp"
 
 class IndexServer {
    public:

@@ -45,8 +45,8 @@ struct word_t {
 };
 
 struct metadata_t {
-    size_t numWords;
-    size_t numTitleWords;
+    uint32_t numWords;
+    uint32_t numTitleWords;
     float pageRank;
     float cheiRank;
     std::vector<std::string> outLinks;
