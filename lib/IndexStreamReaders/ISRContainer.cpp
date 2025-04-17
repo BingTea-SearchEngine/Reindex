@@ -6,14 +6,14 @@ ISRContainer::ISRContainer(ISR* includedISR, std::vector<ISRWord*> excludedISRs)
     : included(includedISR),
       excluded(excludedISRs),
       currentPostEntry(std::nullopt) {
-        for (auto& excludedTerm : excluded) {
+    for (auto& excludedTerm : excluded) {
+        excludedTerm->NextDocument();
+        while (excludedTerm->GetCurrentPostEntry() != std::nullopt) {
+            excludedDocuments.insert(excludedTerm->GetDocumentName());
             excludedTerm->NextDocument();
-            while (excludedTerm->GetCurrentPostEntry() != std::nullopt) {
-                excludedDocuments.insert(excludedTerm->GetDocumentName());
-                excludedTerm->NextDocument();
-            }
         }
-      }
+    }
+}
 
 int ISRContainer::GetStartLocation() {
     assert(this->currentPostEntry.has_value() &&
@@ -40,7 +40,8 @@ std::string ISRContainer::GetDocumentName() {
 std::optional<PostEntry> ISRContainer::Next() {
     while (this->included->Next() != std::nullopt) {
         this->currentPostEntry = this->included->GetCurrentPostEntry();
-        if (this->excludedDocuments.find(this->included->GetDocumentName()) == this->excludedDocuments.end()) {
+        if (this->excludedDocuments.find(this->included->GetDocumentName()) ==
+            this->excludedDocuments.end()) {
             return this->currentPostEntry;
         }
     }
@@ -52,7 +53,8 @@ std::optional<PostEntry> ISRContainer::Next() {
 std::optional<PostEntry> ISRContainer::NextDocument() {
     while (this->included->NextDocument() != std::nullopt) {
         this->currentPostEntry = this->included->GetCurrentPostEntry();
-        if (this->excludedDocuments.find(this->included->GetDocumentName()) == this->excludedDocuments.end()) {
+        if (this->excludedDocuments.find(this->included->GetDocumentName()) ==
+            this->excludedDocuments.end()) {
             return this->currentPostEntry;
         }
     }
@@ -69,7 +71,8 @@ std::optional<PostEntry> ISRContainer::Seek(size_t target) {
 
     this->currentPostEntry = this->included->GetCurrentPostEntry();
 
-    if (this->excludedDocuments.find(this->included->GetDocumentName()) == this->excludedDocuments.end()) {
+    if (this->excludedDocuments.find(this->included->GetDocumentName()) ==
+        this->excludedDocuments.end()) {
         return this->currentPostEntry;
     }
 

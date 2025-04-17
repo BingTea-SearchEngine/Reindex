@@ -34,7 +34,6 @@ DocStreamOutput DocStream::nextFile() {
         return out;
     }
 
-
     std::string line;
     std::getline(document, line);
     if (!checkTagExists(line, "URL: ")) {
@@ -119,7 +118,7 @@ DocStreamOutput DocStream::nextFile() {
     }
 
     float pageRank = 0.0;
-    if(std::getline(document, line)) {
+    if (std::getline(document, line)) {
         pageRank = std::stof(line);
     }
 
@@ -131,11 +130,11 @@ DocStreamOutput DocStream::nextFile() {
     //Check <prank> tag
     std::getline(document, line);
     if (!checkTagExists(line, "<crank>")) {
-        return out; 
+        return out;
     }
 
     float cheiRank = 0.0;
-    if(std::getline(document, line)) {
+    if (std::getline(document, line)) {
         cheiRank = std::stof(line);
     }
 

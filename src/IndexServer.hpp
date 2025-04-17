@@ -7,13 +7,14 @@
 
 #include "Expression.hpp"
 #include "GatewayServer.hpp"
-#include "Parser.hpp"
 #include "IndexChunk.hpp"
 #include "MasterChunk.hpp"
+#include "Parser.hpp"
 
 class IndexServer {
    public:
-    IndexServer(int port, int maxClients, std::string indexPath, MasterChunk master);
+    IndexServer(int port, int maxClients, std::string indexPath,
+                MasterChunk master);
 
     void Start();
 

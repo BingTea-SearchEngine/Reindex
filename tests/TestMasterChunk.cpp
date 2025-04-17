@@ -37,7 +37,6 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
 
     std::cout << "serialized" << std::endl;
 
-
     int fd2 = -1;
     auto [buf2, size] = read_mmap_region(fd2, filePath);
     offset = 0;
@@ -48,9 +47,7 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
 
     std::cout << "deserialized" << std::endl;
 
-
     EXPECT_EQ(master.GetNumDocuments(), master2.GetNumDocuments());
     EXPECT_EQ(master.GetChunkList(), master2.GetChunkList());
     EXPECT_EQ(master.GetMetadataChunkList(), master2.GetMetadataChunkList());
-
 }

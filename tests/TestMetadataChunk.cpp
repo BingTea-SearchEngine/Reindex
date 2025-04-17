@@ -1,19 +1,19 @@
 #include <gtest/gtest.h>
 
 #include "MetadataChunk.hpp"
-#include "WordLocation.hpp"
 #include "Util.hpp"
+#include "WordLocation.hpp"
 
 TEST(BasicMetadataChunk, SerializeDeserialize) {
     MetadataChunk chunk;
-    
+
     // size_t numWords;
     // size_t numTitleWords;
     // float pageRank;
     // float cheiRank;
     // size_t numOutLinks;
     // std::vector<std::string> outLinks;
-    
+
     metadata_t d1{1, 2, 0.1, 0.2, std::vector<std::string>{"a"}};
     metadata_t d2{3, 4, 0.3, 0.4, std::vector<std::string>{"b", "c"}};
     metadata_t d3{5, 6, 0.5, 0.6, std::vector<std::string>{"d", "e", "f"}};
@@ -37,13 +37,14 @@ TEST(BasicMetadataChunk, SerializeDeserialize) {
     int fd2 = -1;
     auto [buf2, size] = read_mmap_region(fd2, filePath);
     offset = 0;
-    MetadataChunk chunk2 = MetadataChunk::Deserailize(static_cast<char*>(buf2), offset);
+    MetadataChunk chunk2 =
+        MetadataChunk::Deserailize(static_cast<char*>(buf2), offset);
     munmap(buf2, size);
     close(fd2);
 
     EXPECT_EQ(chunk.GetDocuments(), chunk2.GetDocuments());
 
-    for(const auto &doc : chunk.GetDocuments()) {
+    for (const auto& doc : chunk.GetDocuments()) {
         EXPECT_TRUE(chunk.GetMetadata(doc) == chunk2.GetMetadata(doc));
     }
 }

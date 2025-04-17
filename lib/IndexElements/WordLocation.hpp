@@ -1,9 +1,9 @@
 #pragma once
 
+#include <cassert>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <cassert>
 
 enum class wordlocation_t {
     title = 0,
@@ -44,8 +44,6 @@ struct word_t {
     }
 };
 
-
-
 struct metadata_t {
     size_t numWords;
     size_t numTitleWords;
@@ -58,16 +56,12 @@ struct metadata_t {
     friend bool operator==(const metadata_t& lhs, const metadata_t& rhs);
 
     size_t getBytes() {
-        size_t bytes = sizeof(numWords) + sizeof(numTitleWords) + sizeof(pageRank) + sizeof(cheiRank);
-        for(const auto &link : outLinks) {
+        size_t bytes = sizeof(numWords) + sizeof(numTitleWords) +
+                       sizeof(pageRank) + sizeof(cheiRank);
+        for (const auto& link : outLinks) {
             bytes += link.size() + 1;
         }
 
         return bytes;
     }
-
 };
-
-
-
-

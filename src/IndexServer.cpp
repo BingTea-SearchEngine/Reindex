@@ -1,9 +1,8 @@
 #include "IndexServer.hpp"
 
-IndexServer::IndexServer(int port, int maxClients, std::string indexaPath, MasterChunk master)
-    : _server(Server(port, maxClients)), _master(master) {
-    
-}
+IndexServer::IndexServer(int port, int maxClients, std::string indexaPath,
+                         MasterChunk master)
+    : _server(Server(port, maxClients)), _master(master) {}
 
 void IndexServer::Start() {
     while (true) {
@@ -21,9 +20,14 @@ void IndexServer::Start() {
 
 std::string IndexServer::_handleSearch(std::string query) {
     spdlog::info("Query: {}", query);
+
+    // Parser query
     Parser parser(query);
     Expression* expr = parser.Parse();
+    // Evaluate query (Call ISRs)
     std::cout << expr->Eval() << std::endl;
+    // Rank?
+    // Serialize and send back to client
     return "Hi from server";
 }
 
@@ -60,11 +64,11 @@ int main(int argc, char** argv) {
     spdlog::info("Index Path {}", indexPath);
 
     int fd = -1;
-    auto [buf, size] = read_mmap_region(fd, indexPath + "/masterchunk");
+    auto [buf, size] = read_mmap_region(fd, indexPath + "masterchunk");
     size_t offset = 0;
     MasterChunk master =
         MasterChunk::Deserailize(static_cast<char*>(buf), offset);
-    munmap(buf, 4098);
+    munmap(buf, size);
     close(fd);
 
     IndexServer indexServer(port, maxClients, indexPath, master);
