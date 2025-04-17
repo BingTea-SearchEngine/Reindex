@@ -82,6 +82,20 @@ class MasterChunk {
      * */
     void PrintCurrentMetadataChunk() const;
 
+    /*
+     * @brief Return the index chunk at index i of _indexChunks
+     *
+     * @param i The index of the index. Must be less than the size of _indexChunks
+     * */
+    IndexChunk GetIndexChunk(size_t i);
+
+    /*
+     * @brief Return the metadata chunk at index i of metadata chunk
+     *
+     * @param i The index of the index. Must be less than the size of _medataChunks
+     * */
+    MetadataChunk GetMetadataChunk(size_t i);
+
     /**
      * @brief Serializes a given MasterChunk object into a specific region of memory.
      *

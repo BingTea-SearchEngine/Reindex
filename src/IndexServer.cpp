@@ -2,7 +2,10 @@
 
 IndexServer::IndexServer(int port, int maxClients, std::string indexaPath,
                          MasterChunk master)
-    : _server(Server(port, maxClients)), _master(master) {}
+    : _server(Server(port, maxClients)), _master(master) {
+    _primaryIndexChunk = _master.GetIndexChunk(0);
+    _primaryMetadataChunk = _master.GetMetadataChunk(0);
+}
 
 void IndexServer::Start() {
     while (true) {
@@ -10,25 +13,37 @@ void IndexServer::Start() {
         for (const auto& m : messages) {
             spdlog::info("Request from {}:{}", m.senderIp, m.senderPort);
 
+            IndexMessage queryMsg = IndexInterface::Decode(m.msg);
+
             Message msg;
             msg.receiverSock = m.senderSock;
-            msg.msg = _handleSearch(m.msg);
+            msg.msg = IndexInterface::Encode(_handleSearch(queryMsg));
             _server.SendMessage(msg);
         }
     }
 }
 
-std::string IndexServer::_handleSearch(std::string query) {
-    spdlog::info("Query: {}", query);
+IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
+    if (msg.type != IndexMessageType::QUERY) {
+        return IndexMessage{IndexMessageType::DOCUMENTS, "", {}};
+    }
+    spdlog::info("Query: {}", msg.query);
 
     // Parser query
-    Parser parser(query);
+    Parser parser(msg.query);
     Expression* expr = parser.Parse();
     // Evaluate query (Call ISRs)
     std::cout << expr->Eval() << std::endl;
     // Rank?
-    // Serialize and send back to client
-    return "Hi from server";
+
+    std::vector<doc_t> documents;
+    documents.push_back(doc_t{"https://wwww.google.com", 5, 1231, 0.4, 0.5, std::vector<std::string>{"b.com", "c.com"}});
+    documents.push_back(doc_t{"https://www.twitter.com", 5, 1231, 0.4, 0.5, std::vector<std::string>{"b.com", "c.com"}});
+    documents.push_back(doc_t{"https://www.nytimes.com", 5, 1231, 0.4, 0.5, std::vector<std::string>{"b.com", "c.com"}});
+    documents.push_back(doc_t{"https://www.washingtonpost.com", 5, 1231, 0.4, 0.5, std::vector<std::string>{"b.com", "c.com"}});
+    documents.push_back(doc_t{"https://www.ft.com", 5, 1231, 0.4, 0.5, std::vector<std::string>{"b.com", "c.com"}});
+
+    return IndexMessage{IndexMessageType::DOCUMENTS, "", documents};
 }
 
 int main(int argc, char** argv) {
@@ -70,6 +85,7 @@ int main(int argc, char** argv) {
         MasterChunk::Deserailize(static_cast<char*>(buf), offset);
     munmap(buf, size);
     close(fd);
+
 
     IndexServer indexServer(port, maxClients, indexPath, master);
     spdlog::info("======= Index Server Started =======");

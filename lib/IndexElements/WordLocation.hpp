@@ -47,9 +47,9 @@ struct word_t {
 struct metadata_t {
     uint32_t numWords;
     uint32_t numTitleWords;
+    uint32_t numOutLinks;
     float pageRank;
     float cheiRank;
-    std::vector<std::string> outLinks;
 
     friend std::ostream& operator<<(std::ostream& os, const metadata_t& m);
 
@@ -57,11 +57,7 @@ struct metadata_t {
 
     size_t getBytes() {
         size_t bytes = sizeof(numWords) + sizeof(numTitleWords) +
-                       sizeof(pageRank) + sizeof(cheiRank);
-        for (const auto& link : outLinks) {
-            bytes += link.size() + 1;
-        }
-
+                       sizeof(numOutLinks) + sizeof(pageRank) + sizeof(cheiRank);
         return bytes;
     }
 };

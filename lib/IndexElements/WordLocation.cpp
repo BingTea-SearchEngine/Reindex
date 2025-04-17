@@ -21,15 +21,11 @@ std::ostream& operator<<(std::ostream& os, wordlocation_t loc) {
 std::ostream& operator<<(std::ostream& os, const metadata_t& m) {
     os << "metadata_t\n{\n\t# of words=" << m.numWords
        << "\n\t# of title words=" << m.numTitleWords
+       << "\n\t# of out links=" << m.numOutLinks
        << "\n\tpageRank score=" << m.pageRank
        << "\n\tcheiRank score=" << m.cheiRank;
     os << "\n\t}\n";
 
-    os << m.outLinks.size() << " outward links: \n{\n";
-    for (const auto& link : m.outLinks) {
-        os << "\t" << link << "\n";
-    }
-    os << "}";
 
     return os;
 }
@@ -38,13 +34,8 @@ bool operator==(const metadata_t& lhs, const metadata_t& rhs) {
     if (!(lhs.numWords == rhs.numWords &&
           lhs.numTitleWords == rhs.numTitleWords &&
           lhs.pageRank == rhs.pageRank && lhs.cheiRank == rhs.cheiRank &&
-          lhs.outLinks.size() == rhs.outLinks.size())) {
+          lhs.numOutLinks == rhs.numOutLinks)) {
         return false;
-    }
-
-    for (int i = 0; i < lhs.outLinks.size(); ++i) {
-        if (lhs.outLinks[i] != rhs.outLinks[i])
-            return false;
     }
 
     return true;

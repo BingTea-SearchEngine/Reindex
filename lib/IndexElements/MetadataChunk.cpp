@@ -79,17 +79,9 @@ void MetadataChunk::Serialize(char* base_region, size_t& offset,
                     sizeof(metadata.cheiRank));
         offset += sizeof(metadata.cheiRank);
 
-        size_t numOutLinks = metadata.outLinks.size();
+        uint32_t numOutLinks = metadata.numOutLinks;
         std::memcpy(base_region + offset, &numOutLinks, sizeof(numOutLinks));
         offset += sizeof(numOutLinks);
-
-        for (size_t j = 0; j < metadata.outLinks.size(); ++j) {
-            size_t link_size = metadata.outLinks[j].size() + 1;
-            // std::string link = std::string(base_region+offset);
-            std::memcpy(base_region + offset, metadata.outLinks[j].c_str(),
-                        link_size);
-            offset += link_size;
-        }
     }
 
     // Serailize metadata for each document
@@ -116,7 +108,7 @@ MetadataChunk MetadataChunk::Deserailize(char* base_region, size_t& offset) {
         chunk._documents.push_back(docname);
 
         // Read number of words
-        uint32_t numWords = 0, numTitleWords = 0;
+        uint32_t numWords = 0, numTitleWords = 0, numOutLinks = 0;
         float pageRank = 0.0, cheiRank = 0.0;
 
         std::memcpy(&numWords, base_region + offset, sizeof(numWords));
@@ -132,22 +124,10 @@ MetadataChunk MetadataChunk::Deserailize(char* base_region, size_t& offset) {
         std::memcpy(&cheiRank, base_region + offset, sizeof(cheiRank));
         offset += sizeof(cheiRank);
 
-        size_t numOutLinks;
         std::memcpy(&numOutLinks, base_region + offset, sizeof(numOutLinks));
         offset += sizeof(numOutLinks);
 
-        //Read outward links
-        std::vector<std::string> outLinks;
-        outLinks.reserve(numOutLinks);
-        for (size_t j = 0; j < numOutLinks; ++j) {
-            std::string link = std::string(base_region + offset);
-            // std::memcpy(&numOutLinks, base_region+offset, sizeof(numOutLinks));
-            offset += link.size() + 1;
-            outLinks.push_back(link);
-        }
-
-        metadata_t metadata{numWords, numTitleWords, pageRank, cheiRank,
-                            outLinks};
+        metadata_t metadata{numWords, numTitleWords, numOutLinks, pageRank, cheiRank};
         chunk._docMetadata.insert(make_pair(docname, metadata));
     }
 

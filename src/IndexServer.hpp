@@ -20,10 +20,12 @@ class IndexServer {
     void Start();
 
    private:
-    std::string _handleSearch(std::string query);
+    IndexMessage _handleSearch(IndexMessage msg);
 
     Server _server;
 
     MasterChunk _master;
+
     IndexChunk _primaryIndexChunk;
+    MetadataChunk _primaryMetadataChunk;
 };

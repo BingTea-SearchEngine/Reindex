@@ -14,9 +14,9 @@ TEST(BasicMetadataChunk, SerializeDeserialize) {
     // size_t numOutLinks;
     // std::vector<std::string> outLinks;
 
-    metadata_t d1{1, 2, 0.1, 0.2, std::vector<std::string>{"a"}};
-    metadata_t d2{3, 4, 0.3, 0.4, std::vector<std::string>{"b", "c"}};
-    metadata_t d3{5, 6, 0.5, 0.6, std::vector<std::string>{"d", "e", "f"}};
+    metadata_t d1{1, 2, 2, 0.1, 0.2};
+    metadata_t d2{3, 4, 3, 0.4, 0.1};
+    metadata_t d3{5, 6, 4, 0.6, 0.1};
 
     chunk.AddDocument("doc1", d1);
     chunk.AddDocument("doc2", d2);

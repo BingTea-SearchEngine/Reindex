@@ -9,6 +9,7 @@
 #include "WordLocation.hpp"
 
 int main(int argc, char** argv) {
+    spdlog::set_level(spdlog::level::off);
     argparse::ArgumentParser program("reindex");
     program.add_argument("-i", "--input")
         .required()

@@ -4,7 +4,7 @@
 
 bool checkTagExists(std::string line, std::string tag) {
     if (line.rfind(tag, 0) != 0) {
-        std::cerr << "Malformed file. " << tag << " not found." << endl;
+        // std::cerr << "Malformed file. " << tag << " not found." << endl;
         return false;
     }
     return true;
@@ -103,13 +103,14 @@ DocStreamOutput DocStream::nextFile() {
     }
 
     std::getline(document, line);
+    uint32_t numOutLinks = 0;
     std::vector<std::string> outLinks;
     while (line != "</links>") {
-        outLinks.push_back(line);
         std::getline(document, line);
+        numOutLinks++;
     }
 
-    out.metadata = {static_cast<uint32_t>(output.size()), numTitleWords, 0.0, 0.0, outLinks};
+    out.metadata = {static_cast<uint32_t>(output.size()), numTitleWords, numOutLinks, 0.0, 0.0};
 
     //Check <prank> tag
     std::getline(document, line);

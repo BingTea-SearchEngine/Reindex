@@ -26,7 +26,7 @@ void IndexChunk::Print() const {
 
 void IndexChunk::AddDocument(std::string doc, std::vector<word_t> words) {
     // Add to set of documents
-    _documents.push_back(doc);
+    // _documents.push_back(doc);
 
     // Iterate over words
     for (word_t& word : words) {
@@ -60,7 +60,10 @@ void IndexChunk::Serialize(char* base_region, size_t& offset,
 
     // Serialize document list
     for (std::string& docname : index._documents) {
-        size_t docname_size = docname.size() + 1;
+        uint16_t docname_size = static_cast<uint16_t>(docname.size());
+        std::memcpy(base_region + offset, &docname_size, sizeof(docname_size));
+        offset += sizeof(docname_size);
+
         std::memcpy(base_region + offset, docname.c_str(), docname_size);
         offset += docname_size;
     }
@@ -87,9 +90,17 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
 
     // Read chunk list
     for (size_t i = 0; i < num_documents; ++i) {
-        std::string docname = std::string(base_region + offset);
-        offset += docname.size() + 1;
-        index._documents.push_back(docname);
+
+        uint16_t docname_size;
+        std::memcpy(&docname_size, base_region+offset, sizeof(docname_size));
+        offset+=sizeof(docname_size);
+
+        // Deserialize the word associated with the PostingList
+        std::string docname(docname_size, '\0');
+        std::memcpy(docname.data(), base_region+offset, docname_size);
+        offset += docname_size;
+        index._documents.emplace_back(docname);
+
     }
 
     // Read number of words
@@ -100,8 +111,9 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
     //Read each posting list
     for (size_t i = 0; i < num_words; ++i) {
         PostingList pl = PostingList::Deserialize(base_region, offset);
-        index._postingLists[pl.GetWord()] = pl;
+        // index._postingLists[pl.GetWord()] = std::move(pl);
+        index._postingLists.emplace(pl.GetWord(), std::move(pl));
     }
 
-    return index;
+    return std::move(index);
 }

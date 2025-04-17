@@ -46,11 +46,15 @@ std::vector<Post> PostingList::GetPosts() const {
 
 void PostingList::Serialize(char* base_region, size_t& offset,
                             const PostingList& postingList) {
+    // Serialize size of word
+    uint16_t word_size = static_cast<uint16_t>(postingList.word.size());
+    std::memcpy(base_region + offset, &word_size, sizeof(word_size));
+    offset += sizeof(word_size);
+
     // Serialize the word representing the PostingList
-    size_t postingList_word_size = postingList.word.size() + 1;
     std::memcpy(base_region + offset, postingList.word.c_str(),
-                postingList_word_size);
-    offset += postingList_word_size;
+                word_size);
+    offset += word_size;
 
     // Serialize the vector of posts
     size_t num_posts = postingList.posts.size();
@@ -65,19 +69,27 @@ void PostingList::Serialize(char* base_region, size_t& offset,
 PostingList PostingList::Deserialize(char* base_region, size_t& offset) {
     PostingList postingList;
 
+    // Deserialize word size
+    uint16_t word_size;
+    std::memcpy(&word_size, base_region+offset, sizeof(word_size));
+    offset+=sizeof(word_size);
+
     // Deserialize the word associated with the PostingList
-    postingList.word = std::string(base_region + offset);
-    offset += postingList.word.size() + 1;
+    std::string word(word_size, '\0');
+    std::memcpy(word.data(), base_region+offset, word_size);
+    offset += word_size;
+    postingList.word = word;
 
     // Deserialize the number of posts
     size_t num_of_posts;
     std::memcpy(&num_of_posts, base_region + offset, sizeof(num_of_posts));
     offset += sizeof(num_of_posts);
-    postingList.posts.resize(num_of_posts);
+    postingList.posts.reserve(num_of_posts);
 
     // Deserialize each post in the vector
     for (size_t i = 0; i < num_of_posts; ++i) {
-        postingList.posts[i] = Post::Deserialize(base_region, offset);
+        // postingList.posts[i] = Post::Deserialize(base_region, offset);
+        postingList.posts.emplace_back(std::move(Post::Deserialize(base_region, offset)));
     }
 
     return postingList;
