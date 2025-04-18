@@ -82,6 +82,12 @@ class PostingList {
          */
     static void Serialize(char* base_region, size_t& offset,
                           const PostingList& postingList);
+     
+    static void OldSerialize(char* base_region, size_t& offset,
+                             const PostingList& postingList);
+
+     static void NewSerialize(char* base_region, size_t& offset,
+     const PostingList& postingList);
 
     /**
          * @brief Deserializes a PostingList object from a specific region of memory.
@@ -96,6 +102,10 @@ class PostingList {
          * @post A PostingList object is created and the offset is updated.
          */
     static PostingList Deserialize(char* base_region, size_t& offset);
+
+    static PostingList OldDeserialize(char* base_region, size_t& offset);
+
+    static PostingList NewDeserialize(char* base_region, size_t& offset);
 
    private:
     /// The word associated with this PostingList

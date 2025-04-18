@@ -46,7 +46,7 @@ class PostEntry {
          * 
          * @return A wordlocation_t of where this word occurred.
          */
-    wordlocation_t GetLocationFound();
+    wordlocation_t GetLocationFound() const;
 
     /*
         * @brief Returns the bytes required to serialize this post entry
