@@ -86,14 +86,14 @@ DocStreamOutput DocStream::nextFile() {
     std::string word;
     uint32_t numTitleWords = 0;
     while (titleIss >> word) {
-        std::transform(word.begin(), word.end(), word.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
-        word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
-        if (is_ascii(word)) {
-            output.push_back(word_t{word, offset, wordlocation_t::title});
-        } else {
-            cout << "Skipping " << word << endl;
-        }
+        // std::transform(word.begin(), word.end(), word.begin(),
+        //            [](unsigned char c) { return std::tolower(c); });
+        // word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
+        // if (is_ascii(word)) {
+        // } else {
+        //     cout << "Skipping " << word << endl;
+        // }
+        output.push_back(word_t{word, offset, wordlocation_t::title});
         ++offset;
         ++numTitleWords;
     }
@@ -113,15 +113,16 @@ DocStreamOutput DocStream::nextFile() {
     std::getline(document, line);
     std::istringstream bodyIss(line);
     while (bodyIss >> word) {
-        std::transform(word.begin(), word.end(), word.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
-        word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
-
-        if (is_ascii(word)) {
-            output.push_back(word_t{word, offset, wordlocation_t::title});
-        } else {
-            cout << "Skipping " << word << endl;
-        }
+        // std::transform(word.begin(), word.end(), word.begin(),
+        //            [](unsigned char c) { return std::tolower(c); });
+        // word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
+        //
+        // if (is_ascii(word)) {
+        //     output.push_back(word_t{word, offset, wordlocation_t::title});
+        // } else {
+        //     cout << "Skipping " << word << endl;
+        // }
+        output.push_back(word_t{word, offset, wordlocation_t::title});
         ++offset;
     }
 
