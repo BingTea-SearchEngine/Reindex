@@ -314,3 +314,90 @@ TEST_F(PhraseISR, SimpleSeekAndNext) {
     EXPECT_EQ(ISR_online_store_phrase->Seek(60), std::nullopt);
     EXPECT_EQ(ISR_online_store_phrase->GetCurrentPostEntry(), std::nullopt);
 }
+
+
+/*
+    Document 1:
+    i went to the store and grabbed some granola bar and then i went to another store
+    0  1   2   3    4    5     6     7      8     9   10  11  12 13  14   15      16
+*/
+
+/*
+    Document 2:
+    costco is the best megastore. it has so many granola and protein bar. love costco
+       17  18  19  20     21      22  23 24  25    26    27    28     29   30    31
+*/
+
+/*
+    Document 3:
+    i think the amazon online store is alright. amazon is bananas
+    32  33  34   35     36     37   38    39      40   41    42
+*/
+
+/*
+    Document 4:
+    mcdonalds has the best food and fulfills my protein goal. bar none
+        43     44  45  46   47   48    49    50   51     52    53  54
+*/
+
+
+TEST_F(PhraseISR, SimpleNext) {
+    ISR* ISR_word_the = new ISRWord(index["the"]);
+    ISR* ISR_word_best = new ISRWord(index["best"]);
+
+    ISR* ISR_the_best_phrase = new ISRPhrase({ISR_word_the, ISR_word_best});
+
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry(), std::nullopt);
+
+    // 19 and 20
+    EXPECT_EQ(ISR_the_best_phrase->Next()->GetDelta(), 19);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetDelta(), 19);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_best_phrase->GetStartLocation(), 19);
+    EXPECT_EQ(ISR_the_best_phrase->GetEndLocation(), 20);
+    EXPECT_EQ(ISR_the_best_phrase->GetDocumentName(), "Document 2");
+
+	EXPECT_EQ(ISR_the_best_phrase->NextDocument()->GetDelta(), 45);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetDelta(), 45);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_best_phrase->GetStartLocation(), 45);
+    EXPECT_EQ(ISR_the_best_phrase->GetEndLocation(), 46);
+    EXPECT_EQ(ISR_the_best_phrase->GetDocumentName(), "Document 4");
+
+	EXPECT_EQ(ISR_the_best_phrase->Seek(20)->GetDelta(), 45);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetDelta(), 45);
+    EXPECT_EQ(
+        ISR_the_best_phrase->GetCurrentPostEntry()->GetLocationFound(),
+        wordlocation_t::body);
+    EXPECT_EQ(ISR_the_best_phrase->GetStartLocation(), 45);
+    EXPECT_EQ(ISR_the_best_phrase->GetEndLocation(), 46);
+    EXPECT_EQ(ISR_the_best_phrase->GetDocumentName(), "Document 4");
+
+	EXPECT_EQ(ISR_the_best_phrase->Seek(19)->GetDelta(), 19);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetDelta(), 19);
+    EXPECT_EQ(
+        ISR_online_store_phrase->GetCurrentPostEntry()->GetLocationFound(),
+        wordlocation_t::body);
+    EXPECT_EQ(ISR_the_best_phrase->GetStartLocation(), 19);
+    EXPECT_EQ(ISR_the_best_phrase->GetEndLocation(), 20);
+    EXPECT_EQ(ISR_the_best_phrase->GetDocumentName(), "Document 4");
+
+	EXPECT_EQ(ISR_the_best_phrase->Next()->GetDelta(), 45);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetDelta(), 45);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_best_phrase->GetStartLocation(), 45);
+    EXPECT_EQ(ISR_the_best_phrase->GetEndLocation(), 46);
+    EXPECT_EQ(ISR_the_best_phrase->GetDocumentName(), "Document 4");
+
+    EXPECT_EQ(ISR_online_store_phrase->Seek(46), std::nullopt);
+    EXPECT_EQ(ISR_online_store_phrase->GetCurrentPostEntry(), std::nullopt);
+
+    EXPECT_EQ(ISR_the_best_phrase->Next(), std::nullopt);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry(), std::nullopt);
+
+    EXPECT_EQ(ISR_the_best_phrase->NextDocument(), std::nullopt);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry(), std::nullopt);
+}

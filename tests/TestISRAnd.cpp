@@ -384,3 +384,271 @@ TEST_F(AndISR, SimpleBoundaryAvoidance) {
     EXPECT_EQ(ISR_bananas_AND_mcdonalds->Next(), std::nullopt);
     EXPECT_EQ(ISR_bananas_AND_mcdonalds->GetCurrentPostEntry(), std::nullopt);
 }
+
+
+class AndISRStress : public ::testing::Test {
+   protected:
+	std::unordered_map<std::string, PostingList> index;
+
+	struct Document {
+		std::string name;
+		std::vector<std::string> words;
+	};
+
+	std::vector<Document> documents = {
+		{"Document 1",
+			{"the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog",
+				"while", "the", "quick", "cat", "sleeps", "under", "a", "tree"}},
+		{"Document 2",
+			{"in", "a", "galaxy", "far", "far", "away", "the", "rebels", "fight",
+				"against", "the", "empire", "with", "hope", "and", "courage"}},
+		{"Document 3",
+			{"data", "structures", "and", "algorithms", "are", "essential", "for",
+				"every", "software", "engineer", "who", "wants", "to", "solve", "problems"}},
+		{"Document 4",
+			{"the", "adventure", "of", "the", "brave", "knight", "continues", "into",
+				"the", "dark", "forest", "full", "of", "mystery", "and", "danger"}},
+		{"Document 5",
+			{"bar", "none", "the", "best", "protein", "bar", "you", "will", "ever",
+				"taste", "with", "no", "added", "sugar", "or", "artificial", "flavors"}}
+	}
+
+	void SetUp() override {
+		uint32_t word_counter = 0;
+		for (const auto& doc : documents) {
+			for (size_t i = 0; i < doc.words.size(); ++i) {
+				const std::string& word = doc.words[i];
+				if (index.find(word) == index.end()) {
+					index[word] = PostingList(word);
+				}
+				index[word].AddWord(doc.name,
+									{word_counter, wordlocation_t::body});
+				word_counter++;
+			}
+		}
+	}
+};
+
+/*
+    Document 1:
+    the quick brown fox jumps over the lazy dog while the quick cat sleeps under a tree
+     0    1     2    3    4     5    6   7  8     9   10   11   12   13    14  15  16
+
+    Document 2:
+    in a galaxy far far away the rebels fight against the empire with hope and courage
+    17 18  19   20   21   22  23  24     25    26      27    28  29   30    31  32
+
+    Document 3:
+    data structures and algorithms are essential for every software engineer who wants to solve problems
+    33   34         35      36      37   38     39    40    41       42     43   44    45  46    47
+
+    Document 4:
+    the adventure of the brave knight continues into the dark forest full of mystery and danger
+    48   49       50  51   52   53        54     55   56   57  58     59  60  61     62   63
+
+    Document 5:
+    bar none the best protein bar you will ever taste with no added sugar or artificial flavors
+    64   65  66   67   68     69   70 71    72    73   74  75  76   77    78     79      80
+*/
+
+// PostingList{ the }: 4 document(s)
+//         Post{ Document 1 }: 3 entries
+//                 0 body | 6 body | 10 body |
+//         Post{ Document 2 }: 2 entries
+//                 23 body | 27 body |
+//         Post{ Document 4 }: 3 entries
+//                 48 body | 51 body | 56 body |
+//         Post{ Document 5 }: 1 entries
+//                 66 body |
+
+// PostingList{ and }: 3 document(s)
+//         Post{ Document 2 }: 1 entries
+//                 31 body |
+//         Post{ Document 3 }: 1 entries
+//                 35 body |
+//         Post{ Document 4 }: 1 entries
+//                 62 body |
+
+// 2, 4
+TEST_F(AndISRStress, StressTest1) {
+    ISR* ISR_the = new ISRWord(index["the"]);
+    ISR* ISR_and = new ISRWord(index["and"]);
+
+    ISR* ISR_the_AND_and =
+        new ISRAnd({ISR_the, ISR_and});
+
+	EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+	EXPECT_EQ(ISR_the_AND_and->Next()->GetDelta(), 23);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetDelta(), 23);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 23);
+    EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 31);
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 2");
+
+	EXPECT_EQ(ISR_the_AND_and->Seek(27)->GetDelta(), 27);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetDelta(), 27);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 27);
+    EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 31);
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 2");
+
+	EXPECT_EQ(ISR_the_AND_and->NextDocument()->GetDelta(), 48);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetDelta(), 48);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 48);
+    EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 62);
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 4");
+
+	EXPECT_EQ(ISR_the_AND_and->Next()->GetDelta(), 51);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetDelta(), 51);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 51);
+    EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 62);
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 4");
+
+	EXPECT_EQ(ISR_the_AND_and->Next()->GetDelta(), 56);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetDelta(), 56);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 56);
+    EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 62);
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 4");
+
+	EXPECT_EQ(ISR_the_AND_and->Seek(57), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+	EXPECT_EQ(ISR_the_AND_and->Seek(25)->GetDelta(), 27);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetDelta(), 27);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 27);
+    EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 31);
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 2");
+
+	EXPECT_EQ(ISR_the_AND_and->Next()->GetDelta(), 48);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetDelta(), 48);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 48);
+    EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 62);
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 4");
+}
+
+// Only one word in the documents
+TEST_F(AndISRStress, OneWord) {
+    ISR* ISR_the = new ISRWord(index["the"]);
+    ISR* ISR_and = new ISRWord(index["yerr"]);
+
+    ISR* ISR_the_AND_and =
+        new ISROr({ISR_the, ISR_and});
+
+	EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+    EXPECT_EQ(ISR_the_AND_and->Seek(0), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+	EXPECT_EQ(ISR_the_AND_and->NextDocument(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->NextDocument(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+	EXPECT_EQ(ISR_the_AND_and->Next(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->Next(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+}
+
+
+// No words in the documents
+TEST_F(AndISRStress, NoDocuments) {
+    ISR* ISR_the = new ISRWord(index["ricky"]);
+    ISR* ISR_and = new ISRWord(index["danny"]);
+
+    ISR* ISR_the_AND_and =
+        new ISRAnd({ISR_the, ISR_and});
+
+	EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+	EXPECT_EQ(ISR_the_AND_and->Seek(2), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+	EXPECT_EQ(ISR_the_AND_and->NextDocument(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->NextDocument(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+	EXPECT_EQ(ISR_the_AND_and->Next(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->Next(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+}
+
+// (48, 51, 56), 62, 63
+// Three Words
+TEST_F(AndISRStress, ThreeWords) {
+    ISR* ISR_the = new ISRWord(index["the"]);
+    ISR* ISR_and = new ISRWord(index["and"]);
+	ISR* ISR_danger = new ISRWord(index["danger"]);
+
+    ISR* ISR_the_AND_and =
+        new ISRAnd({ISR_the, ISR_and, ISR_danger});
+
+	EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+	EXPECT_EQ(ISR_the_AND_and->Next()->GetDelta(), 48);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetDelta(), 48);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 48);
+    EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 63);
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 4");
+
+	EXPECT_EQ(ISR_the_AND_and->Next()->GetDelta(), 51);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetDelta(), 51);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 51);
+    EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 63);
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 4");
+
+	EXPECT_EQ(ISR_the_AND_and->Next()->GetDelta(), 56);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetDelta(), 56);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 56);
+    EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 63);
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 4");
+
+	EXPECT_EQ(ISR_the_AND_and->NextDocument(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->NextDocument(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+	EXPECT_EQ(ISR_the_AND_and->Seek(5)->GetDelta(), 48);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetDelta(), 48);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 48);
+    EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 63);
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 4");
+
+	EXPECT_EQ(ISR_the_AND_and->NextDocument(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->NextDocument(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+	EXPECT_EQ(ISR_the_AND_and->Seek(57), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+	EXPECT_EQ(ISR_the_AND_and->Next(), std::nullopt);
+    EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+}
