@@ -341,7 +341,7 @@ TEST_F(PhraseISR, SimpleSeekAndNext) {
 */
 
 
-TEST_F(PhraseISR, SimpleNext) {
+TEST_F(PhraseISR, StressTest) {
     ISR* ISR_word_the = new ISRWord(index["the"]);
     ISR* ISR_word_best = new ISRWord(index["best"]);
 
@@ -378,11 +378,11 @@ TEST_F(PhraseISR, SimpleNext) {
 	EXPECT_EQ(ISR_the_best_phrase->Seek(19)->GetDelta(), 19);
     EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetDelta(), 19);
     EXPECT_EQ(
-        ISR_online_store_phrase->GetCurrentPostEntry()->GetLocationFound(),
+        ISR_the_best_phrase->GetCurrentPostEntry()->GetLocationFound(),
         wordlocation_t::body);
     EXPECT_EQ(ISR_the_best_phrase->GetStartLocation(), 19);
     EXPECT_EQ(ISR_the_best_phrase->GetEndLocation(), 20);
-    EXPECT_EQ(ISR_the_best_phrase->GetDocumentName(), "Document 4");
+    EXPECT_EQ(ISR_the_best_phrase->GetDocumentName(), "Document 2");
 
 	EXPECT_EQ(ISR_the_best_phrase->Next()->GetDelta(), 45);
     EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetDelta(), 45);
@@ -392,8 +392,8 @@ TEST_F(PhraseISR, SimpleNext) {
     EXPECT_EQ(ISR_the_best_phrase->GetEndLocation(), 46);
     EXPECT_EQ(ISR_the_best_phrase->GetDocumentName(), "Document 4");
 
-    EXPECT_EQ(ISR_online_store_phrase->Seek(46), std::nullopt);
-    EXPECT_EQ(ISR_online_store_phrase->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_the_best_phrase->Seek(46), std::nullopt);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry(), std::nullopt);
 
     EXPECT_EQ(ISR_the_best_phrase->Next(), std::nullopt);
     EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry(), std::nullopt);

@@ -461,7 +461,7 @@ class OrISRStress : public ::testing::Test {
 		{"Document 5",
 			{"bar", "none", "the", "best", "protein", "bar", "you", "will", "ever",
 				"taste", "with", "no", "added", "sugar", "or", "artificial", "flavors"}}
-	}
+	};
 
 	void SetUp() override {
 		uint32_t word_counter = 0;
@@ -545,20 +545,20 @@ TEST_F(OrISRStress, StressTest1) {
     EXPECT_EQ(ISR_the_OR_and->GetEndLocation(), 48);
     EXPECT_EQ(ISR_the_OR_and->GetDocumentName(), "Document 2");
 
-	EXPECT_EQ(ISR_the_OR_and->NextDocument()->GetDelta(), 48);
-    EXPECT_EQ(ISR_the_OR_and->GetCurrentPostEntry()->GetDelta(), 48);
+	EXPECT_EQ(ISR_the_OR_and->NextDocument()->GetDelta(), 35);
+    EXPECT_EQ(ISR_the_OR_and->GetCurrentPostEntry()->GetDelta(), 35);
     EXPECT_EQ(ISR_the_OR_and->GetCurrentPostEntry()->GetLocationFound(),
               wordlocation_t::body);
-    EXPECT_EQ(ISR_the_OR_and->GetStartLocation(), 48);
-    EXPECT_EQ(ISR_the_OR_and->GetEndLocation(), 62);
-    EXPECT_EQ(ISR_the_OR_and->GetDocumentName(), "Document 4");
+    EXPECT_EQ(ISR_the_OR_and->GetStartLocation(), 35);
+    EXPECT_EQ(ISR_the_OR_and->GetEndLocation(), 48);
+    EXPECT_EQ(ISR_the_OR_and->GetDocumentName(), "Document 3");
 
 	EXPECT_EQ(ISR_the_OR_and->Seek(25)->GetDelta(), 27);
     EXPECT_EQ(ISR_the_OR_and->GetCurrentPostEntry()->GetDelta(), 27);
     EXPECT_EQ(ISR_the_OR_and->GetCurrentPostEntry()->GetLocationFound(),
               wordlocation_t::body);
     EXPECT_EQ(ISR_the_OR_and->GetStartLocation(), 27);
-    EXPECT_EQ(ISR_the_OR_and->GetEndLocation(), 35);
+    EXPECT_EQ(ISR_the_OR_and->GetEndLocation(), 31);
     EXPECT_EQ(ISR_the_OR_and->GetDocumentName(), "Document 2");
 
 	EXPECT_EQ(ISR_the_OR_and->NextDocument()->GetDelta(), 35);
@@ -574,7 +574,7 @@ TEST_F(OrISRStress, StressTest1) {
     EXPECT_EQ(ISR_the_OR_and->GetCurrentPostEntry()->GetLocationFound(),
               wordlocation_t::body);
     EXPECT_EQ(ISR_the_OR_and->GetStartLocation(), 48);
-    EXPECT_EQ(ISR_the_OR_and->GetEndLocation(), 48);
+    EXPECT_EQ(ISR_the_OR_and->GetEndLocation(), 62);
     EXPECT_EQ(ISR_the_OR_and->GetDocumentName(), "Document 4");
 
 	EXPECT_EQ(ISR_the_OR_and->Seek(63)->GetDelta(), 66);

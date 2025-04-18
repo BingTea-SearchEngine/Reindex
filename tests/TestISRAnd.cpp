@@ -411,7 +411,7 @@ class AndISRStress : public ::testing::Test {
 		{"Document 5",
 			{"bar", "none", "the", "best", "protein", "bar", "you", "will", "ever",
 				"taste", "with", "no", "added", "sugar", "or", "artificial", "flavors"}}
-	}
+	};
 
 	void SetUp() override {
 		uint32_t word_counter = 0;
@@ -546,7 +546,7 @@ TEST_F(AndISRStress, OneWord) {
     ISR* ISR_and = new ISRWord(index["yerr"]);
 
     ISR* ISR_the_AND_and =
-        new ISROr({ISR_the, ISR_and});
+        new ISRAnd({ISR_the, ISR_and});
 
 	EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
 
