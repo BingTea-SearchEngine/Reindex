@@ -101,17 +101,21 @@ uint32_t decodeVB(const uint8_t* data, size_t& consumed_bytes) {
 
 void PostingList::NewSerialize(char* base_region, size_t& offset,
                                const PostingList& postingList) {
-    // Serialize the word
-    std::cout << "A: " << offset << std::endl;
-    size_t word_len = postingList.word.size() + 1;
-    std::memcpy(base_region + offset, postingList.word.c_str(), word_len);
-    offset += word_len;
-    std::cout << "B: " << offset << std::endl;
+    // Serialize size of word
+    uint16_t word_size = static_cast<uint16_t>(postingList.word.size());
+    std::memcpy(base_region + offset, &word_size, sizeof(word_size));
+    offset += sizeof(word_size);
+
+    // Serialize the word representing the PostingList
+    std::memcpy(base_region + offset, postingList.word.c_str(),
+                word_size);
+    offset += word_size;
 
     // Serialize the number of posts (documents)
     size_t num_posts = postingList.posts.size();
     std::memcpy(base_region + offset, &num_posts, sizeof(num_posts));
     offset += sizeof(num_posts);
+
     std::cout << "C: " << offset << std::endl;
     uint32_t prev_position = 0;
     for (auto& post : postingList.posts) {
@@ -186,13 +190,18 @@ PostingList PostingList::OldDeserialize(char* base_region, size_t& offset) {
 }
 
 PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
-    std::cout << "a: " << offset << std::endl;
     PostingList list;
-    
-    // Deserialize the word
-    list.word = std::string(base_region + offset);
-    offset += list.word.size() + 1;
-    std::cout << "b: " << offset << std::endl;
+
+    // Deserialize word size
+    uint16_t word_size;
+    std::memcpy(&word_size, base_region+offset, sizeof(word_size));
+    offset+=sizeof(word_size);
+
+    // Deserialize the word associated with the PostingList
+    std::string word(word_size, '\0');
+    std::memcpy(word.data(), base_region+offset, word_size);
+    offset += word_size;
+    list.word = word;
 
     // Read number of posts
     size_t num_posts;
