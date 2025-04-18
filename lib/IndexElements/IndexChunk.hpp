@@ -89,6 +89,7 @@ class IndexChunk {
     static IndexChunk Deserailize(char* base_region, size_t& offset);
 
    private:
+    friend class MasterChunk;
     // Set of documents in this index chunk
     std::vector<std::string> _documents;
     // Word to posting list map

@@ -38,6 +38,7 @@ void IndexChunk::AddDocument(std::string doc, std::vector<word_t> words) {
         _bytesRequired += _postingLists[word.word].AddWord(
             doc, PostEntry(_offset, word.location));
         _offset++;
+        assert(_offset < UINT32_MAX);
     }
 }
 
@@ -92,15 +93,14 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
     for (size_t i = 0; i < num_documents; ++i) {
 
         uint16_t docname_size;
-        std::memcpy(&docname_size, base_region+offset, sizeof(docname_size));
-        offset+=sizeof(docname_size);
+        std::memcpy(&docname_size, base_region + offset, sizeof(docname_size));
+        offset += sizeof(docname_size);
 
         // Deserialize the word associated with the PostingList
         std::string docname(docname_size, '\0');
-        std::memcpy(docname.data(), base_region+offset, docname_size);
+        std::memcpy(docname.data(), base_region + offset, docname_size);
         offset += docname_size;
         index._documents.emplace_back(docname);
-
     }
 
     // Read number of words

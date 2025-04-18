@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-enum class wordlocation_t {
+enum class wordlocation_t : uint8_t {
     title = 0,
     bold = 1,
     body = 2,
@@ -57,7 +57,8 @@ struct metadata_t {
 
     size_t getBytes() {
         size_t bytes = sizeof(numWords) + sizeof(numTitleWords) +
-                       sizeof(numOutLinks) + sizeof(pageRank) + sizeof(cheiRank);
+                       sizeof(numOutLinks) + sizeof(pageRank) +
+                       sizeof(cheiRank);
         return bytes;
     }
 };

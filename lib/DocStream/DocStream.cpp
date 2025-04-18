@@ -2,6 +2,13 @@
 
 #include "DocStream.hpp"
 
+bool is_ascii(const std::string& word) {
+    return std::all_of(word.begin(), word.end(), [](unsigned char c) {
+        return c >= 32 && c <= 126; // printable ASCII
+        // or use: return c < 128; for strict 7-bit ASCII
+    });
+}
+
 bool checkTagExists(std::string line, std::string tag) {
     if (line.rfind(tag, 0) != 0) {
         // std::cerr << "Malformed file. " << tag << " not found." << endl;
@@ -10,13 +17,26 @@ bool checkTagExists(std::string line, std::string tag) {
     return true;
 }
 
-DocStream::DocStream(std::string dirPath) : _dirPath(dirPath) {
+DocStream::DocStream(std::string dirPath, std::string dictionaryPath)
+    : _dirPath(dirPath) {
     for (const auto& entry : std::filesystem::directory_iterator(dirPath)) {
         std::string filename = entry.path().filename();
         if (filename == "logs.txt") {
             continue;
         }
         _documents.push(filename);
+    }
+
+    std::ifstream dictFile(dictionaryPath);
+    if (!dictFile.is_open()) {
+        std::cerr << "Error opening dictionary" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    std::string word;
+    while(std::getline(dictFile, word)) {
+        word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
+        _dictionary.insert(word);
     }
 }
 
@@ -66,7 +86,14 @@ DocStreamOutput DocStream::nextFile() {
     std::string word;
     uint32_t numTitleWords = 0;
     while (titleIss >> word) {
-        output.push_back(word_t{word, offset, wordlocation_t::title});
+        std::transform(word.begin(), word.end(), word.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+        word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
+        if (is_ascii(word)) {
+            output.push_back(word_t{word, offset, wordlocation_t::title});
+        } else {
+            cout << "Skipping " << word << endl;
+        }
         ++offset;
         ++numTitleWords;
     }
@@ -86,7 +113,15 @@ DocStreamOutput DocStream::nextFile() {
     std::getline(document, line);
     std::istringstream bodyIss(line);
     while (bodyIss >> word) {
-        output.push_back(word_t{word, offset, wordlocation_t::body});
+        std::transform(word.begin(), word.end(), word.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+        word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
+
+        if (is_ascii(word)) {
+            output.push_back(word_t{word, offset, wordlocation_t::title});
+        } else {
+            cout << "Skipping " << word << endl;
+        }
         ++offset;
     }
 
@@ -110,7 +145,8 @@ DocStreamOutput DocStream::nextFile() {
         numOutLinks++;
     }
 
-    out.metadata = {static_cast<uint32_t>(output.size()), numTitleWords, numOutLinks, 0.0, 0.0};
+    out.metadata = {static_cast<uint32_t>(output.size()), numTitleWords,
+                    numOutLinks, 0.0, 0.0};
 
     //Check <prank> tag
     std::getline(document, line);

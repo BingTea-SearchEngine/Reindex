@@ -9,7 +9,6 @@
 #include "WordLocation.hpp"
 
 int main(int argc, char** argv) {
-    spdlog::set_level(spdlog::level::off);
     argparse::ArgumentParser program("reindex");
     program.add_argument("-i", "--input")
         .required()
@@ -18,6 +17,10 @@ int main(int argc, char** argv) {
     program.add_argument("-o", "--output")
         .required()
         .help("Specify the output directory.");
+
+    program.add_argument("-d", "--dictionary")
+        .default_value("../dictionary.txt")
+        .help("Specify the path to the dictionary");
 
     program.add_argument("-s", "--size")
         .default_value(500)
@@ -34,15 +37,17 @@ int main(int argc, char** argv) {
 
     std::string inputDir = program.get<std::string>("-i");
     std::string outputDir = program.get<std::string>("-o");
+    std::string dictionaryPath = program.get<std::string>("-d");
     int chunkSizeMB = program.get<int>("-s");
     size_t chunkSizeBytes = chunkSizeMB * 1000000;
     spdlog::info("Input directory: {}", inputDir);
     spdlog::info("Output directory: {}", outputDir);
+    spdlog::info("Dictionary path: {}", dictionaryPath);
     spdlog::info("Chunk size: {} MB", chunkSizeMB);
     spdlog::info("Chunk size: {}", chunkSizeBytes);
     spdlog::info("======= Reindex Started =======");
 
-    DocStream docStream(inputDir);
+    DocStream docStream(inputDir, dictionaryPath);
     MasterChunk master(outputDir, chunkSizeBytes);
 
     while (docStream.size() > 0) {
@@ -60,14 +65,14 @@ int main(int argc, char** argv) {
     // Open file and mmap
     std::string masterchunkOutputFile = outputDir + "/masterchunk";
     int fd = -1;
-    void* base_region = create_mmap_region(fd, 4098, masterchunkOutputFile);
+    void* base_region = create_mmap_region(fd, 32768, masterchunkOutputFile);
 
     //Serialize master chunk
     size_t offset = 0;
     MasterChunk::Serialize(static_cast<char*>(base_region), offset, master);
 
     // Un memory map and truncate file
-    munmap(base_region, 4098);
+    munmap(base_region, 32768);
     if (ftruncate(fd, offset) == -1) {
         perror("Error truncating file");
     }

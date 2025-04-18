@@ -37,11 +37,16 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
     // Rank?
 
     std::vector<doc_t> documents;
-    documents.push_back(doc_t{"https://wwww.google.com", 5, 1231, 0.4, 0.5, std::vector<std::string>{"b.com", "c.com"}});
-    documents.push_back(doc_t{"https://www.twitter.com", 5, 1231, 0.4, 0.5, std::vector<std::string>{"b.com", "c.com"}});
-    documents.push_back(doc_t{"https://www.nytimes.com", 5, 1231, 0.4, 0.5, std::vector<std::string>{"b.com", "c.com"}});
-    documents.push_back(doc_t{"https://www.washingtonpost.com", 5, 1231, 0.4, 0.5, std::vector<std::string>{"b.com", "c.com"}});
-    documents.push_back(doc_t{"https://www.ft.com", 5, 1231, 0.4, 0.5, std::vector<std::string>{"b.com", "c.com"}});
+    documents.push_back(doc_t{"https://wwww.google.com", 5, 1231, 0.4, 0.5,
+                              std::vector<std::string>{"b.com", "c.com"}});
+    documents.push_back(doc_t{"https://www.twitter.com", 5, 1231, 0.4, 0.5,
+                              std::vector<std::string>{"b.com", "c.com"}});
+    documents.push_back(doc_t{"https://www.nytimes.com", 5, 1231, 0.4, 0.5,
+                              std::vector<std::string>{"b.com", "c.com"}});
+    documents.push_back(doc_t{"https://www.washingtonpost.com", 5, 1231, 0.4,
+                              0.5, std::vector<std::string>{"b.com", "c.com"}});
+    documents.push_back(doc_t{"https://www.ft.com", 5, 1231, 0.4, 0.5,
+                              std::vector<std::string>{"b.com", "c.com"}});
 
     return IndexMessage{IndexMessageType::DOCUMENTS, "", documents};
 }
@@ -85,7 +90,6 @@ int main(int argc, char** argv) {
         MasterChunk::Deserailize(static_cast<char*>(buf), offset);
     munmap(buf, size);
     close(fd);
-
 
     IndexServer indexServer(port, maxClients, indexPath, master);
     spdlog::info("======= Index Server Started =======");

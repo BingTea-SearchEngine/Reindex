@@ -127,7 +127,8 @@ MetadataChunk MetadataChunk::Deserailize(char* base_region, size_t& offset) {
         std::memcpy(&numOutLinks, base_region + offset, sizeof(numOutLinks));
         offset += sizeof(numOutLinks);
 
-        metadata_t metadata{numWords, numTitleWords, numOutLinks, pageRank, cheiRank};
+        metadata_t metadata{numWords, numTitleWords, numOutLinks, pageRank,
+                            cheiRank};
         chunk._docMetadata.insert(make_pair(docname, metadata));
     }
 

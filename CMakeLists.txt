@@ -56,6 +56,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(IndexInterface)
 
+find_package(OpenSSL REQUIRED)
+message(STATUS "OpenSSL Include Dir: ${OPENSSL_INCLUDE_DIR}")
+message(STATUS "OpenSSL Libraries: ${OPENSSL_LIBRARIES}")
+
 set(GATEWAY_SOURCE_DIR ${gateway_SOURCE_DIR})
 set(GATEWAY_INCLUDE_DIR "${gateway_SOURCE_DIR}/lib")
 message(STATUS "Gateway project source directory: ${GATEWAY_SOURCE_DIR}")
@@ -65,6 +69,14 @@ set(EXPRESSIONPARSER_SOURCE_DIR ${expressionparser_SOURCE_DIR})
 set(EXPRESSIONPARSER_INCLUDE_DIR "${expressionparser_SOURCE_DIR}/lib")
 
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+
+add_library(BloomFilter INTERFACE)
+target_include_directories(BloomFilter INTERFACE ${LIB_DIR}/BloomFilter ${OPENSSL_INCLUDE_DIR})
+if(TARGET OpenSSL::Crypto)
+    target_link_libraries(BloomFilter INTERFACE OpenSSL::Crypto)
+else()
+    message(FATAL_ERROR "OpenSSL::Crypto was not found!")
+endif()
 
 add_library(IndexElements STATIC 
     ${LIB_DIR}/IndexElements/MasterChunk.cpp
@@ -81,7 +93,7 @@ target_link_libraries(IndexElements PUBLIC spdlog::spdlog)
 
 add_library(DocStream STATIC ${LIB_DIR}/DocStream/DocStream.cpp)
 target_include_directories(DocStream PUBLIC ${LIB_DIR}/DocStream)
-target_link_libraries(DocStream PUBLIC IndexElements)
+target_link_libraries(DocStream PUBLIC IndexElements BloomFilter)
 
 
 add_library(IndexStreamReaders STATIC 

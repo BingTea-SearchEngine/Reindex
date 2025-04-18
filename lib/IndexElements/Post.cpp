@@ -31,14 +31,16 @@ void Post::Print() const {
 
 void Post::Serialize(char* base_region, size_t& offset, const Post& post) {
     // Serialize size of document name
-    uint16_t document_name_size = static_cast<uint16_t>(post.document_name.size());
-    std::memcpy(base_region + offset, &document_name_size, sizeof(document_name_size));
+    uint16_t document_name_size =
+        static_cast<uint16_t>(post.document_name.size());
+    std::memcpy(base_region + offset, &document_name_size,
+                sizeof(document_name_size));
     offset += sizeof(document_name_size);
 
     // Serialize document name
     std::memcpy(base_region + offset, post.document_name.c_str(),
                 document_name_size);
-    offset+=document_name_size;
+    offset += document_name_size;
 
     // Serialize the vector of word occurrences
     uint32_t num_words = static_cast<uint32_t>(post.entries.size());
@@ -56,12 +58,13 @@ Post Post::Deserialize(char* base_region, size_t& offset) {
 
     // Deserialize size of document name
     uint16_t document_name_size;
-    std::memcpy(&document_name_size, base_region+offset, sizeof(document_name_size));
-    offset+=sizeof(document_name_size);
+    std::memcpy(&document_name_size, base_region + offset,
+                sizeof(document_name_size));
+    offset += sizeof(document_name_size);
 
     // Deserialize document name
     std::string document_name(document_name_size, '\0');
-    std::memcpy(document_name.data(), base_region+offset, document_name_size);
+    std::memcpy(document_name.data(), base_region + offset, document_name_size);
     offset += document_name_size;
     post.document_name = document_name;
 
@@ -73,7 +76,8 @@ Post Post::Deserialize(char* base_region, size_t& offset) {
 
     // Deserialize each PostEntry
     for (size_t i = 0; i < num_of_words; ++i) {
-        post.entries[i] = std::move(PostEntry::Deserialize(base_region, offset));
+        post.entries[i] =
+            std::move(PostEntry::Deserialize(base_region, offset));
     }
 
     return post;

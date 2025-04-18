@@ -117,12 +117,13 @@ int MasterChunk::GetNumDocuments() {
 
 void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words,
                               metadata_t metadata) {
-    spdlog::info("Adding {}", doc);
+    // spdlog::info("Adding {}", doc);
     // Check if index will become too big
     // If too big write to disk and reinitialize _currIndexChunk
     if (_currIndexChunk.GetBytesRequired() > _chunkSize ||
         _currMetadataChunk.GetBytesRequired() > _chunkSize) {
         spdlog::info("Flushing");
+        spdlog::info("Offset reached {}", _currIndexChunk._offset);
         Flush();
         spdlog::info("Done Flushing, number of index chunks: {}",
                      _indexChunks.size());
@@ -134,8 +135,6 @@ void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words,
 }
 
 void MasterChunk::Flush() {
-    _currIndexChunk.Print();
-    _currMetadataChunk.Print();
     _serializeCurrIndexChunk();
     _serializeCurrMetadataChunk();
     _currIndexChunk = IndexChunk();
@@ -164,8 +163,7 @@ IndexChunk MasterChunk::GetIndexChunk(size_t i) {
     int fd = -1;
     auto [buf, size] = read_mmap_region(fd, indexFilePath);
     size_t offset = 0;
-    IndexChunk chunk =
-        IndexChunk::Deserailize(static_cast<char*>(buf), offset);
+    IndexChunk chunk = IndexChunk::Deserailize(static_cast<char*>(buf), offset);
     munmap(buf, size);
     close(fd);
     return chunk;
@@ -183,7 +181,6 @@ MetadataChunk MasterChunk::GetMetadataChunk(size_t i) {
     close(fd);
     return chunk;
 }
-
 
 void MasterChunk::_serializeCurrIndexChunk() {
     std::string chunkFilePath = _indexDir + std::to_string(_indexChunks.size());

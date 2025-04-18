@@ -26,7 +26,6 @@ std::ostream& operator<<(std::ostream& os, const metadata_t& m) {
        << "\n\tcheiRank score=" << m.cheiRank;
     os << "\n\t}\n";
 
-
     return os;
 }
 

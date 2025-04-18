@@ -8,9 +8,9 @@
 #include "Expression.hpp"
 #include "GatewayServer.hpp"
 #include "IndexChunk.hpp"
+#include "IndexInterface.hpp"
 #include "MasterChunk.hpp"
 #include "Parser.hpp"
-#include "IndexInterface.hpp"
 
 class IndexServer {
    public:
