@@ -15,6 +15,8 @@ public:
    virtual ~Expression();
    virtual ISR* Eval() const = 0; // placeholder for actual ISRs
 
+   virtual std::string GetString() const = 0; // prints ISR structure for debugging
+
 };
 // class Expression
 
@@ -29,6 +31,8 @@ public:
    Constraint(std::vector<Expression*> BCin);
    ~Constraint();
    ISR* Eval() const override;
+
+   std::string GetString() const override;
 };
 // class Constraint
 
@@ -45,6 +49,7 @@ public:
    ~BaseConstraint();
    ISR* Eval() const override;
 
+   std::string GetString() const override;
 };
 // class BaseConstraint
 
@@ -60,6 +65,7 @@ public:
    ~SimpleConstraint();
    ISR* Eval() const override;
 
+   std::string GetString() const override;
 };
 // class SimpleConstraint
 
@@ -75,6 +81,7 @@ public:
     ~Phrase();
     ISR* Eval() const override;
 
+    std::string GetString() const override;
 };
 // class Phrase
 
@@ -90,6 +97,7 @@ public:
     ~NestedConstraint();
     ISR* Eval() const override;
     
+    std::string GetString() const override;
 };
 // class NestedConstraint
 
@@ -105,5 +113,6 @@ public:
     SearchWord(std::string valuein, const std::unordered_map<std::string, PostingList>& indexin);
     ISR* Eval() const override;
     
+    std::string GetString() const override;
 };
 // class SearchWord

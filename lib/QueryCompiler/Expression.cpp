@@ -28,6 +28,22 @@ ISR* Constraint::Eval() const{ // placeholder for an OR ISR
     }
     return new ISROr(children);
 }
+
+std::string Constraint::GetString() const{ // print debugging
+    if(BCs.size() == 1){ // collapse level if there is only one child
+        return BCs[0]->GetString();
+    }
+    std::stringstream ss;
+    ss << "OrISR(";
+    for(int i = 0; i < BCs.size(); i++){
+        if(i > 0){
+            ss << ", ";
+        }
+        ss << BCs[i]->GetString();
+    }
+    ss <<")";
+    return ss.str();
+}
 // class Constraint
 
 // <BaseConstraint> ::= <SimpleConstaint> { [ <AndOp> ] <SimpleConstraint> } | <SimpleConstraint> <NotOp> <SimpleConstraint>
@@ -55,6 +71,27 @@ ISR* BaseConstraint::Eval() const{
     }
     return nullptr; // should not reach this return
 }
+
+std::string BaseConstraint::GetString() const{
+    if(SCs.size() == 1){ // collapse level if there is only one child
+        return SCs[0]->GetString();
+    }
+    if(type == "And"){
+        std::stringstream ss;
+        ss << "AndISR(";
+        for(int i = 0; i < SCs.size(); i++){
+            if(i > 0){
+                ss << ", ";
+            }
+            ss << SCs[i]->GetString();
+        }
+        ss <<")";
+        return ss.str();
+    }
+    else if(type == "Not"){ // not ISR only has two fields
+        return "NotISR(" + SCs[0]->GetString() + ", " + SCs[1]->GetString() + ")";
+    }
+}
 // class BaseConstraint
 
 // <SimpleConstraint> ::= <Phrase> | <NestedConstraint> | <SearchWord>
@@ -66,6 +103,10 @@ SimpleConstraint::~SimpleConstraint(){
 
 ISR* SimpleConstraint::Eval() const{ // this just needs to evaluate inner
     return inner->Eval();
+}
+
+std::string SimpleConstraint::GetString() const{ // this just needs to evaluate inner
+    return inner->GetString();
 }
 // class SimpleConstraint
 
@@ -88,6 +129,22 @@ ISR* Phrase::Eval() const{ // placeholder for a PHRASE ISR
     }
     return new ISRPhrase(children);
 }
+
+std::string Phrase::GetString() const{ // placeholder for a PHRASE ISR
+    if(SWs.size() == 1){ // collapse level if there is only one child
+        return SWs[0]->GetString();
+    }
+    std::stringstream ss;
+    ss << "PhraseISR(";
+    for(int i = 0; i < SWs.size(); i++){
+        if(i > 0){
+            ss << ", ";
+        }
+        ss << SWs[i]->GetString();
+    }
+    ss <<")";
+    return ss.str();
+}
 // class Phrase
 
 // <NestedConstraint> ::= '(' <Constraint> ')'
@@ -99,6 +156,10 @@ NestedConstraint::~NestedConstraint(){
         
 ISR* NestedConstraint::Eval() const{ // just needs to eval inner
     return inner->Eval();
+}
+
+std::string NestedConstraint::GetString() const{ // just needs to eval inner
+    return inner->GetString();
 }
 // class NestedConstraint
 
@@ -112,5 +173,9 @@ ISR* SearchWord::Eval() const{
         return nullptr; 
     }
     return new ISRWord(it->second);
+}
+
+std::string SearchWord::GetString() const{ // placeholder for an OR ISR
+    return "WordISR(" + value + ")";
 }
 // class SearchWord
