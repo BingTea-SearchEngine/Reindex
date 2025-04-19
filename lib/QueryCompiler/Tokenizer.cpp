@@ -67,6 +67,7 @@ void Tokenstream::Tokenize(const std::string& input){
                 Tokens.push_back("NOT");
             }
             else{
+                std::transform(word.begin(), word.end(), word.begin(),[](unsigned char c){ return std::tolower(c); });
                 AppendToken(TokenType::WORD, word);
                 Tokens.push_back(word);
             }

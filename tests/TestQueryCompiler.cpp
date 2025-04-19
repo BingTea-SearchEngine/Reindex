@@ -104,7 +104,7 @@ TEST_F(QueryCompilerTest, Phrase) {
 }
 
 TEST_F(QueryCompilerTest, OR) {
-    std::string input = "Granola OR protein";
+    std::string input = "(Granola OR protein) bar";
     Parser parser(input, index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
@@ -113,19 +113,41 @@ TEST_F(QueryCompilerTest, OR) {
     ISR* root = expr->Eval();
     ASSERT_NE(root, nullptr);
 
-    std::cout<<"0"<<std::endl;
     auto post = root->Next();
-    std::cout<<"1"<<std::endl;
     ASSERT_TRUE(post.has_value());
-    std::cout<<"2"<<std::endl;
     EXPECT_EQ(root->GetDocumentName(), "Document 1");
-    std::cout<<"4"<<std::endl;
+
+    post = root->Next();
+    EXPECT_EQ(root->GetDocumentName(), "Document 2");
 
     post = root->Next();
     EXPECT_EQ(root->GetDocumentName(), "Document 2");
 
     post = root->Next();
     EXPECT_EQ(root->GetDocumentName(), "Document 4");
+
+    post = root->Next();
+    EXPECT_FALSE(post.has_value());
+
+    delete expr;
+}
+
+TEST_F(QueryCompilerTest, PhraseOR) {
+    std::string input = "\"Granola Bar\" OR \"Protein Bar\"";
+    Parser parser(input, index);
+    Expression* expr = parser.Parse();
+    ASSERT_NE(expr, nullptr);
+    std::cout<<expr->GetString()<<std::endl;
+
+    ISR* root = expr->Eval();
+    ASSERT_NE(root, nullptr);
+
+    auto post = root->Next();
+    ASSERT_TRUE(post.has_value());
+    EXPECT_EQ(root->GetDocumentName(), "Document 1");
+
+    post = root->Next();
+    EXPECT_EQ(root->GetDocumentName(), "Document 2");
 
     post = root->Next();
     EXPECT_FALSE(post.has_value());
