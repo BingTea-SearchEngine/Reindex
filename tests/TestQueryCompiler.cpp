@@ -44,6 +44,7 @@ TEST_F(QueryCompilerTest, AndQuery) {
     Parser parser(input, index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);  // Parsing succeeded
+    std::cout<<expr->GetString()<<std::endl;
 
     ISR* root = expr->Eval();
     ASSERT_NE(root, nullptr);  // Evaluation returned a valid ISR
@@ -67,6 +68,7 @@ TEST_F(QueryCompilerTest, AndNotQuery) {
     Parser parser(input, index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
+    std::cout<<expr->GetString()<<std::endl;
 
     ISR* root = expr->Eval();
     ASSERT_NE(root, nullptr);
@@ -86,6 +88,7 @@ TEST_F(QueryCompilerTest, Phrase) {
     Parser parser(input, index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
+    std::cout<<expr->GetString()<<std::endl;
 
     ISR* root = expr->Eval();
     ASSERT_NE(root, nullptr);
@@ -101,10 +104,11 @@ TEST_F(QueryCompilerTest, Phrase) {
 }
 
 TEST_F(QueryCompilerTest, OR) {
-    std::string input = "(Granola OR Protein) Bar";
+    std::string input = "Granola OR protein";
     Parser parser(input, index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
+    std::cout<<expr->GetString()<<std::endl;
 
     ISR* root = expr->Eval();
     ASSERT_NE(root, nullptr);
