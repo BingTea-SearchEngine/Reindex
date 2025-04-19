@@ -10,7 +10,7 @@
 class Parser {
 private:
     Tokenstream stream; // tokenstream to parse
-    const std::unordered_map<std::string, PostingList> index; // just for testing, input the index
+    const std::unordered_map<std::string, PostingList> index; // pass in the index for now
 
     // Find various parts of the grammar, return nullptr if not found
     Expression *FindConstraint();

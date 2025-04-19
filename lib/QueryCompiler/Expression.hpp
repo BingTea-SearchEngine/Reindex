@@ -32,33 +32,33 @@ public:
 };
 // class Constraint
 
-// <BaseConstraint> ::= <SimpleConstaint> { [ <AndOp> ] <SimpleConstraint> }
+// <BaseConstraint> ::= <SimpleConstaint> { [ <AndOp> ] <SimpleConstraint> } | <SimpleConstraint> <NotOp> <SimpleConstraint>
 class BaseConstraint: public Expression {
 protected:
 
    std::vector<Expression*> SCs;
+   std::string type;
 
 public:
 
-   BaseConstraint(std::vector<Expression*> SCin);
+   BaseConstraint(std::vector<Expression*> SCin, std::string typein);
    ~BaseConstraint();
    ISR* Eval() const override;
 
 };
 // class BaseConstraint
 
-// <SimpleConstraint> ::= <Phrase> | <NestedConstraint> | <UnaryOp> <SimpleConstraint> | <SearchWord>
+// <SimpleConstraint> ::= <Phrase> | <NestedConstraint> | <SearchWord>
 class SimpleConstraint: public Expression {
 protected:
 
-   char type; // 'p' for phrase, 'n' for nested, '-'/'+' for unary+simple, 's' for search
    Expression* inner;
 
 public:
 
-   SimpleConstraint(char typein, Expression* innerin);
+   SimpleConstraint(Expression* innerin);
    ~SimpleConstraint();
-   ISR* Eval() const override; // calls a different ISR depending on type
+   ISR* Eval() const override;
 
 };
 // class SimpleConstraint

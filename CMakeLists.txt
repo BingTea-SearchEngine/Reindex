@@ -66,6 +66,14 @@ add_library(IndexStreamReaders STATIC
 target_include_directories(IndexStreamReaders PUBLIC ${LIB_DIR}/IndexStreamReaders)
 target_link_libraries(IndexStreamReaders PUBLIC IndexElements)
 
+add_library(QueryCompiler STATIC
+  ${LIB_DIR}/QueryCompiler/Expression.cpp
+  ${LIB_DIR}/QueryCompiler/Parser.cpp
+  ${LIB_DIR}/QueryCompiler/Tokenizer.cpp
+)
+target_include_directories(QueryCompiler PUBLIC ${LIB_DIR}/QueryCompiler)
+target_link_libraries(QueryCompiler PUBLIC IndexStreamReaders IndexElements)
+
 add_executable(${THIS} src/reindex.cpp)
 target_link_libraries(${THIS} PUBLIC spdlog::spdlog argparse DocStream IndexElements)
 target_include_directories(${THIS} PRIVATE ${LIB_DIR}/DocStream ${LIB_DIR}/IndexElements)
@@ -100,6 +108,9 @@ target_link_libraries(TestISRPhrase PRIVATE GTest::gtest_main IndexStreamReaders
 add_executable(TestISRContainer tests/TestISRContainer.cpp)
 target_link_libraries(TestISRContainer PRIVATE GTest::gtest_main IndexStreamReaders)
 
+add_executable(TestQueryCompiler tests/TestQueryCompiler.cpp)
+target_link_libraries(TestQueryCompiler PRIVATE GTest::gtest_main QueryCompiler)
+
 include(GoogleTest)
 gtest_discover_tests(TestExample)
 gtest_discover_tests(TestMasterChunk)
@@ -113,3 +124,4 @@ gtest_discover_tests(TestISRAnd)
 gtest_discover_tests(TestISRPhrase)
 gtest_discover_tests(TestISRContainer)
 
+set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type")

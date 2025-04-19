@@ -5,6 +5,7 @@
 #include "ISROr.hpp"
 #include "ISRPhrase.hpp"
 #include "ISRWord.hpp"
+#include "ISRContainer.hpp"
 
 Expression::~Expression(){}
 
@@ -29,8 +30,8 @@ ISR* Constraint::Eval() const{ // placeholder for an OR ISR
 }
 // class Constraint
 
-// <BaseConstraint> ::= <SimpleConstaint> { [ <AndOp> ] <SimpleConstraint> }
-BaseConstraint::BaseConstraint(std::vector<Expression*> SCin): SCs(SCin) {}
+// <BaseConstraint> ::= <SimpleConstaint> { [ <AndOp> ] <SimpleConstraint> } | <SimpleConstraint> <NotOp> <SimpleConstraint>
+BaseConstraint::BaseConstraint(std::vector<Expression*> SCin, std::string typein): SCs(SCin), type(typein) {}
 
 BaseConstraint::~BaseConstraint(){
     for(int i = 0; i < SCs.size(); i++){
@@ -38,7 +39,7 @@ BaseConstraint::~BaseConstraint(){
     }
 }
 
-ISR* BaseConstraint::Eval() const{ // placeholder for an AND ISR
+ISR* BaseConstraint::Eval() const{
     if(SCs.size() == 1){ // collapse level if there is only one child
         return SCs[0]->Eval();
     }
@@ -46,29 +47,25 @@ ISR* BaseConstraint::Eval() const{ // placeholder for an AND ISR
     for(int i = 0; i < SCs.size(); i++){
         children.push_back(SCs[i]->Eval());
     }
-    return new ISRAnd(children);
+    if(type == "And"){
+        return new ISRAnd(children);
+    }
+    else if(type == "Not"){
+        return new ISRContainer(children[0], children[1]);
+    }
+    return nullptr; // should not reach this return
 }
 // class BaseConstraint
 
-// <SimpleConstraint> ::= <Phrase> | <NestedConstraint> | <UnaryOp> <SimpleConstraint> | <SearchWord>
-SimpleConstraint::SimpleConstraint(char typein, Expression* innerin): type(typein), inner(innerin) {}
+// <SimpleConstraint> ::= <Phrase> | <NestedConstraint> | <SearchWord>
+SimpleConstraint::SimpleConstraint(Expression* innerin): inner(innerin) {}
    
 SimpleConstraint::~SimpleConstraint(){
     delete inner;
 }
 
 ISR* SimpleConstraint::Eval() const{ // this just needs to evaluate inner
-    if(type == 'p' || type == 'n' || type == 's'){
-        return inner->Eval();
-    }
-    else{
-        if(type == '-'){
-            return nullptr // TODO: ADD ISRNot support here (eg return new ISRNot(inner->Eval()))
-        }
-        else{ // '+' is just evaluating inner
-            return inner->Eval();
-        }
-    }
+    return inner->Eval();
 }
 // class SimpleConstraint
 
@@ -110,6 +107,10 @@ SearchWord::SearchWord(std::string valuein, const std::unordered_map<std::string
         
 ISR* SearchWord::Eval() const{
     //return new ISRWord(index.getpostinglist(value)); // TODO: eventually get a posting list from the actual index
-    return new ISRWord(index[value]);
+    auto it = index.find(value);
+    if (it == index.end()) {
+        return nullptr; 
+    }
+    return new ISRWord(it->second);
 }
 // class SearchWord

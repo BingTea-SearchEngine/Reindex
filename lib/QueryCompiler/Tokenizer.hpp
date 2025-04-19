@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 
 enum class TokenType {
     WORD,       // individual words
@@ -8,7 +9,7 @@ enum class TokenType {
     OROP,       // OR, |, ||
     LPAREN,     // (
     RPAREN,     // )
-    UNARYOP,    // NOT, -, +
+    NOTOP,      // NOT, -
     END         // end of input
 };
 
@@ -28,9 +29,11 @@ public:
 private:
     Token* head;
     Token* end;
+    std::vector<std::string> Tokens; // tokenized input in vector form for the ranker
 
     void Tokenize(const std::string& input);
     void AppendToken(TokenType type, const std::string& value);
+    std::vector<std::string> getTokens(); // return the vector of tokens
     
     void PrintTokens();
 };

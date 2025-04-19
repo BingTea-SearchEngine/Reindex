@@ -27,15 +27,25 @@ Expression* Parser::FindConstraint(){
     return new Constraint(BCs); // new constraint of all BCs ORed together
 }
 
-// <BaseConstraint> ::= <SimpleConstaint> { [ <AndOp> ] <SimpleConstraint> }
+// <BaseConstraint> ::= <SimpleConstraint> { [ <AndOp> ] <SimpleConstraint> } | <SimpleConstraint> <NotOp> <SimpleConstraint>
 Expression* Parser::FindBaseConstraint(){
     std::vector<Expression*> SCs; // accumulate simple constraints
     Expression* SC = FindSimpleConstraint(); // find first <SimpleConstraint>
     if(SC){
         SCs.push_back(SC);
     }
-    else{
+    else{ // fail instantly if there is no opening <SimpleConstraint>
         return nullptr;
+    }
+    if(stream.MatchToken(TokenType::NOTOP)){
+        Expression* right = FindSimpleConstraint();
+        if(right){
+            SCs.push_back(right);
+            return new BaseConstraint(SCs, "Not");
+        }
+        else{
+            return nullptr;
+        }
     }
     while(true){
         if(stream.MatchToken(TokenType::ANDOP)){
@@ -54,34 +64,21 @@ Expression* Parser::FindBaseConstraint(){
             break; // break out of the loop if we hit anything else
         }
     }
-    return new BaseConstraint(SCs); // new Base Constraint of all SCs ANDed together
+    return new BaseConstraint(SCs, "And"); // new Base Constraint of all SCs ANDed together
 }
 
-// <SimpleConstraint> ::= <Phrase> | <NestedConstraint> | <UnaryOp> <SimpleConstraint> | <SearchWord>
+// <SimpleConstraint> ::= <Phrase> | <NestedConstraint> | <SearchWord>
 Expression* Parser::FindSimpleConstraint() {
-    char type = 'p';
     Expression* inner = FindPhrase();
     if(!inner){
         inner = FindNestedConstraint();
-        type = 'n';
     } 
     if(!inner){
         inner = FindSearchWord();
-        type = 's';
-    } 
+    }
     if(inner){
-        return new SimpleConstraint(type, inner);
+        return new SimpleConstraint(inner);
     }
-
-    Token* t = stream.MatchToken(TokenType::UNARYOP);
-    if(t){
-        inner = FindSimpleConstraint();
-        if(inner){
-            return new SimpleConstraint(t->value[0], inner); // value is either '+' or '-'
-        }
-        return nullptr;
-    }
-
     return nullptr;
 }
 
