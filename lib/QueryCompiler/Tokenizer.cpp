@@ -107,6 +107,7 @@ void Tokenstream::Tokenize(const std::string& input){
                     while (i < input.size() && !std::isspace(input[i]) && !std::ispunct(input[i])) {
                         word += input[i++];
                     }
+                    std::transform(word.begin(), word.end(), word.begin(),[](unsigned char c){ return std::tolower(c); });
                     if (!word.empty()) {
                         AppendToken(TokenType::WORD, word);
                         continue;
