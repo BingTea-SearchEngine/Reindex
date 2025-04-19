@@ -14,13 +14,13 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
 
     metadata_t m;
 
-    std::cout << "Before adding documents" << std::endl;
+    // std::cout << "Before adding documents" << std::endl;
 
     master.AddDocument("doc1", w, m);
     master.AddDocument("doc2", w, m);
     master.Flush();
 
-    std::cout << "flushed everything" << std::endl;
+    // std::cout << "flushed everything" << std::endl;
 
     std::string filePath = "test_master_chunk";
     int fd = -1;
@@ -45,7 +45,7 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
     munmap(buf2, 4098);
     close(fd2);
 
-    std::cout << "deserialized" << std::endl;
+    // std::cout << "deserialized" << std::endl;
 
     // EXPECT_EQ(master.GetNumDocuments(), master2.GetNumDocuments());
     // EXPECT_EQ(master.GetChunkList(), master2.GetChunkList());
