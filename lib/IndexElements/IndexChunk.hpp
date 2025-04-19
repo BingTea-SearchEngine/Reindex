@@ -45,7 +45,14 @@ class IndexChunk {
      * @param The word to look for
      * @return PostingList for that word
      * */
-    PostingList GetPostingList(std::string word);
+    const PostingList& GetPostingList(std::string word);
+
+    /*
+     * @brief Get all posting lists to feed into expression parser
+     *
+     * @return Entire Posting list for this index chunk
+     * */
+    const std::unordered_map<std::string, PostingList>& GetAllPostingLists();
 
     /*
      * @brief Prints the contents of the IndexChunk

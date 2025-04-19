@@ -103,7 +103,7 @@ ISR* NestedConstraint::Eval() const{ // just needs to eval inner
 // class NestedConstraint
 
 // <SearchWord> lowest level
-SearchWord::SearchWord(std::string valuein, const std::unordered_map<std::string, PostingList> indexin): value(valuein), index(indexin) {}
+SearchWord::SearchWord(std::string valuein, const std::unordered_map<std::string, PostingList>& indexin): value(valuein), index(indexin) {}
         
 ISR* SearchWord::Eval() const{
     //return new ISRWord(index.getpostinglist(value)); // TODO: eventually get a posting list from the actual index

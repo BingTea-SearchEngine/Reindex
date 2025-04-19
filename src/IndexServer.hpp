@@ -5,12 +5,12 @@
 #include <spdlog/spdlog.h>
 #include <argparse/argparse.hpp>
 
-#include "Expression.hpp"
 #include "GatewayServer.hpp"
 #include "IndexChunk.hpp"
 #include "IndexInterface.hpp"
 #include "MasterChunk.hpp"
 #include "Parser.hpp"
+#include "Expression.hpp"
 
 class IndexServer {
    public:

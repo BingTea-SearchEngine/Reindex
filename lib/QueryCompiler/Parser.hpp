@@ -27,7 +27,7 @@ private:
 
 public:
     // construct stream based on a query
-    Parser(const std::string &query, const std::unordered_map<std::string, PostingList> indexin);
+    Parser(const std::string &query, const std::unordered_map<std::string, PostingList>& indexin);
 
     // Builds the tree
     Expression *Parse();

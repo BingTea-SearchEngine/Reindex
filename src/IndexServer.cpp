@@ -30,7 +30,7 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
     spdlog::info("Query: {}", msg.query);
 
     // Parser query
-    Parser parser(msg.query);
+    Parser parser(msg.query, _primaryIndexChunk.GetAllPostingLists());
     Expression* expr = parser.Parse();
     // Evaluate query (Call ISRs)
     std::cout << expr->Eval() << std::endl;

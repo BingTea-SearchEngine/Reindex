@@ -30,13 +30,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(spdlog)
 
 FetchContent_Declare(
-    ExpressionParser
-    GIT_REPOSITORY https://github.com/BingTea-SearchEngine/ExpressionParser.git
-    GIT_TAG main
-)
-FetchContent_MakeAvailable(ExpressionParser)
-
-FetchContent_Declare(
     argparse
     GIT_REPOSITORY https://github.com/p-ranav/argparse.git
 )
@@ -120,7 +113,7 @@ target_include_directories(${THIS} PRIVATE ${LIB_DIR}/DocStream ${LIB_DIR}/Index
 
 add_executable(IndexServer src/IndexServer.cpp)
 target_link_libraries(IndexServer PUBLIC spdlog::spdlog argparse IndexElements GatewayServer
-    ExpressionParser IndexInterface)
+    IndexInterface QueryCompiler)
 target_include_directories(IndexServer PUBLIC ${LIB_DIR}/IndexElements ${GATEWAY_INCLUDE_DIR} ${EXPRESSIONPARSER_INCLUDE_DIR})
 
 add_executable(TestExample tests/TestExample.cpp)

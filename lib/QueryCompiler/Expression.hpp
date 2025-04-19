@@ -102,7 +102,7 @@ protected:
 
 public:
 
-    SearchWord(std::string valuein, const std::unordered_map<std::string, PostingList> indexin);
+    SearchWord(std::string valuein, const std::unordered_map<std::string, PostingList>& indexin);
     ISR* Eval() const override;
     
 };
