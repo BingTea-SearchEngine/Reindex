@@ -154,3 +154,23 @@ TEST_F(QueryCompilerTest, PhraseOR) {
 
     delete expr;
 }
+
+TEST_F(QueryCompilerTest, PhraseORNOT) {
+    std::string input = "(\"Granola Bar\" OR \"Protein Bar\") NOT Costco";
+    Parser parser(input, index);
+    Expression* expr = parser.Parse();
+    ASSERT_NE(expr, nullptr);
+    std::cout<<expr->GetString()<<std::endl;
+
+    ISR* root = expr->Eval();
+    ASSERT_NE(root, nullptr);
+
+    auto post = root->Next();
+    ASSERT_TRUE(post.has_value());
+    EXPECT_EQ(root->GetDocumentName(), "Document 1");
+
+    post = root->Next();
+    EXPECT_FALSE(post.has_value());
+
+    delete expr;
+}
