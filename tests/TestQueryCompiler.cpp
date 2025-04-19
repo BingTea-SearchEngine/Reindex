@@ -2,6 +2,7 @@
 #include "Parser.hpp"
 #include "Expression.hpp"
 #include "PostingList.hpp"
+#include <iostream>
 
 class QueryCompilerTest : public ::testing::Test {
 protected:
@@ -92,6 +93,35 @@ TEST_F(QueryCompilerTest, Phrase) {
     auto post = root->Next();
     ASSERT_TRUE(post.has_value());
     EXPECT_EQ(root->GetDocumentName(), "Document 1");
+
+    post = root->Next();
+    EXPECT_FALSE(post.has_value());
+
+    delete expr;
+}
+
+TEST_F(QueryCompilerTest, OR) {
+    std::string input = "(Granola OR Protein) Bar";
+    Parser parser(input, index);
+    Expression* expr = parser.Parse();
+    ASSERT_NE(expr, nullptr);
+
+    ISR* root = expr->Eval();
+    ASSERT_NE(root, nullptr);
+
+    std::cout<<"0"<<std::endl;
+    auto post = root->Next();
+    std::cout<<"1"<<std::endl;
+    ASSERT_TRUE(post.has_value());
+    std::cout<<"2"<<std::endl;
+    EXPECT_EQ(root->GetDocumentName(), "Document 1");
+    std::cout<<"4"<<std::endl;
+
+    post = root->Next();
+    EXPECT_EQ(root->GetDocumentName(), "Document 2");
+
+    post = root->Next();
+    EXPECT_EQ(root->GetDocumentName(), "Document 4");
 
     post = root->Next();
     EXPECT_FALSE(post.has_value());
