@@ -22,9 +22,9 @@ class ISRContainer : public ISR {
      *
      * @param included An ISR structure for the included terms.
      * 
-     * @param excluded A vector of excluded ISRs.
+     * @param excluded An ISR structure for the excluded terms.
      */
-    ISRContainer(ISR* included, std::vector<ISRWord*> excluded);
+    ISRContainer(ISR* included, ISR* excluded);
 
     /**
      * @brief Returns the absolute location of the earliest occurrence
@@ -94,9 +94,6 @@ class ISRContainer : public ISR {
    private:
     /// the included ISR structure this ISR is primarily trying to find occurrences of
     ISR* included;
-
-    /// the excluded ISRWords that this ISR makes sures to exclude when finding documents
-    std::vector<ISRWord*> excluded;
 
     /// The current PostEntry this ISR is pointing at.
     std::optional<PostEntry> currentPostEntry;

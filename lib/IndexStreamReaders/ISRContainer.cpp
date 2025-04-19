@@ -2,15 +2,13 @@
 
 #include "ISRContainer.hpp"
 
-ISRContainer::ISRContainer(ISR* includedISR, std::vector<ISRWord*> excludedISRs)
+ISRContainer::ISRContainer(ISR* includedISR, ISR* excludedISR)
     : included(includedISR),
-      excluded(excludedISRs),
       currentPostEntry(std::nullopt) {
-    for (auto& excludedTerm : excluded) {
-        excludedTerm->NextDocument();
-        while (excludedTerm->GetCurrentPostEntry() != std::nullopt) {
-            excludedDocuments.insert(excludedTerm->GetDocumentName());
-            excludedTerm->NextDocument();
+        excludedISR->NextDocument();
+        while (excludedISR->GetCurrentPostEntry() != std::nullopt) {
+            excludedDocuments.insert(excludedISR->GetDocumentName());
+            excludedISR->NextDocument();
         }
     }
 }
