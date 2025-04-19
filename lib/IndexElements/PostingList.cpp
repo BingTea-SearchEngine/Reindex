@@ -46,11 +46,6 @@ std::vector<Post> PostingList::GetPosts() const {
 
 void PostingList::Serialize(char* base_region, size_t& offset,
                             const PostingList& postingList) {
-    // Serialize size of word
-    // uint16_t word_size = static_cast<uint16_t>(postingList.word.size());
-    // std::memcpy(base_region + offset, &word_size, sizeof(word_size));
-    // offset += sizeof(word_size);
-
     // PostingList::NewSerialize(base_region, offset, postingList);
     PostingList::OldSerialize(base_region, offset, postingList);
 }
