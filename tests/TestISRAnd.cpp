@@ -337,7 +337,7 @@ TEST_F(AndISR, SimpleSeekAndNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_bar_AND_and->GetStartLocation(), 5);
     EXPECT_EQ(ISR_bar_AND_and->GetEndLocation(), 9);
-    EXPECT_EQ(ISR_bar_AND_and->GetDocumentName(), "Document 1");
+    EXPECT_EQ(ISR_bar_AND_and->GetDocumentID(), 1);
 
     // seek to 9, bar=9, and=10
     EXPECT_EQ(ISR_bar_AND_and->Seek(9)->GetDelta(), 9);
@@ -346,7 +346,7 @@ TEST_F(AndISR, SimpleSeekAndNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_bar_AND_and->GetStartLocation(), 9);
     EXPECT_EQ(ISR_bar_AND_and->GetEndLocation(), 10);
-    EXPECT_EQ(ISR_bar_AND_and->GetDocumentName(), "Document 1");
+    EXPECT_EQ(ISR_bar_AND_and->GetDocumentID(), 1);
 
     // seek to 27, bar=29, and=27
     EXPECT_EQ(ISR_bar_AND_and->Seek(27)->GetDelta(), 27);
@@ -355,7 +355,7 @@ TEST_F(AndISR, SimpleSeekAndNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_bar_AND_and->GetStartLocation(), 27);
     EXPECT_EQ(ISR_bar_AND_and->GetEndLocation(), 29);
-    EXPECT_EQ(ISR_bar_AND_and->GetDocumentName(), "Document 2");
+    EXPECT_EQ(ISR_bar_AND_and->GetDocumentID(), 2);
 
     // seek to 28, bar=53, and=48
     EXPECT_EQ(ISR_bar_AND_and->Seek(28)->GetDelta(), 48);
@@ -364,7 +364,7 @@ TEST_F(AndISR, SimpleSeekAndNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_bar_AND_and->GetStartLocation(), 48);
     EXPECT_EQ(ISR_bar_AND_and->GetEndLocation(), 53);
-    EXPECT_EQ(ISR_bar_AND_and->GetDocumentName(), "Document 4");
+    EXPECT_EQ(ISR_bar_AND_and->GetDocumentID(), 4);
 
     // seek to 49, nothing
     EXPECT_EQ(ISR_bar_AND_and->Seek(49), std::nullopt);

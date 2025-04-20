@@ -83,15 +83,15 @@ TEST(BasicPostingList, TestAddWord) {
     PostEntry w1 = {0, wordlocation_t::title};
     PostEntry w2 = {1, wordlocation_t::body};
     PostEntry w3 = {2, wordlocation_t::bold};
-    pl.AddWord("doc1", w1);
-    pl.AddWord("doc1", w2);
-    pl.AddWord("doc2", w3);
+    pl.AddWord(1, w1);
+    pl.AddWord(1, w2);
+    pl.AddWord(2, w3);
 
     // Access posts using GetPosts()
     auto posts = pl.GetPosts();
 
     // First post
-    EXPECT_EQ(posts[0].GetDocumentName(), "doc1");
+    EXPECT_EQ(posts[0].GetDocumentID(), 1);
     auto wordEntries1 =
         posts[0].GetEntries();  // Get entries for the first post
     EXPECT_EQ(wordEntries1[0].GetDelta(), w1.GetDelta());
@@ -100,7 +100,7 @@ TEST(BasicPostingList, TestAddWord) {
     EXPECT_EQ(wordEntries1[1].GetLocationFound(), w2.GetLocationFound());
 
     // Second post
-    EXPECT_EQ(posts[1].GetDocumentName(), "doc2");
+    EXPECT_EQ(posts[1].GetDocumentID(), 2);
     auto wordEntries2 =
         posts[1].GetEntries();  // Get entries for the second post
     EXPECT_EQ(wordEntries2[0].GetDelta(), w3.GetDelta());
@@ -129,14 +129,14 @@ void test_serializiation() {
     PostEntry word_occurrence_6 = {200010, wordlocation_t::title};
     PostEntry word_occurrence_7 = {200015, wordlocation_t::body};
 
-    postingList->AddWord(cnn_doc, word_occurrence_1);
-    postingList->AddWord(cnn_doc, word_occurrence_2);
-    postingList->AddWord(cnn_doc, word_occurrence_3);
+    postingList->AddWord(1, word_occurrence_1);
+    postingList->AddWord(1, word_occurrence_2);
+    postingList->AddWord(1, word_occurrence_3);
 
-    postingList->AddWord(fox_doc, word_occurrence_4);
-    postingList->AddWord(fox_doc, word_occurrence_5);
-    postingList->AddWord(fox_doc, word_occurrence_6);
-    postingList->AddWord(fox_doc, word_occurrence_7);
+    postingList->AddWord(2, word_occurrence_4);
+    postingList->AddWord(2, word_occurrence_5);
+    postingList->AddWord(2, word_occurrence_6);
+    postingList->AddWord(2, word_occurrence_7);
 
     size_t offset = 0;
     PostingList::NewSerialize(static_cast<char*>(base_region), offset,
@@ -181,7 +181,7 @@ void test_deserialization() {
 
     std::vector<Post> catPostingList = postingList.GetPosts();
     Post cnnPost = catPostingList[0];
-    if (cnnPost.GetDocumentName() == "cnn/index.html") {
+    if (cnnPost.GetDocumentID() == 1) {
         std::cout << "Passed!" << std::endl;
     } else {
         std::cout << "Failed!" << std::endl;
@@ -218,7 +218,7 @@ void test_deserialization() {
     }
 
     Post foxPost = catPostingList[1];
-    if (foxPost.GetDocumentName() == "fox/index.html") {
+    if (foxPost.GetDocumentID() == 2) {
         std::cout << "Passed!" << std::endl;
     } else {
         std::cout << "Failed!" << std::endl;
@@ -282,7 +282,7 @@ void test_deserialization() {
 
     catPostingList = postingList.GetPosts();
     cnnPost = catPostingList[0];
-    if (cnnPost.GetDocumentName() == "cnn/index.html") {
+    if (cnnPost.GetDocumentID() == 1) {
         std::cout << "Passed!" << std::endl;
     } else {
         std::cout << "Failed!" << std::endl;
@@ -319,7 +319,7 @@ void test_deserialization() {
     }
 
     foxPost = catPostingList[1];
-    if (foxPost.GetDocumentName() == "fox/index.html") {
+    if (foxPost.GetDocumentID() == 2) {
         std::cout << "Passed!" << std::endl;
     } else {
         std::cout << "Failed!" << std::endl;
