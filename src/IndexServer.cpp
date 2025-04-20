@@ -11,15 +11,20 @@ std::string IndexServer::getSnippet(metadata_t docMetadata, uint32_t matchOffset
     std::string filePath = _htmlDir + std::to_string(docMetadata.docNum) + ".parsed";
     std::ifstream file(filePath);
     if (!file) {
+        std::cerr << "Error openning " << filePath << endl;
         return "";
     }
 
     int docRelativeMatchOffset = matchOffset - docMetadata.docStartOffset;
-    assert(docRelativeMatchOffset >= 0);
+    if (docRelativeMatchOffset < 0) {
+        return "";
+    }
 
-    int snippetStartOffset = std::min(docRelativeMatchOffset - delta, 0);
+    int snippetStartOffset = std::max(docRelativeMatchOffset - delta, 0);
+    cout << snippetStartOffset << " " << docRelativeMatchOffset << endl;
 
     std::string snippet;
+
     std::string line;
     std::getline(file, line); // URL and Doc num line
     std::getline(file, line); // get <title> tag
@@ -31,12 +36,53 @@ std::string IndexServer::getSnippet(metadata_t docMetadata, uint32_t matchOffset
     bool snippetFound = false;
     while (titleIss >> word) {
         if (offset == snippetStartOffset) {
+            snippet += word;
+            snippet += " ";
             snippetFound = true;
+            offset++;
             break;
         }
         ++offset;
     }
 
+    if (snippetFound) {
+        while (titleIss >> word) {
+            snippet += word;
+            snippet += " ";
+            if (offset == docRelativeMatchOffset + delta) {
+                break;
+            }
+            ++offset;
+        }
+        return snippet;
+    }
+
+    std::getline(file, line); // get </title>
+    std::getline(file, line); // get <words>
+    std::getline(file, line); // get words
+    std::istringstream wordIss(line);
+    while (wordIss >> word) {
+        if (offset == snippetStartOffset) {
+            snippet += word;
+            snippet += " ";
+            snippetFound = true;
+            offset++;
+            break;
+        }
+        ++offset;
+    }
+
+    if (snippetFound) {
+        while (wordIss >> word) {
+            if (offset == docRelativeMatchOffset + delta) {
+                break;
+            }
+            snippet += word;
+            snippet += " ";
+            ++offset;
+        }
+    }
+    
     return snippet;
 }
 
@@ -66,21 +112,33 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
 
     // Parser query
 
-    cout << _primaryIndexChunk.GetAllPostingLists().size() << endl;
-    Parser parser(msg.query, _primaryIndexChunk.GetAllPostingLists());
+    Parser parser(msg.query, &_primaryIndexChunk.GetAllPostingLists());
     Expression* expr = parser.Parse();
     // Evaluate query (Call ISRs)
     std::cout << expr->Eval() << std::endl;
-    // std::cout << expr->GetString() << std::endl;
+    auto ISR = expr->Eval();
+    ISR->NextDocument();
+
+    std::vector<std::string> docs;
+    while (ISR->GetCurrentPostEntry() != std::nullopt) {
+        docs.push_back(ISR->GetDocumentName());
+        std::cout << docs.back() << endl;
+        ISR->NextDocument();
+    }
+
     // Rank?
 
     std::vector<doc_t> documents;
-    documents.push_back(doc_t{"https://wwww.google.com", 5, 1231, 4, 0.4, 0.5, "This is google.com"});
+    documents.push_back(doc_t{"https://wwww.google.com", 5, 1231, 4, 0.4, 0.5, "This is google.com"});;
     documents.push_back(doc_t{"https://www.twitter.com", 5, 1231, 5, 0.4, 0.5, "This is twitter.com"});
     documents.push_back(doc_t{"https://www.nytimes.com", 5, 1231, 6, 0.4, 0.5, "this is nytimes.com"});
     documents.push_back(
         doc_t{"https://www.washingtonpost.com", 5, 1231, 7, 0.4, 0.5, "This is washintongpost.com"});
     documents.push_back(doc_t{"https://www.ft.com", 5, 1231, 5, 0.4, 0.5, "This is ft.com"});
+
+    cout << "Getting snippet" << endl;
+    metadata_t docMetadata = _primaryMetadataChunk.GetMetadata("https://news.google.com/");
+    cout << getSnippet(docMetadata, 461, 10) << endl;
 
     return IndexMessage{IndexMessageType::DOCUMENTS, "", documents};
 }
