@@ -12,13 +12,13 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
     std::vector<word_t> w;
     w.push_back(word_t{"w", 0, wordlocation_t::title});
 
-    // metadata_t m;
-    //
-    // std::cout << "Before adding documents" << std::endl;
-    //
-    // master.AddDocument("doc1", w, m);
-    // master.AddDocument("doc2", w, m);
-    // master.Flush();
+    metadata_t m;
+
+    std::cout << "Before adding documents" << std::endl;
+
+    master.AddDocument("doc1", w, m);
+    master.AddDocument("doc2", w, m);
+    master.Flush();
     //
     // std::cout << "flushed everything" << std::endl;
     //
