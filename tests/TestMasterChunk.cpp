@@ -42,8 +42,8 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
     offset = 0;
     MasterChunk master2 =
         MasterChunk::Deserailize(static_cast<char*>(buf2), offset);
-    // munmap(buf2, 4098);
-    // close(fd2);
+    munmap(buf2, size);
+    close(fd2);
     //
     // std::cout << "deserialized" << std::endl;
     //
