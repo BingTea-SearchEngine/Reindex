@@ -44,10 +44,10 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
         MasterChunk::Deserailize(static_cast<char*>(buf2), offset);
     munmap(buf2, size);
     close(fd2);
-    //
-    // std::cout << "deserialized" << std::endl;
-    //
-    // EXPECT_EQ(master.GetNumDocuments(), master2.GetNumDocuments());
-    // EXPECT_EQ(master.GetChunkList(), master2.GetChunkList());
-    // EXPECT_EQ(master.GetMetadataChunkList(), master2.GetMetadataChunkList());
+
+    std::cout << "deserialized" << std::endl;
+
+    EXPECT_EQ(master.GetNumDocuments(), master2.GetNumDocuments());
+    EXPECT_EQ(master.GetChunkList(), master2.GetChunkList());
+    EXPECT_EQ(master.GetMetadataChunkList(), master2.GetMetadataChunkList());
 }
