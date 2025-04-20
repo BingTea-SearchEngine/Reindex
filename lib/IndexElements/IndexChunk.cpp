@@ -50,10 +50,14 @@ const PostingList& IndexChunk::GetPostingList(std::string word) {
     return _postingLists[word];
 }
 
-const std::unordered_map<std::string, PostingList>& IndexChunk::GetAllPostingLists() {
+const std::unordered_map<std::string, PostingList>&
+IndexChunk::GetAllPostingLists() {
     return _postingLists;
 }
 
+uint32_t IndexChunk::GetCurrentOffset() {
+    return _offset;
+}
 
 void IndexChunk::Serialize(char* base_region, size_t& offset,
                            IndexChunk& index) {

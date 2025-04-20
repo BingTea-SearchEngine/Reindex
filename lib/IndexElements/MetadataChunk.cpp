@@ -82,6 +82,10 @@ void MetadataChunk::Serialize(char* base_region, size_t& offset,
         uint32_t numOutLinks = metadata.numOutLinks;
         std::memcpy(base_region + offset, &numOutLinks, sizeof(numOutLinks));
         offset += sizeof(numOutLinks);
+
+        std::memcpy(base_region + offset, &metadata.docNum,
+                    sizeof(metadata.docNum));
+        offset += sizeof(metadata.docNum);
     }
 
     // Serailize metadata for each document
@@ -108,7 +112,7 @@ MetadataChunk MetadataChunk::Deserailize(char* base_region, size_t& offset) {
         chunk._documents.push_back(docname);
 
         // Read number of words
-        uint32_t numWords = 0, numTitleWords = 0, numOutLinks = 0;
+        uint32_t numWords = 0, numTitleWords = 0, numOutLinks = 0, docNum;
         float pageRank = 0.0, cheiRank = 0.0;
 
         std::memcpy(&numWords, base_region + offset, sizeof(numWords));
@@ -127,8 +131,11 @@ MetadataChunk MetadataChunk::Deserailize(char* base_region, size_t& offset) {
         std::memcpy(&numOutLinks, base_region + offset, sizeof(numOutLinks));
         offset += sizeof(numOutLinks);
 
-        metadata_t metadata{numWords, numTitleWords, numOutLinks, pageRank,
-                            cheiRank};
+        std::memcpy(&docNum, base_region + offset, sizeof(docNum));
+        offset += sizeof(docNum);
+
+        metadata_t metadata{numWords, numTitleWords, numOutLinks,
+                            pageRank, cheiRank,      docNum};
         chunk._docMetadata.insert(make_pair(docname, metadata));
     }
 

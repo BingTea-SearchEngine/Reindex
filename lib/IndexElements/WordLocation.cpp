@@ -23,7 +23,8 @@ std::ostream& operator<<(std::ostream& os, const metadata_t& m) {
        << "\n\t# of title words=" << m.numTitleWords
        << "\n\t# of out links=" << m.numOutLinks
        << "\n\tpageRank score=" << m.pageRank
-       << "\n\tcheiRank score=" << m.cheiRank;
+       << "\n\tcheiRank score=" << m.cheiRank << "\n\tdoc num=" << m.docNum
+       << "\n\tdoc start offset=" << m.docStartOffset;
     os << "\n\t}\n";
 
     return os;
@@ -33,7 +34,7 @@ bool operator==(const metadata_t& lhs, const metadata_t& rhs) {
     if (!(lhs.numWords == rhs.numWords &&
           lhs.numTitleWords == rhs.numTitleWords &&
           lhs.pageRank == rhs.pageRank && lhs.cheiRank == rhs.cheiRank &&
-          lhs.numOutLinks == rhs.numOutLinks)) {
+          lhs.numOutLinks == rhs.numOutLinks && lhs.docNum == rhs.docNum && lhs.docStartOffset == rhs.docStartOffset)) {
         return false;
     }
 

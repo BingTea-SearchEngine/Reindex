@@ -15,9 +15,9 @@ std::vector<uint8_t> encode(uint32_t value) {
         uint8_t byte = value & 0x7F;  // Get the lowest 7 bits
         value >>= 7;
         if (value != 0) {
-            bytes.push_back(byte);    // More bytes to come
+            bytes.push_back(byte);  // More bytes to come
         } else {
-            byte |= 0x80;             // Set MSB = 1 to mark end
+            byte |= 0x80;  // Set MSB = 1 to mark end
             bytes.push_back(byte);
             break;
         }
@@ -35,7 +35,8 @@ uint32_t decode(const uint8_t* base, size_t& offset) {
 
         result |= (byte & 0x7F) << shift;
 
-        if (byte & 0x80) break;  // MSB = 1 means done
+        if (byte & 0x80)
+            break;  // MSB = 1 means done
         shift += 7;
     }
     return result;
@@ -72,7 +73,8 @@ TEST(BasicCompression, CompressedVsNaiveSizeBenefit) {
         compressed_bytes += encode(d).size();
     }
 
-    std::cout << "Compressed takes " << compressed_bytes << " bytes" << std::endl;
+    std::cout << "Compressed takes " << compressed_bytes << " bytes"
+              << std::endl;
     std::cout << "Naive takes " << naive_bytes << " bytes" << std::endl;
 
     EXPECT_LT(compressed_bytes, naive_bytes);
@@ -140,16 +142,19 @@ void test_serializiation() {
 
     size_t offset = 0;
     PostingList::NewSerialize(static_cast<char*>(base_region), offset,
-                           *postingList);
+                              *postingList);
 
     std::cout << "Compressed PostingList serialized to mmap.\n";
-    std::cout << "This many bytes were used for COMPRESSED RELATIVE DELTAS: " << offset << std::endl;
+    std::cout << "This many bytes were used for COMPRESSED RELATIVE DELTAS: "
+              << offset << std::endl;
 
     size_t new_offset = offset;
-    PostingList::OldSerialize(static_cast<char*>(base_region), new_offset, *postingList);
+    PostingList::OldSerialize(static_cast<char*>(base_region), new_offset,
+                              *postingList);
 
     std::cout << "Naive PostingList serialized to mmap.\n";
-    std::cout << "This many bytes were used for NAIVE: " << new_offset - offset << std::endl;
+    std::cout << "This many bytes were used for NAIVE: " << new_offset - offset
+              << std::endl;
 
     munmap(base_region, REGION_SIZE);
     close(fd);

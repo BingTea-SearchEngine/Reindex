@@ -54,8 +54,8 @@ void PostingList::OldSerialize(char* base_region, size_t& offset,
                                const PostingList& postingList) {
     // Serialize the word representing the PostingList
     uint16_t word_size = postingList.word.size();
-    std::memcpy(base_region+offset, &word_size, sizeof(word_size));
-    offset+=sizeof(word_size);
+    std::memcpy(base_region + offset, &word_size, sizeof(word_size));
+    offset += sizeof(word_size);
 
     std::memcpy(base_region + offset, postingList.word.c_str(), word_size);
     offset += word_size;
@@ -76,9 +76,9 @@ std::vector<uint8_t> encodeVB(uint32_t value) {
         uint8_t byte = value & 0x7F;  // Get the lowest 7 bits
         value >>= 7;
         if (value != 0) {
-            bytes.push_back(byte);    // More bytes to come
+            bytes.push_back(byte);  // More bytes to come
         } else {
-            byte |= 0x80;             // Set MSB = 1 to mark end
+            byte |= 0x80;  // Set MSB = 1 to mark end
             bytes.push_back(byte);
             break;
         }
@@ -95,7 +95,8 @@ uint32_t decodeVB(const uint8_t* data, size_t& consumed_bytes) {
     while (true) {
         uint8_t byte = data[consumed_bytes++];
         result |= (byte & 0x7F) << shift;
-        if (byte & 0x80) break;
+        if (byte & 0x80)
+            break;
         shift += 7;
     }
 
@@ -110,8 +111,7 @@ void PostingList::NewSerialize(char* base_region, size_t& offset,
     offset += sizeof(word_size);
 
     // Serialize the word representing the PostingList
-    std::memcpy(base_region + offset, postingList.word.c_str(),
-                word_size);
+    std::memcpy(base_region + offset, postingList.word.c_str(), word_size);
     offset += word_size;
 
     // Serialize the number of posts (documents)
@@ -122,8 +122,10 @@ void PostingList::NewSerialize(char* base_region, size_t& offset,
     uint32_t prev_position = 0;
     for (auto& post : postingList.posts) {
         // Serialize the document name
-        size_t document_name_size = post.GetDocumentName().size() + 1;  // account for null terminator
-        std::memcpy(base_region + offset, post.GetDocumentName().c_str(), document_name_size);
+        size_t document_name_size =
+            post.GetDocumentName().size() + 1;  // account for null terminator
+        std::memcpy(base_region + offset, post.GetDocumentName().c_str(),
+                    document_name_size);
         offset += document_name_size;
 
         const auto& entries = post.GetEntries();
@@ -195,12 +197,12 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
 
     // Deserialize word size
     uint16_t word_size;
-    std::memcpy(&word_size, base_region+offset, sizeof(word_size));
-    offset+=sizeof(word_size);
+    std::memcpy(&word_size, base_region + offset, sizeof(word_size));
+    offset += sizeof(word_size);
 
     // Deserialize the word associated with the PostingList
     std::string word(word_size, '\0');
-    std::memcpy(word.data(), base_region+offset, word_size);
+    std::memcpy(word.data(), base_region + offset, word_size);
     offset += word_size;
     list.word = word;
 
@@ -223,13 +225,16 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
 
         for (uint32_t j = 0; j < num_entries; ++j) {
             size_t bytes_read = 0;
-            uint32_t delta = decodeVB(reinterpret_cast<const uint8_t*>(base_region + offset), bytes_read);
+            uint32_t delta =
+                decodeVB(reinterpret_cast<const uint8_t*>(base_region + offset),
+                         bytes_read);
             offset += bytes_read;
             uint32_t abs_pos = prev_pos + delta;
             prev_pos = abs_pos;
 
             uint8_t location_raw;
-            std::memcpy(&location_raw, base_region + offset, sizeof(location_raw));
+            std::memcpy(&location_raw, base_region + offset,
+                        sizeof(location_raw));
             offset += sizeof(location_raw);
 
             wordlocation_t location = static_cast<wordlocation_t>(location_raw);

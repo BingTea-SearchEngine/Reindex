@@ -1,5 +1,3 @@
-#include <utility>
-
 #include "DocStream.hpp"
 
 std::string strip_utf8_spaces(const std::string& input) {
@@ -22,7 +20,8 @@ std::string strip_utf8_spaces(const std::string& input) {
         // UTF-8 en/em/thin/narrow spaces (U+2002 – U+200B or so)
         if (i + 2 < input.size() && c == 0xE2 && input[i + 1] == 0x80) {
             unsigned char third = input[i + 2];
-            if (third == 0x82 || third == 0x83 || third == 0x89 || third == 0xAF) {
+            if (third == 0x82 || third == 0x83 || third == 0x89 ||
+                third == 0xAF) {
                 i += 3;
                 continue;
             }
@@ -35,7 +34,7 @@ std::string strip_utf8_spaces(const std::string& input) {
 
 bool is_ascii(const std::string& word) {
     return std::all_of(word.begin(), word.end(), [](unsigned char c) {
-        return c >= 32 && c <= 126; // printable ASCII
+        return c >= 32 && c <= 126;  // printable ASCII
         // or use: return c < 128; for strict 7-bit ASCII
     });
 }
@@ -65,8 +64,9 @@ DocStream::DocStream(std::string dirPath, std::string dictionaryPath)
     }
 
     std::string word;
-    while(std::getline(dictFile, word)) {
-        word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
+    while (std::getline(dictFile, word)) {
+        word.erase(std::remove_if(word.begin(), word.end(), ::isspace),
+                   word.end());
         _dictionary.insert(word);
     }
 }
@@ -92,11 +92,13 @@ DocStreamOutput DocStream::nextFile() {
     }
 
     // Get first line that contains URL
-    std::regex url_regex(R"(URL:\s*(\S+)\s+D)");
+    std::regex url_doc_regex(R"(URL:\s*(\S+)\s+Doc number:\s*(\d+))");
     std::smatch match;
     std::string url;
-    if (std::regex_search(line, match, url_regex)) {
+    uint32_t docNum;
+    if (std::regex_search(line, match, url_doc_regex)) {
         url = match[1];
+        docNum = std::stoi(match[2]);
     } else {
         std::cerr << "No URL found!" << std::endl;
         return out;
@@ -118,7 +120,7 @@ DocStreamOutput DocStream::nextFile() {
     uint32_t numTitleWords = 0;
     while (titleIss >> word) {
         std::transform(word.begin(), word.end(), word.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
+                       [](unsigned char c) { return std::tolower(c); });
         word = strip_utf8_spaces(word);
         if (is_ascii(word)) {
             output.push_back(word_t{word, offset, wordlocation_t::title});
@@ -143,7 +145,7 @@ DocStreamOutput DocStream::nextFile() {
     std::istringstream bodyIss(line);
     while (bodyIss >> word) {
         std::transform(word.begin(), word.end(), word.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
+                       [](unsigned char c) { return std::tolower(c); });
         word = strip_utf8_spaces(word);
 
         if (is_ascii(word)) {
@@ -172,8 +174,12 @@ DocStreamOutput DocStream::nextFile() {
         numOutLinks++;
     }
 
-    out.metadata = {static_cast<uint32_t>(output.size()), numTitleWords,
-                    numOutLinks, 0.0, 0.0};
+    out.metadata = {static_cast<uint32_t>(output.size()),
+                    numTitleWords,
+                    numOutLinks,
+                    0.0,
+                    0.0,
+                    docNum};
 
     //Check <prank> tag
     std::getline(document, line);

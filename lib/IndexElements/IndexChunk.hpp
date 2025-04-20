@@ -55,6 +55,13 @@ class IndexChunk {
     const std::unordered_map<std::string, PostingList>& GetAllPostingLists();
 
     /*
+     * @brief Get the current offset the index chunk is at
+     *
+     * @return The current offset of the index chunk
+     * */
+    uint32_t GetCurrentOffset();
+
+    /*
      * @brief Prints the contents of the IndexChunk
      * */
     void Print() const;

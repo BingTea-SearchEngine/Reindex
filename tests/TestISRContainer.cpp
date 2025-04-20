@@ -211,7 +211,8 @@ TEST_F(ContainerISR, SimpleNext) {
 
     ISR* ISR_word_costco = new ISRWord(index["costco"]);
 
-    ISR* ISR_granola_bar_container_no_costco = new ISRContainer(ISR_granola_AND_bar, ISR_word_costco);
+    ISR* ISR_granola_bar_container_no_costco =
+        new ISRContainer(ISR_granola_AND_bar, ISR_word_costco);
 
     EXPECT_EQ(ISR_granola_bar_container_no_costco->GetCurrentPostEntry(),
               std::nullopt);
@@ -279,7 +280,8 @@ TEST_F(ContainerISR, SimpleSeekAndNext) {
     ISR* ISR_word_best = new ISRWord(index["best"]);
     ISR* ISR_word_mcdonalds = new ISRWord(index["mcdonalds"]);
 
-    ISR* ISR_best_no_mcdonalds = new ISRContainer(ISR_word_best, ISR_word_mcdonalds);
+    ISR* ISR_best_no_mcdonalds =
+        new ISRContainer(ISR_word_best, ISR_word_mcdonalds);
 
     EXPECT_EQ(ISR_best_no_mcdonalds->GetCurrentPostEntry(), std::nullopt);
 

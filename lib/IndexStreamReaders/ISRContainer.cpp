@@ -3,8 +3,7 @@
 #include "ISRContainer.hpp"
 
 ISRContainer::ISRContainer(ISR* includedISR, ISR* excludedISR)
-    : included(includedISR),
-      currentPostEntry(std::nullopt) {
+    : included(includedISR), currentPostEntry(std::nullopt) {
     excludedISR->NextDocument();
     while (excludedISR->GetCurrentPostEntry() != std::nullopt) {
         excludedDocuments.insert(excludedISR->GetDocumentName());

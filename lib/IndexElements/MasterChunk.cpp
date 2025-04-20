@@ -129,6 +129,7 @@ void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words,
                      _indexChunks.size());
         spdlog::info("Number of documents indexed so far {}", _numDocuments);
     }
+    metadata.docStartOffset = _currIndexChunk.GetCurrentOffset();
     _currIndexChunk.AddDocument(doc, words);
     _currMetadataChunk.AddDocument(doc, metadata);
     _numDocuments++;
