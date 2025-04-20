@@ -106,11 +106,11 @@ class SearchWord: public Expression {
 protected:
 
     std::string value;
-    const std::unordered_map<std::string, PostingList> index;
+    const std::unordered_map<std::string, PostingList>* index;
 
 public:
 
-    SearchWord(std::string valuein, const std::unordered_map<std::string, PostingList> indexin);
+    SearchWord(std::string valuein, const std::unordered_map<std::string, PostingList>* indexin);
     ISR* Eval() const override;
     
     std::string GetString() const override;

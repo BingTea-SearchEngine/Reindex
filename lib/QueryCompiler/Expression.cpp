@@ -91,6 +91,7 @@ std::string BaseConstraint::GetString() const{
     else if(type == "Not"){ // not ISR only has two fields
         return "NotISR(" + SCs[0]->GetString() + ", " + SCs[1]->GetString() + ")";
     }
+    return "Error";
 }
 // class BaseConstraint
 
@@ -164,12 +165,12 @@ std::string NestedConstraint::GetString() const{ // just needs to eval inner
 // class NestedConstraint
 
 // <SearchWord> lowest level
-SearchWord::SearchWord(std::string valuein, const std::unordered_map<std::string, PostingList> indexin): value(valuein), index(indexin) {}
+SearchWord::SearchWord(std::string valuein, const std::unordered_map<std::string, PostingList>* indexin): value(valuein), index(indexin) {}
         
 ISR* SearchWord::Eval() const{
     //return new ISRWord(index.getpostinglist(value)); // TODO: eventually get a posting list from the actual index
-    auto it = index.find(value);
-    if (it == index.end()) {
+    auto it = index->find(value);
+    if (it == index->end()) {
         return nullptr; 
     }
     return new ISRWord(it->second);
