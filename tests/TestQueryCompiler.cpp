@@ -45,7 +45,7 @@ class QueryCompilerTest : public ::testing::Test {
 
 TEST_F(QueryCompilerTest, AndQuery) {
     std::string input = "amazon store";  // implicit AND
-    Parser parser(input, index);
+    Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);  // Parsing succeeded
     std::cout << expr->GetString() << std::endl;
@@ -69,7 +69,7 @@ TEST_F(QueryCompilerTest, AndQuery) {
 
 TEST_F(QueryCompilerTest, AndNotQuery) {
     std::string input = "(granola bar) NOT costco";
-    Parser parser(input, index);
+    Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
     std::cout << expr->GetString() << std::endl;
@@ -89,7 +89,7 @@ TEST_F(QueryCompilerTest, AndNotQuery) {
 
 TEST_F(QueryCompilerTest, Phrase) {
     std::string input = "\"i went to the store\"";
-    Parser parser(input, index);
+    Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
     std::cout << expr->GetString() << std::endl;
@@ -109,7 +109,7 @@ TEST_F(QueryCompilerTest, Phrase) {
 
 TEST_F(QueryCompilerTest, OR) {
     std::string input = "(Granola OR protein) bar";
-    Parser parser(input, index);
+    Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
     std::cout << expr->GetString() << std::endl;
@@ -138,7 +138,7 @@ TEST_F(QueryCompilerTest, OR) {
 
 TEST_F(QueryCompilerTest, PhraseOR) {
     std::string input = "\"Granola Bar\" OR \"Protein Bar\"";
-    Parser parser(input, index);
+    Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
     std::cout << expr->GetString() << std::endl;
@@ -161,7 +161,7 @@ TEST_F(QueryCompilerTest, PhraseOR) {
 
 TEST_F(QueryCompilerTest, PhraseORNOT) {
     std::string input = "(\"Granola Bar\" OR \"Protein Bar\") NOT Costco";
-    Parser parser(input, index);
+    Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
     std::cout << expr->GetString() << std::endl;

@@ -2,9 +2,8 @@
 
 #include "Parser.hpp"
 
-Parser::Parser(const std::string& query,
-               const std::unordered_map<std::string, PostingList>& indexin)
-    : stream(query), index(indexin) {}
+
+Parser::Parser(const std::string &query, const std::unordered_map<std::string, PostingList>* indexin): stream(query), index(indexin) {}
 
 // <Constraint> ::= <BaseConstraint> { <OrOp> <BaseConstraint> }
 Expression* Parser::FindConstraint() {

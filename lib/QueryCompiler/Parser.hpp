@@ -8,10 +8,9 @@
 #include "Tokenizer.hpp"
 
 class Parser {
-   private:
-    Tokenstream stream;  // tokenstream to parse
-    const std::unordered_map<std::string, PostingList>
-        index;  // pass in the index for now
+private:
+    Tokenstream stream; // tokenstream to parse
+    const std::unordered_map<std::string, PostingList>* index; // pass in the index for now
 
     // Find various parts of the grammar, return nullptr if not found
     Expression* FindConstraint();
@@ -28,8 +27,7 @@ class Parser {
 
    public:
     // construct stream based on a query
-    Parser(const std::string& query,
-           const std::unordered_map<std::string, PostingList>& indexin);
+    Parser(const std::string &query, const std::unordered_map<std::string, PostingList>* indexin);
 
     // Builds the tree
     Expression* Parse();
