@@ -7,7 +7,7 @@ ISRContainer::ISRContainer(ISR* includedISR, ISR* excludedISR)
       currentPostEntry(std::nullopt) {
     excludedISR->NextDocument();
     while (excludedISR->GetCurrentPostEntry() != std::nullopt) {
-        excludedDocuments.insert(excludedISR->GetDocumentName());
+        excludedDocuments.insert(excludedISR->GetDocumentID());
         excludedISR->NextDocument();
     }
 }
@@ -28,16 +28,16 @@ std::optional<PostEntry> ISRContainer::GetCurrentPostEntry() {
     return this->included->GetCurrentPostEntry();
 }
 
-std::string ISRContainer::GetDocumentName() {
+uint32_t ISRContainer::GetDocumentID() {
     assert(this->currentPostEntry.has_value() &&
-           "GetDocumentName called when this ISR is not pointing to anything");
-    return this->included->GetDocumentName();
+           "GetDocumentID called when this ISR is not pointing to anything");
+    return this->included->GetDocumentID();
 }
 
 std::optional<PostEntry> ISRContainer::Next() {
     while (this->included->Next() != std::nullopt) {
         this->currentPostEntry = this->included->GetCurrentPostEntry();
-        if (this->excludedDocuments.find(this->included->GetDocumentName()) ==
+        if (this->excludedDocuments.find(this->included->GetDocumentID()) ==
             this->excludedDocuments.end()) {
             return this->currentPostEntry;
         }
@@ -50,7 +50,7 @@ std::optional<PostEntry> ISRContainer::Next() {
 std::optional<PostEntry> ISRContainer::NextDocument() {
     while (this->included->NextDocument() != std::nullopt) {
         this->currentPostEntry = this->included->GetCurrentPostEntry();
-        if (this->excludedDocuments.find(this->included->GetDocumentName()) ==
+        if (this->excludedDocuments.find(this->included->GetDocumentID()) ==
             this->excludedDocuments.end()) {
             return this->currentPostEntry;
         }
@@ -68,7 +68,7 @@ std::optional<PostEntry> ISRContainer::Seek(size_t target) {
 
     this->currentPostEntry = this->included->GetCurrentPostEntry();
 
-    if (this->excludedDocuments.find(this->included->GetDocumentName()) ==
+    if (this->excludedDocuments.find(this->included->GetDocumentID()) ==
         this->excludedDocuments.end()) {
         return this->currentPostEntry;
     }

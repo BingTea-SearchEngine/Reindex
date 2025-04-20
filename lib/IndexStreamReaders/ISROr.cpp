@@ -26,10 +26,10 @@ std::optional<PostEntry> ISROr::GetCurrentPostEntry() {
     return this->currentPostEntry;
 }
 
-std::string ISROr::GetDocumentName() {
+uint32_t ISROr::GetDocumentID() {
     assert(this->currentPostEntry.has_value() &&
-           "GetDocumentName called when this ISR is not pointing to anything");
-    return (this->childISRs)[this->nearestTerm]->GetDocumentName();
+           "GetDocumentID called when this ISR is not pointing to anything");
+    return (this->childISRs)[this->nearestTerm]->GetDocumentID();
 }
 
 // helper function to update the internal marker variables
@@ -143,9 +143,9 @@ std::optional<PostEntry> ISROr::NextDocument() {
         return this->currentPostEntry;
     }
 
-    std::string prevDocumentName = this->GetDocumentName();
+    uint32_t prevDocumentID = this->GetDocumentID();
 
-    while (this->GetDocumentName() == prevDocumentName) {
+    while (this->GetDocumentID() == prevDocumentID) {
         if (this->childISRs[this->nearestTerm]->NextDocument() ==
             std::nullopt) {
             this->whichChildFinished[this->nearestTerm] = true;

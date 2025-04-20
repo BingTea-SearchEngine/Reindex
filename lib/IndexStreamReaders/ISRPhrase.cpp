@@ -26,10 +26,10 @@ std::optional<PostEntry> ISRPhrase::GetCurrentPostEntry() {
     return this->currentPostEntry;
 }
 
-std::string ISRPhrase::GetDocumentName() {
+uint32_t ISRPhrase::GetDocumentID() {
     assert(this->currentPostEntry.has_value() &&
-           "GetDocumentName called when this ISR is not pointing to anything");
-    return this->childISRs[nearestTerm]->GetDocumentName();
+           "GetDocumentID called when this ISR is not pointing to anything");
+    return this->childISRs[nearestTerm]->GetDocumentID();
 }
 
 // PRECONDITION: for this helper function to be called,
@@ -67,19 +67,19 @@ void ISRPhrase::UpdateMarkers() {
 // are pointing to the same document AND are all consecutive
 // occurrences in order
 bool ISRPhrase::ChildrenFormPhrase() {
-    std::string prevDocumentName;
+    uint32_t prevDocumentID;
     int prevOccurrence;
     bool first = true;
 
     for (auto& child : childISRs) {
         if (first) {
-            prevDocumentName = child->GetDocumentName();
+            prevDocumentID = child->GetDocumentID();
             prevOccurrence = child->GetStartLocation();
             first = false;
             continue;
         }
 
-        if (child->GetDocumentName() != prevDocumentName) {
+        if (child->GetDocumentID() != prevDocumentID) {
             return false;
         }
 
@@ -101,8 +101,8 @@ bool ISRPhrase::CatchUpStragglerISRs() {
         // .................y........
         // .........................z
         // move forward the proper stragglers until they're hopefully RIGHT NEXT TO z
-        std::string potentialTargetDocument =
-            (this->childISRs)[this->farthestTerm]->GetDocumentName();
+        uint32_t potentialTargetDocument =
+            (this->childISRs)[this->farthestTerm]->GetDocumentID();
         size_t baselineLocation =
             (this->childISRs)[this->farthestTerm]->GetStartLocation();
 
@@ -111,8 +111,8 @@ bool ISRPhrase::CatchUpStragglerISRs() {
                 continue;
             }
 
-            std::string currentDocument =
-                (this->childISRs)[i]->GetDocumentName();
+            uint32_t currentDocument =
+                (this->childISRs)[i]->GetDocumentID();
             size_t currLocation = (this->childISRs)[i]->GetStartLocation();
 
             // let's say there are child ISRs a, b, c, and d
