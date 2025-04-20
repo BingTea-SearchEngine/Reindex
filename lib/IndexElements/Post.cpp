@@ -4,10 +4,10 @@
 
 Post::Post() {}
 
-Post::Post(std::string name) : document_name(name), entries() {}
+Post::Post(uint32_t docID) : docID(docID), entries() {}
 
-std::string Post::GetDocumentName() const {
-    return document_name;
+uint32_t Post::GetDocumentID() const {
+    return docID;
 }
 
 std::vector<PostEntry> Post::GetEntries() const {
@@ -19,7 +19,7 @@ void Post::AddWord(PostEntry word) {
 }
 
 void Post::Print() const {
-    cout << "\tPost{ " << document_name << " }: " << entries.size()
+    cout << "\tPost{ " << docID << " }: " << entries.size()
          << " entries" << endl;
     cout << "\t\t";
     for (const PostEntry& entry : entries) {
@@ -30,17 +30,21 @@ void Post::Print() const {
 }
 
 void Post::Serialize(char* base_region, size_t& offset, const Post& post) {
-    // Serialize size of document name
-    uint16_t document_name_size =
-        static_cast<uint16_t>(post.document_name.size());
-    std::memcpy(base_region + offset, &document_name_size,
-                sizeof(document_name_size));
-    offset += sizeof(document_name_size);
+    // // Serialize size of document name
+    // uint16_t document_name_size =
+    //     static_cast<uint16_t>(post.document_name.size());
+    // std::memcpy(base_region + offset, &document_name_size,
+    //             sizeof(document_name_size));
+    // offset += sizeof(document_name_size);
 
-    // Serialize document name
-    std::memcpy(base_region + offset, post.document_name.c_str(),
-                document_name_size);
-    offset += document_name_size;
+    // // Serialize document name
+    // std::memcpy(base_region + offset, post.document_name.c_str(),
+    //             document_name_size);
+    // offset += document_name_size;
+
+    // Serialize the ID of this document
+    std::memcpy(base_region + offset, &post.docID, sizeof(post.docID));
+    offset += sizeof(post.docID);
 
     // Serialize the vector of word occurrences
     uint32_t num_words = static_cast<uint32_t>(post.entries.size());
@@ -56,17 +60,22 @@ void Post::Serialize(char* base_region, size_t& offset, const Post& post) {
 Post Post::Deserialize(char* base_region, size_t& offset) {
     Post post;
 
-    // Deserialize size of document name
-    uint16_t document_name_size;
-    std::memcpy(&document_name_size, base_region + offset,
-                sizeof(document_name_size));
-    offset += sizeof(document_name_size);
+    // // Deserialize size of document name
+    // uint16_t document_name_size;
+    // std::memcpy(&document_name_size, base_region + offset,
+    //             sizeof(document_name_size));
+    // offset += sizeof(document_name_size);
 
-    // Deserialize document name
-    std::string document_name(document_name_size, '\0');
-    std::memcpy(document_name.data(), base_region + offset, document_name_size);
-    offset += document_name_size;
-    post.document_name = document_name;
+    // // Deserialize document name
+    // std::string document_name(document_name_size, '\0');
+    // std::memcpy(document_name.data(), base_region + offset, document_name_size);
+    // offset += document_name_size;
+    // post.document_name = document_name;
+
+    uint32_t docID = 0;
+    std::memcpy(&docID, base_region + offset, sizeof(docID));
+    offset += sizeof(docID);
+    post.docID = docID;
 
     // Deserialize the number of words in the vector
     uint32_t num_of_words;

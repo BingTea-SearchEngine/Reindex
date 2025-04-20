@@ -15,16 +15,16 @@ std::string PostingList::GetWord() {
     return word;
 }
 
-size_t PostingList::AddWord(std::string doc, PostEntry word) {
+size_t PostingList::AddWord(uint32_t docID, PostEntry word) {
     size_t bytesRequired = 0;
     if (posts.empty()) {
-        posts.emplace_back(doc);
-        bytesRequired += doc.size() + 1;
+        posts.emplace_back(docID);
+        bytesRequired += sizeof(docID);
     }
 
-    if (doc != posts.back().GetDocumentName()) {
-        posts.emplace_back(doc);
-        bytesRequired += doc.size() + 1;
+    if (docID != posts.back().GetDocumentID()) {
+        posts.emplace_back(docID);
+        bytesRequired += sizeof(docID);
     }
 
     posts.back().AddWord(word);
@@ -121,10 +121,15 @@ void PostingList::NewSerialize(char* base_region, size_t& offset,
 
     uint32_t prev_position = 0;
     for (auto& post : postingList.posts) {
-        // Serialize the document name
-        size_t document_name_size = post.GetDocumentName().size() + 1;  // account for null terminator
-        std::memcpy(base_region + offset, post.GetDocumentName().c_str(), document_name_size);
-        offset += document_name_size;
+        // // Serialize the document name
+        // size_t document_name_size = post.GetDocumentName().size() + 1;  // account for null terminator
+        // std::memcpy(base_region + offset, post.GetDocumentName().c_str(), document_name_size);
+        // offset += document_name_size;
+
+        // Serialize the document ID
+        uint32_t docID = post.GetDocumentID();
+        std::memcpy(base_region + offset, &docID, sizeof(docID));
+        offset += sizeof(docID);
 
         const auto& entries = post.GetEntries();
         size_t num_entries = entries.size();
@@ -212,10 +217,15 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
 
     uint32_t prev_pos = 0;
     for (size_t i = 0; i < num_posts; ++i) {
-        std::string docName(base_region + offset);
+        uint32_t docID = 0;
+        std::memcpy(&docID, base_region + offset, sizeof(docID));
 
-        Post post(docName);
-        offset += post.GetDocumentName().size() + 1;
+        Post post(docID);
+        offset += sizeof(docID);
+        // std::string docName(base_region + offset);
+
+        // Post post(docName);
+        // offset += post.GetDocumentName().size() + 1;
 
         size_t num_entries;
         std::memcpy(&num_entries, base_region + offset, sizeof(num_entries));

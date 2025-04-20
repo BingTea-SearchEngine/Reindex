@@ -20,18 +20,18 @@ class Post {
     Post();
 
     /**
-         * @brief Constructs a Post with a specified name.
+         * @brief Constructs a Post with a specified ID.
          * 
-         * @param name The name of the document.
+         * @param docID The ID of the document.
         */
-    Post(std::string name);
+    Post(uint32_t docID);
 
     /**
-         * @brief Returns the name of this document that this Post represents.
+         * @brief Returns the ID of this document that this Post represents.
          * 
-         * @return A std::string of the document's name.
+         * @return The document's ID.
          */
-    std::string GetDocumentName() const;
+    uint32_t GetDocumentID() const;
 
     /**
          * @brief Returns a vector containing all word occurrences (PostEntry objects) in the post.
@@ -93,8 +93,8 @@ class Post {
     static Post Deserialize(char* base_region, size_t& offset);
 
    private:
-    /// The name of the document.
-    std::string document_name;
+    /// The ID of the document.
+    uint32_t docID;
 
     /// A vector containing the word occurrences (PostEntry objects) in the document that
     /// pertain to the specifc word this PostingList represents.
