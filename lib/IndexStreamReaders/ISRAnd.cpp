@@ -10,6 +10,12 @@ ISRAnd::ISRAnd(std::vector<ISR*> children)
       nearestStartLocation(-1),
       nearestEndLocation(-1) {}
 
+ISRAnd::~ISRAnd(){
+    for(auto child : childISRs){
+        delete child;
+    }
+}
+
 int ISRAnd::GetStartLocation() {
     assert(this->currentPostEntry.has_value() &&
            "GetStartLocation called when this ISR is not pointing to anything");

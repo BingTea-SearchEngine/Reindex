@@ -23,6 +23,11 @@ class ISRPhrase : public ISR {
     ISRPhrase(std::vector<ISR*> children);
 
     /**
+     * @brief Deletes all children ISRs
+    */
+    ~ISRPhrase() override;
+
+    /**
      * @brief Returns the absolute location of the earliest occurrence
      *        among the child ISRs at this moment.
      * 

@@ -39,7 +39,7 @@ protected:
     }
 };
 
-TEST_F(QueryCompilerTest, AndQuery) {
+TEST_F(QueryCompilerTest, AND) {
     std::string input = "amazon store";  // implicit AND
     Parser parser(input, &index);
     Expression* expr = parser.Parse();
@@ -61,9 +61,10 @@ TEST_F(QueryCompilerTest, AndQuery) {
     EXPECT_FALSE(post.has_value());  // Should be exhausted
 
     delete expr;
+    delete root;
 }
 
-TEST_F(QueryCompilerTest, AndNotQuery) {
+TEST_F(QueryCompilerTest, ANDNOT) {
     std::string input = "(granola bar) NOT costco";
     Parser parser(input, &index);
     Expression* expr = parser.Parse();
@@ -81,6 +82,7 @@ TEST_F(QueryCompilerTest, AndNotQuery) {
     EXPECT_FALSE(post.has_value());
 
     delete expr;
+    delete root;
 }
 
 TEST_F(QueryCompilerTest, Phrase) {
@@ -101,9 +103,10 @@ TEST_F(QueryCompilerTest, Phrase) {
     EXPECT_FALSE(post.has_value());
 
     delete expr;
+    delete root;
 }
 
-TEST_F(QueryCompilerTest, OR) {
+TEST_F(QueryCompilerTest, ORAND) {
     std::string input = "(Granola OR protein) bar";
     Parser parser(input, &index);
     Expression* expr = parser.Parse();
@@ -130,6 +133,7 @@ TEST_F(QueryCompilerTest, OR) {
     EXPECT_FALSE(post.has_value());
 
     delete expr;
+    delete root;
 }
 
 TEST_F(QueryCompilerTest, PhraseOR) {
@@ -153,6 +157,7 @@ TEST_F(QueryCompilerTest, PhraseOR) {
     EXPECT_FALSE(post.has_value());
 
     delete expr;
+    delete root;
 }
 
 TEST_F(QueryCompilerTest, PhraseORNOT) {
@@ -173,4 +178,5 @@ TEST_F(QueryCompilerTest, PhraseORNOT) {
     EXPECT_FALSE(post.has_value());
 
     delete expr;
+    delete root;
 }
