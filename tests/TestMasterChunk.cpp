@@ -19,21 +19,21 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
     master.AddDocument("doc1", w, m);
     master.AddDocument("doc2", w, m);
     master.Flush();
-    //
-    // std::cout << "flushed everything" << std::endl;
-    //
-    // std::string filePath = "test_master_chunk";
-    // int fd = -1;
-    // void* base_region = create_mmap_region(fd, 4098, filePath);
-    //
-    // size_t offset = 0;
-    // MasterChunk::Serialize(static_cast<char*>(base_region), offset, master);
-    //
-    // munmap(base_region, 4098);
-    // if (ftruncate(fd, offset) == -1) {
-    //     perror("Error truncating file");
-    // }
-    // close(fd);
+
+    std::cout << "flushed everything" << std::endl;
+
+    std::string filePath = "test_master_chunk";
+    int fd = -1;
+    void* base_region = create_mmap_region(fd, 4098, filePath);
+
+    size_t offset = 0;
+    MasterChunk::Serialize(static_cast<char*>(base_region), offset, master);
+
+    munmap(base_region, 4098);
+    if (ftruncate(fd, offset) == -1) {
+        perror("Error truncating file");
+    }
+    close(fd);
     //
     // std::cout << "serialized" << std::endl;
     //
