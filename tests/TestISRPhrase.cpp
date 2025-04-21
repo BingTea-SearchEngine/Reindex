@@ -197,8 +197,8 @@ class PhraseISR : public ::testing::Test {
                         index[word].AddWord(docID,
                                             {word_counter, wordlocation_t::body});
                         word_counter++;
-                        docID++;
                     }
+                    docID++;
                 }
             }
 };

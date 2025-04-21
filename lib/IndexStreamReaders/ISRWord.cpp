@@ -8,7 +8,8 @@ ISRWord::ISRWord(const PostingList& pL)
       currentPostEntry(std::nullopt),
       currentPostEntryIdx(-1),
       absoluteLocation(-1),
-      documentID(0) {
+      documentID(0),
+      numOccurrences(0) {
     this->documentCount = this->postingList.GetPosts().size();
 
     for (auto& post : this->postingList.GetPosts()) {

@@ -196,8 +196,8 @@ class WordISR : public ::testing::Test {
                         index[word].AddWord(docID,
                                             {word_counter, wordlocation_t::body});
                         word_counter++;
-                        docID++;
                     }
+                    docID++;
                 }
             }
 };
@@ -209,8 +209,7 @@ TEST_F(WordISR, SimpleNext) {
     EXPECT_EQ(
         static_cast<ISRWord*>(ISR_word_megastore)->GetDocumentCount(),
         1);  // downward cast because polymorphism and ISR_word has these methods but ISR does not
-    EXPECT_EQ(
-        static_cast<ISRWord*>(ISR_word_megastore)->GetNumberOfOccurrences(), 1);
+    EXPECT_EQ( static_cast<ISRWord*>(ISR_word_megastore)->GetNumberOfOccurrences(), 1);
 
     EXPECT_EQ(ISR_word_megastore->Next()->GetDelta(), 21);
     EXPECT_EQ(ISR_word_megastore->GetCurrentPostEntry()->GetDelta(), 21);
