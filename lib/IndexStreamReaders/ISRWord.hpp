@@ -48,13 +48,13 @@ class ISRWord : public ISR {
     virtual std::optional<PostEntry> GetCurrentPostEntry() override;
 
     /**
-     * @brief Returns the document name this ISR is pointing at.
+     * @brief Returns the document ID this ISR is pointing at.
      * 
-     * @return The name of the document this ISR is currently on.
+     * @return The ID of the document this ISR is currently on.
      * 
      * @pre The ISR must currently be pointing to a valid PostEntry.
      */
-    virtual std::string GetDocumentName() override;
+    virtual uint32_t GetDocumentID() override;
 
     /**
      * @brief Returns the number of documents that this term appears in
@@ -118,8 +118,8 @@ class ISRWord : public ISR {
     /// to the start of this index chunk.
     int absoluteLocation;
 
-    /// The name of the document this ISR is currently pointing at.
-    std::string documentName;
+    /// The ID of the document this ISR is currently pointing at.
+    uint32_t documentID;
 
     /// The amount of documents that this word appears in.
     int documentCount;

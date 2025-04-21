@@ -106,6 +106,13 @@ class IndexChunk {
     friend class MasterChunk;
     // Set of documents in this index chunk
     std::vector<std::string> _documents;
+
+    // map from document ID to document name
+    std::unordered_map<uint32_t, std::string> docID_to_doc_name;
+
+    // int documentID (monotonically increasing)
+    uint32_t documentID;
+
     // Word to posting list map
     std::unordered_map<std::string, PostingList> _postingLists;
     // Estimation of bytes required to serialize this index chunk. Need to test if it is accurate

@@ -55,13 +55,13 @@ class ISRPhrase : public ISR {
     virtual std::optional<PostEntry> GetCurrentPostEntry() override;
 
     /**
-       * @brief Returns the document name this ISR is pointing at.
-       * 
-       * @return The name of the document this ISR is currently on
-       * 
-       * @pre The ISR must currently be pointing to a valid PostEntry.
-       */
-    virtual std::string GetDocumentName() override;
+     * @brief Returns the document ID this ISR is pointing at.
+     * 
+     * @return The ID of the document this ISR is currently on.
+     * 
+     * @pre The ISR must currently be pointing to a valid PostEntry.
+     */
+    virtual uint32_t GetDocumentID() override;
 
     /**
       * @brief Returns the next PostEntry that matches the occurrence of

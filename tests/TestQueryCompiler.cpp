@@ -29,14 +29,18 @@ class QueryCompilerTest : public ::testing::Test {
 
     void SetUp() override {
         uint32_t word_counter = 0;
+        uint32_t docID = 1;
         for (const auto& doc : documents) {
-            for (const auto& word : doc.words) {
+            for (size_t i = 0; i < doc.words.size(); ++i) {
+                const std::string& word = doc.words[i];
                 if (index.find(word) == index.end()) {
                     index[word] = PostingList(word);
                 }
-                index[word].AddWord(doc.name, {word_counter, wordlocation_t::body});
+                index[word].AddWord(docID,
+                                    {word_counter, wordlocation_t::body});
                 word_counter++;
             }
+            docID++;
         }
     }
 };
@@ -53,11 +57,11 @@ TEST_F(QueryCompilerTest, AND) {
 
     auto post = root->Next();
     ASSERT_TRUE(post.has_value());
-    EXPECT_EQ(root->GetDocumentName(), "Document 3");
+    EXPECT_EQ(root->GetDocumentID(), 3);
 
     post = root->Next();
     ASSERT_TRUE(post.has_value());
-    EXPECT_EQ(root->GetDocumentName(), "Document 3");
+    EXPECT_EQ(root->GetDocumentID(), 3);
 
     post = root->Next();
     EXPECT_FALSE(post.has_value());  // Should be exhausted
@@ -78,7 +82,7 @@ TEST_F(QueryCompilerTest, ANDNOT) {
 
     auto post = root->Next();
     ASSERT_TRUE(post.has_value());
-    EXPECT_EQ(root->GetDocumentName(), "Document 1");
+    EXPECT_EQ(root->GetDocumentID(), 1);
 
     post = root->Next();
     EXPECT_FALSE(post.has_value());
@@ -99,7 +103,7 @@ TEST_F(QueryCompilerTest, Phrase) {
 
     auto post = root->Next();
     ASSERT_TRUE(post.has_value());
-    EXPECT_EQ(root->GetDocumentName(), "Document 1");
+    EXPECT_EQ(root->GetDocumentID(), 1);
 
     post = root->Next();
     EXPECT_FALSE(post.has_value());
@@ -120,16 +124,16 @@ TEST_F(QueryCompilerTest, ORAND) {
 
     auto post = root->Next();
     ASSERT_TRUE(post.has_value());
-    EXPECT_EQ(root->GetDocumentName(), "Document 1");
+    EXPECT_EQ(root->GetDocumentID(), 1);
 
     post = root->Next();
-    EXPECT_EQ(root->GetDocumentName(), "Document 2");
+    EXPECT_EQ(root->GetDocumentID(), 2);
 
     post = root->Next();
-    EXPECT_EQ(root->GetDocumentName(), "Document 2");
+    EXPECT_EQ(root->GetDocumentID(), 2);
 
     post = root->Next();
-    EXPECT_EQ(root->GetDocumentName(), "Document 4");
+    EXPECT_EQ(root->GetDocumentID(), 4);
 
     post = root->Next();
     EXPECT_FALSE(post.has_value());
@@ -150,10 +154,10 @@ TEST_F(QueryCompilerTest, PhraseOR) {
 
     auto post = root->Next();
     ASSERT_TRUE(post.has_value());
-    EXPECT_EQ(root->GetDocumentName(), "Document 1");
+    EXPECT_EQ(root->GetDocumentID(), 1);
 
     post = root->Next();
-    EXPECT_EQ(root->GetDocumentName(), "Document 2");
+    EXPECT_EQ(root->GetDocumentID(), 2);
 
     post = root->Next();
     EXPECT_FALSE(post.has_value());
@@ -174,7 +178,7 @@ TEST_F(QueryCompilerTest, PhraseORNOT) {
 
     auto post = root->Next();
     ASSERT_TRUE(post.has_value());
-    EXPECT_EQ(root->GetDocumentName(), "Document 1");
+    EXPECT_EQ(root->GetDocumentID(), 1);
 
     post = root->Next();
     EXPECT_FALSE(post.has_value());

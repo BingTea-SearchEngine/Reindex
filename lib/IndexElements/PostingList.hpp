@@ -45,10 +45,10 @@ class PostingList {
     /**
          * @brief Adds a new word (PostEntry) to the list of posts in this PostingList.
          *
-         * @param doc The document name where the word is found.
+         * @param docID The ID of the document where the word is found.
          * @param word The PostEntry object that contains the word occurrence information.
          */
-    size_t AddWord(std::string doc, PostEntry word);
+    size_t AddWord(uint32_t docID, PostEntry word);
 
     /**
          * @brief Retrieves the list of posts associated with this PostingList.

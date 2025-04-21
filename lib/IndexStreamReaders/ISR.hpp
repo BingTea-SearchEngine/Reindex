@@ -41,13 +41,13 @@ class ISR {
     virtual std::optional<PostEntry> GetCurrentPostEntry() = 0;
 
     /**
-     * @brief Returns the document name this ISR is pointing at.
+     * @brief Returns the document ID this ISR is pointing at.
      * 
-     * @return The name of the document this ISR is currently on.
+     * @return The ID of the document this ISR is currently on.
      * 
      * @pre The ISR must currently be pointing to a valid PostEntry.
      */
-    virtual std::string GetDocumentName() = 0;
+    virtual uint32_t GetDocumentID() = 0;
 
     /**
      * @brief Returns the next PostEntry that matches the occurrence of
