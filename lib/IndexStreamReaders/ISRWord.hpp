@@ -18,7 +18,7 @@ class ISRWord : public ISR {
      *
      * @param pL A posting list for a particular word.
      */
-    ISRWord(const PostingList& pL);
+    ISRWord(const PostingList* pL);
 
     /**
      * @brief Returns the absolute location of the earliest occurrence
@@ -103,7 +103,7 @@ class ISRWord : public ISR {
 
    private:
     /// The postingList associated with this ISRWord
-    const PostingList& postingList;
+    const PostingList* postingList;
 
     /// The index of the current Post (document Post).
     int currentPostIdx;

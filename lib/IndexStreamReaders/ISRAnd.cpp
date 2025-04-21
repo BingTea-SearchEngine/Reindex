@@ -62,8 +62,7 @@ void ISRAnd::UpdateMarkers() {
     this->farthestTerm = whichChildLatest;
     this->nearestStartLocation = nearestStart;
     this->nearestEndLocation = nearestEnd;
-    this->currentPostEntry =
-        this->childISRs[nearestTerm]->GetCurrentPostEntry();
+    this->currentPostEntry = this->childISRs[nearestTerm]->GetCurrentPostEntry();
 }
 
 // helper function to check if all the current child ISRs
@@ -105,8 +104,7 @@ bool ISRAnd::CatchUpStragglerISRs() {
                 continue;
             }
 
-            std::string currentDocument =
-                (this->childISRs)[i]->GetDocumentName();
+            std::string currentDocument = (this->childISRs)[i]->GetDocumentName();
             if (currentDocument == potentialTargetDocument) {
                 continue;
             }

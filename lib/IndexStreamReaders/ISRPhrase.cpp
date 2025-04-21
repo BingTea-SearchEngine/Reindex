@@ -59,8 +59,7 @@ void ISRPhrase::UpdateMarkers() {
     this->farthestTerm = whichChildLatest;
     this->nearestStartLocation = nearestStart;
     this->nearestEndLocation = nearestEnd;
-    this->currentPostEntry =
-        this->childISRs[nearestTerm]->GetCurrentPostEntry();
+    this->currentPostEntry = this->childISRs[nearestTerm]->GetCurrentPostEntry();
 }
 
 // helper function to check if all the current child ISRs
@@ -103,16 +102,14 @@ bool ISRPhrase::CatchUpStragglerISRs() {
         // move forward the proper stragglers until they're hopefully RIGHT NEXT TO z
         std::string potentialTargetDocument =
             (this->childISRs)[this->farthestTerm]->GetDocumentName();
-        size_t baselineLocation =
-            (this->childISRs)[this->farthestTerm]->GetStartLocation();
+        size_t baselineLocation = (this->childISRs)[this->farthestTerm]->GetStartLocation();
 
         for (int i = 0; i < childISRs.size(); ++i) {
             if (i == this->farthestTerm) {
                 continue;
             }
 
-            std::string currentDocument =
-                (this->childISRs)[i]->GetDocumentName();
+            std::string currentDocument = (this->childISRs)[i]->GetDocumentName();
             size_t currLocation = (this->childISRs)[i]->GetStartLocation();
 
             // let's say there are child ISRs a, b, c, and d
@@ -123,8 +120,7 @@ bool ISRPhrase::CatchUpStragglerISRs() {
             int expectedLocationDifference = i - this->farthestTerm;
 
             if ((currentDocument == potentialTargetDocument) &&
-                (currLocation - baselineLocation ==
-                 expectedLocationDifference)) {
+                (currLocation - baselineLocation == expectedLocationDifference)) {
                 continue;
             }
 

@@ -16,8 +16,7 @@ std::pair<void*, size_t> read_mmap_region(int& fd, std::string filename) {
     size_t fileSize;
     if (fstat(fd, &fileStat) == -1) {
         close(fd);
-        throw std::runtime_error(
-            "Error: Failed to get file size for test_posting_list");
+        throw std::runtime_error("Error: Failed to get file size for test_posting_list");
     }
     fileSize = fileStat.st_size;
 

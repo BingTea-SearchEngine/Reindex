@@ -2,8 +2,9 @@
 
 #include "Parser.hpp"
 
-
-Parser::Parser(const std::string &query, const std::unordered_map<std::string, PostingList>* indexin): stream(query), index(indexin) {}
+Parser::Parser(const std::string& query,
+               const std::unordered_map<std::string, PostingList>* indexin)
+    : stream(query), index(indexin) {}
 
 // <Constraint> ::= <BaseConstraint> { <OrOp> <BaseConstraint> }
 Expression* Parser::FindConstraint() {
@@ -14,10 +15,8 @@ Expression* Parser::FindConstraint() {
     } else {
         return nullptr;
     }
-    while (stream.MatchToken(
-        TokenType::OROP)) {  // can repeat an arbitrary amount of times
-        BC =
-            FindBaseConstraint();  // there needs to be a <BaseConstraint> after every OROP
+    while (stream.MatchToken(TokenType::OROP)) {  // can repeat an arbitrary amount of times
+        BC = FindBaseConstraint();  // there needs to be a <BaseConstraint> after every OROP
         if (BC) {
             BCs.push_back(BC);
         } else {
@@ -47,8 +46,7 @@ Expression* Parser::FindBaseConstraint() {
     }
     while (true) {
         if (stream.MatchToken(TokenType::ANDOP)) {
-            SC =
-                FindSimpleConstraint();  // if there is an ANDOP, a <SimpleConstraint> MUST follow
+            SC = FindSimpleConstraint();  // if there is an ANDOP, a <SimpleConstraint> MUST follow
             if (SC) {
                 SCs.push_back(SC);
             } else {
@@ -62,8 +60,7 @@ Expression* Parser::FindBaseConstraint() {
             break;  // break out of the loop if we hit anything else
         }
     }
-    return new BaseConstraint(
-        SCs, "And");  // new Base Constraint of all SCs ANDed together
+    return new BaseConstraint(SCs, "And");  // new Base Constraint of all SCs ANDed together
 }
 
 // <SimpleConstraint> ::= <Phrase> | <NestedConstraint> | <SearchWord>

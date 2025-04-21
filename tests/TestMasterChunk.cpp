@@ -40,8 +40,7 @@ TEST(BasicMasterChunk, SerialiezDeserialize) {
     int fd2 = -1;
     auto [buf2, size] = read_mmap_region(fd2, filePath);
     offset = 0;
-    MasterChunk master2 =
-        MasterChunk::Deserailize(static_cast<char*>(buf2), offset);
+    MasterChunk master2 = MasterChunk::Deserailize(static_cast<char*>(buf2), offset);
     munmap(buf2, size);
     close(fd2);
 

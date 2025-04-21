@@ -26,10 +26,10 @@ std::string IndexServer::getSnippet(metadata_t docMetadata, uint32_t matchOffset
     std::string snippet;
 
     std::string line;
-    std::getline(file, line); // URL and Doc num line
-    std::getline(file, line); // get <title> tag
-    std::getline(file, line); // get titles
-    
+    std::getline(file, line);  // URL and Doc num line
+    std::getline(file, line);  // get <title> tag
+    std::getline(file, line);  // get titles
+
     std::istringstream titleIss(line);
     std::string word;
     uint32_t offset = 0;
@@ -57,9 +57,9 @@ std::string IndexServer::getSnippet(metadata_t docMetadata, uint32_t matchOffset
         return snippet;
     }
 
-    std::getline(file, line); // get </title>
-    std::getline(file, line); // get <words>
-    std::getline(file, line); // get words
+    std::getline(file, line);  // get </title>
+    std::getline(file, line);  // get <words>
+    std::getline(file, line);  // get words
     std::istringstream wordIss(line);
     while (wordIss >> word) {
         if (offset == snippetStartOffset) {
@@ -82,10 +82,9 @@ std::string IndexServer::getSnippet(metadata_t docMetadata, uint32_t matchOffset
             ++offset;
         }
     }
-    
+
     return snippet;
 }
-
 
 void IndexServer::Start() {
     while (true) {
@@ -111,36 +110,76 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
     spdlog::info("Query: {}", msg.query);
 
     // Parser query
+    std::vector<std::pair<std::string, search_result_t>> docs = findDocuments(msg.query, 100);
 
-    Parser parser(msg.query, &_primaryIndexChunk.GetAllPostingLists());
-    Expression* expr = parser.Parse();
-    // Evaluate query (Call ISRs)
-    std::cout << expr->Eval() << std::endl;
-    auto ISR = expr->Eval();
-    ISR->NextDocument();
+    spdlog::info("Got {} results", docs.size());
 
-    std::vector<std::string> docs;
-    while (ISR->GetCurrentPostEntry() != std::nullopt) {
-        docs.push_back(ISR->GetDocumentName());
-        std::cout << docs.back() << endl;
-        ISR->NextDocument();
+    // Some kind of ranking
+
+    std::vector<doc_t> results;
+    for (const auto& [url, metadata] : docs) {
     }
 
-    // Rank?
+    // documents.push_back(
+    //     doc_t{"https://wwww.google.com", 5, 1231, 4, 0.4, 0.5, "This is google.com"});
+    // ;
+    // documents.push_back(
+    //     doc_t{"https://www.twitter.com", 5, 1231, 5, 0.4, 0.5, "This is twitter.com"});
+    // documents.push_back(
+    //     doc_t{"https://www.nytimes.com", 5, 1231, 6, 0.4, 0.5, "this is nytimes.com"});
+    // documents.push_back(doc_t{"https://www.washingtonpost.com", 5, 1231, 7, 0.4, 0.5,
+    //                           "This is washintongpost.com"});
+    // documents.push_back(doc_t{"https://www.ft.com", 5, 1231, 5, 0.4, 0.5, "This is ft.com"});
 
-    std::vector<doc_t> documents;
-    documents.push_back(doc_t{"https://wwww.google.com", 5, 1231, 4, 0.4, 0.5, "This is google.com"});;
-    documents.push_back(doc_t{"https://www.twitter.com", 5, 1231, 5, 0.4, 0.5, "This is twitter.com"});
-    documents.push_back(doc_t{"https://www.nytimes.com", 5, 1231, 6, 0.4, 0.5, "this is nytimes.com"});
-    documents.push_back(
-        doc_t{"https://www.washingtonpost.com", 5, 1231, 7, 0.4, 0.5, "This is washintongpost.com"});
-    documents.push_back(doc_t{"https://www.ft.com", 5, 1231, 5, 0.4, 0.5, "This is ft.com"});
-
-    cout << "Getting snippet" << endl;
-    metadata_t docMetadata = _primaryMetadataChunk.GetMetadata("https://news.google.com/");
+    metadata_t docMetadata = _primaryMetadataChunk->GetMetadata("https://news.google.com/");
     cout << getSnippet(docMetadata, 461, 10) << endl;
 
-    return IndexMessage{IndexMessageType::DOCUMENTS, "", documents};
+    return IndexMessage{IndexMessageType::DOCUMENTS, "", results};
+}
+
+std::vector<std::pair<std::string, search_result_t>> IndexServer::findDocuments(std::string query,
+                                                                           int matchCount) {
+    std::vector<std::pair<std::string, search_result_t>> docs;
+    const IndexChunk* currIndexChunk = _primaryIndexChunk.get();
+    const MetadataChunk* currMetadataChunk = _primaryMetadataChunk.get();
+
+    size_t chunkIndex = 0;
+    while (docs.size() < matchCount) {
+        spdlog::info("Checking chunk index {}", chunkIndex);
+        if (chunkIndex != 0) {
+            _secondaryIndexChunk = _master.GetIndexChunk(chunkIndex);
+            _secondaryMetadataChunk = _master.GetMetadataChunk(chunkIndex);
+
+            currIndexChunk = _secondaryIndexChunk.get();
+            currMetadataChunk = _secondaryMetadataChunk.get();
+        }
+        Parser parser(query, &currIndexChunk->GetAllPostingLists());
+        Expression* expr = parser.Parse();
+        auto ISR = expr->Eval();
+        ISR->NextDocument();
+
+        while (ISR->GetCurrentPostEntry() != std::nullopt) {
+            if (docs.size() == matchCount)
+                break;
+
+            std::string docName = ISR->GetDocumentName();
+            metadata_t data = currMetadataChunk->GetMetadata(docName);
+            search_result_t docData {
+                data.numWords,
+                data.numTitleWords,
+                data.numOutLinks,
+                data.pageRank,
+                data.cheiRank,
+                data.docNum,
+                data.docStartOffset
+            };
+            docs.push_back({docName, docData});
+            ISR->NextDocument();
+        }
+        delete ISR;
+        chunkIndex++;
+    }
+    return docs;
 }
 
 int main(int argc, char** argv) {
@@ -155,13 +194,9 @@ int main(int argc, char** argv) {
         .help("Max number of clients")
         .scan<'i', int>();
 
-    program.add_argument("-i", "--input")
-        .required()
-        .help("Directory index files are located");
+    program.add_argument("-i", "--input").required().help("Directory index files are located");
 
-    program.add_argument("-h", "--htmlinput")
-        .required()
-        .help("Directory html files are located");
+    program.add_argument("-h", "--htmlinput").required().help("Directory html files are located");
 
     try {
         program.parse_args(argc, argv);
@@ -183,8 +218,7 @@ int main(int argc, char** argv) {
     int fd = -1;
     auto [buf, size] = read_mmap_region(fd, indexPath + "masterchunk");
     size_t offset = 0;
-    MasterChunk master =
-        MasterChunk::Deserailize(static_cast<char*>(buf), offset);
+    MasterChunk master = MasterChunk::Deserailize(static_cast<char*>(buf), offset);
     munmap(buf, size);
     close(fd);
 

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <fcntl.h>  // For O_CREAT, O_RDWR
+#include <fcntl.h>     // For O_CREAT, O_RDWR
 #include <sys/mman.h>  // For shm_open, mmap, PROT_READ, PROT_WRITE, MAP_SHARED, munmap
 #include <sys/stat.h>  // For mode constants
 #include <unistd.h>    // For ftruncate, close
@@ -73,8 +73,7 @@ TEST(BasicCompression, CompressedVsNaiveSizeBenefit) {
         compressed_bytes += encode(d).size();
     }
 
-    std::cout << "Compressed takes " << compressed_bytes << " bytes"
-              << std::endl;
+    std::cout << "Compressed takes " << compressed_bytes << " bytes" << std::endl;
     std::cout << "Naive takes " << naive_bytes << " bytes" << std::endl;
 
     EXPECT_LT(compressed_bytes, naive_bytes);
@@ -94,8 +93,7 @@ TEST(BasicPostingList, TestAddWord) {
 
     // First post
     EXPECT_EQ(posts[0].GetDocumentName(), "doc1");
-    auto wordEntries1 =
-        posts[0].GetEntries();  // Get entries for the first post
+    auto wordEntries1 = posts[0].GetEntries();  // Get entries for the first post
     EXPECT_EQ(wordEntries1[0].GetDelta(), w1.GetDelta());
     EXPECT_EQ(wordEntries1[0].GetLocationFound(), w1.GetLocationFound());
     EXPECT_EQ(wordEntries1[1].GetDelta(), w2.GetDelta());
@@ -103,8 +101,7 @@ TEST(BasicPostingList, TestAddWord) {
 
     // Second post
     EXPECT_EQ(posts[1].GetDocumentName(), "doc2");
-    auto wordEntries2 =
-        posts[1].GetEntries();  // Get entries for the second post
+    auto wordEntries2 = posts[1].GetEntries();  // Get entries for the second post
     EXPECT_EQ(wordEntries2[0].GetDelta(), w3.GetDelta());
     EXPECT_EQ(wordEntries2[0].GetLocationFound(), w3.GetLocationFound());
 }
@@ -112,8 +109,7 @@ TEST(BasicPostingList, TestAddWord) {
 void test_serializiation() {
     int fd;
     const size_t REGION_SIZE = 4096;
-    void* base_region =
-        create_mmap_region(fd, REGION_SIZE, "test_posting_list");
+    void* base_region = create_mmap_region(fd, REGION_SIZE, "test_posting_list");
 
     PostingList* postingList = new PostingList("cat");
 
@@ -141,20 +137,17 @@ void test_serializiation() {
     postingList->AddWord(fox_doc, word_occurrence_7);
 
     size_t offset = 0;
-    PostingList::NewSerialize(static_cast<char*>(base_region), offset,
-                              *postingList);
+    PostingList::NewSerialize(static_cast<char*>(base_region), offset, *postingList);
 
     std::cout << "Compressed PostingList serialized to mmap.\n";
-    std::cout << "This many bytes were used for COMPRESSED RELATIVE DELTAS: "
-              << offset << std::endl;
+    std::cout << "This many bytes were used for COMPRESSED RELATIVE DELTAS: " << offset
+              << std::endl;
 
     size_t new_offset = offset;
-    PostingList::OldSerialize(static_cast<char*>(base_region), new_offset,
-                              *postingList);
+    PostingList::OldSerialize(static_cast<char*>(base_region), new_offset, *postingList);
 
     std::cout << "Naive PostingList serialized to mmap.\n";
-    std::cout << "This many bytes were used for NAIVE: " << new_offset - offset
-              << std::endl;
+    std::cout << "This many bytes were used for NAIVE: " << new_offset - offset << std::endl;
 
     munmap(base_region, REGION_SIZE);
     close(fd);
@@ -167,8 +160,7 @@ void test_deserialization() {
     auto [base_region, size] = read_mmap_region(fd, "test_posting_list");
     size_t offset = 0;
 
-    PostingList postingList =
-        PostingList::NewDeserialize(static_cast<char*>(base_region), offset);
+    PostingList postingList = PostingList::NewDeserialize(static_cast<char*>(base_region), offset);
 
     if (postingList.GetWord() == "cat") {
         std::cout << "Passed!" << std::endl;
@@ -268,8 +260,7 @@ void test_deserialization() {
         exit(1);
     }
 
-    postingList =
-        PostingList::OldDeserialize(static_cast<char*>(base_region), offset);
+    postingList = PostingList::OldDeserialize(static_cast<char*>(base_region), offset);
 
     if (postingList.GetWord() == "cat") {
         std::cout << "Passed!" << std::endl;

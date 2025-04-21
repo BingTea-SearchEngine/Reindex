@@ -44,14 +44,12 @@ std::vector<Post> PostingList::GetPosts() const {
     return posts;
 }
 
-void PostingList::Serialize(char* base_region, size_t& offset,
-                            const PostingList& postingList) {
+void PostingList::Serialize(char* base_region, size_t& offset, const PostingList& postingList) {
     // PostingList::NewSerialize(base_region, offset, postingList);
     PostingList::OldSerialize(base_region, offset, postingList);
 }
 
-void PostingList::OldSerialize(char* base_region, size_t& offset,
-                               const PostingList& postingList) {
+void PostingList::OldSerialize(char* base_region, size_t& offset, const PostingList& postingList) {
     // Serialize the word representing the PostingList
     uint16_t word_size = postingList.word.size();
     std::memcpy(base_region + offset, &word_size, sizeof(word_size));
@@ -103,8 +101,7 @@ uint32_t decodeVB(const uint8_t* data, size_t& consumed_bytes) {
     return result;
 }
 
-void PostingList::NewSerialize(char* base_region, size_t& offset,
-                               const PostingList& postingList) {
+void PostingList::NewSerialize(char* base_region, size_t& offset, const PostingList& postingList) {
     // Serialize size of word
     uint16_t word_size = static_cast<uint16_t>(postingList.word.size());
     std::memcpy(base_region + offset, &word_size, sizeof(word_size));
@@ -124,8 +121,7 @@ void PostingList::NewSerialize(char* base_region, size_t& offset,
         // Serialize the document name
         size_t document_name_size =
             post.GetDocumentName().size() + 1;  // account for null terminator
-        std::memcpy(base_region + offset, post.GetDocumentName().c_str(),
-                    document_name_size);
+        std::memcpy(base_region + offset, post.GetDocumentName().c_str(), document_name_size);
         offset += document_name_size;
 
         const auto& entries = post.GetEntries();
@@ -185,8 +181,7 @@ PostingList PostingList::OldDeserialize(char* base_region, size_t& offset) {
     // Deserialize each post in the vector
     for (size_t i = 0; i < num_of_posts; ++i) {
         // postingList.posts[i] = Post::Deserialize(base_region, offset);
-        postingList.posts.emplace_back(
-            std::move(Post::Deserialize(base_region, offset)));
+        postingList.posts.emplace_back(std::move(Post::Deserialize(base_region, offset)));
     }
 
     return postingList;
@@ -226,15 +221,13 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
         for (uint32_t j = 0; j < num_entries; ++j) {
             size_t bytes_read = 0;
             uint32_t delta =
-                decodeVB(reinterpret_cast<const uint8_t*>(base_region + offset),
-                         bytes_read);
+                decodeVB(reinterpret_cast<const uint8_t*>(base_region + offset), bytes_read);
             offset += bytes_read;
             uint32_t abs_pos = prev_pos + delta;
             prev_pos = abs_pos;
 
             uint8_t location_raw;
-            std::memcpy(&location_raw, base_region + offset,
-                        sizeof(location_raw));
+            std::memcpy(&location_raw, base_region + offset, sizeof(location_raw));
             offset += sizeof(location_raw);
 
             wordlocation_t location = static_cast<wordlocation_t>(location_raw);

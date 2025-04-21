@@ -52,7 +52,7 @@ class IndexChunk {
      *
      * @return Entire Posting list for this index chunk
      * */
-    const std::unordered_map<std::string, PostingList>& GetAllPostingLists();
+    const std::unordered_map<std::string, PostingList>& GetAllPostingLists() const;
 
     /*
      * @brief Get the current offset the index chunk is at

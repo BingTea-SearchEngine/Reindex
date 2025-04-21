@@ -15,18 +15,17 @@ class QueryCompilerTest : public ::testing::Test {
 
     std::vector<Document> documents = {
         {"Document 1",
-         {"i", "went", "to", "the", "store", "and", "grabbed", "some",
-          "granola", "bar", "and", "then", "i", "went", "to", "another",
-          "store"}},
+         {"i", "went", "to", "the", "store", "and", "grabbed", "some", "granola", "bar", "and",
+          "then", "i", "went", "to", "another", "store"}},
         {"Document 2",
-         {"costco", "is", "the", "best", "megastore", "it", "has", "so", "many",
-          "granola", "and", "protein", "bar", "love", "costco"}},
+         {"costco", "is", "the", "best", "megastore", "it", "has", "so", "many", "granola", "and",
+          "protein", "bar", "love", "costco"}},
         {"Document 3",
-         {"i", "think", "the", "amazon", "online", "store", "is", "alright",
-          "amazon", "is", "bananas"}},
+         {"i", "think", "the", "amazon", "online", "store", "is", "alright", "amazon", "is",
+          "bananas"}},
         {"Document 4",
-         {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my",
-          "protein", "goal", "bar", "none"}}};
+         {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my", "protein", "goal",
+          "bar", "none"}}};
 
     void SetUp() override {
         uint32_t word_counter = 0;
@@ -35,8 +34,7 @@ class QueryCompilerTest : public ::testing::Test {
                 if (index.find(word) == index.end()) {
                     index[word] = PostingList(word);
                 }
-                index[word].AddWord(doc.name,
-                                    {word_counter, wordlocation_t::body});
+                index[word].AddWord(doc.name, {word_counter, wordlocation_t::body});
                 word_counter++;
             }
         }

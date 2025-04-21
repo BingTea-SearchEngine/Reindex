@@ -20,8 +20,7 @@ std::string strip_utf8_spaces(const std::string& input) {
         // UTF-8 en/em/thin/narrow spaces (U+2002 – U+200B or so)
         if (i + 2 < input.size() && c == 0xE2 && input[i + 1] == 0x80) {
             unsigned char third = input[i + 2];
-            if (third == 0x82 || third == 0x83 || third == 0x89 ||
-                third == 0xAF) {
+            if (third == 0x82 || third == 0x83 || third == 0x89 || third == 0xAF) {
                 i += 3;
                 continue;
             }
@@ -47,8 +46,7 @@ bool checkTagExists(std::string line, std::string tag) {
     return true;
 }
 
-DocStream::DocStream(std::string dirPath, std::string dictionaryPath)
-    : _dirPath(dirPath) {
+DocStream::DocStream(std::string dirPath, std::string dictionaryPath) : _dirPath(dirPath) {
     for (const auto& entry : std::filesystem::directory_iterator(dirPath)) {
         std::string filename = entry.path().filename();
         if (filename == "logs.txt") {
@@ -65,8 +63,7 @@ DocStream::DocStream(std::string dirPath, std::string dictionaryPath)
 
     std::string word;
     while (std::getline(dictFile, word)) {
-        word.erase(std::remove_if(word.begin(), word.end(), ::isspace),
-                   word.end());
+        word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
         _dictionary.insert(word);
     }
 }
@@ -174,12 +171,8 @@ DocStreamOutput DocStream::nextFile() {
         numOutLinks++;
     }
 
-    out.metadata = {static_cast<uint32_t>(output.size()),
-                    numTitleWords,
-                    numOutLinks,
-                    0.0,
-                    0.0,
-                    docNum};
+    out.metadata = {
+        static_cast<uint32_t>(output.size()), numTitleWords, numOutLinks, 0.0, 0.0, docNum};
 
     //Check <prank> tag
     std::getline(document, line);

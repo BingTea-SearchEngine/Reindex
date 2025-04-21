@@ -2,16 +2,16 @@
 
 #include "ISRWord.hpp"
 
-ISRWord::ISRWord(const PostingList& pL)
+ISRWord::ISRWord(const PostingList* pL)
     : postingList(pL),
       currentPostIdx(-1),
       currentPostEntry(std::nullopt),
       currentPostEntryIdx(-1),
       absoluteLocation(-1),
       documentName("") {
-    this->documentCount = this->postingList.GetPosts().size();
+    this->documentCount = this->postingList->GetPosts().size();
 
-    for (auto& post : this->postingList.GetPosts()) {
+    for (auto& post : this->postingList->GetPosts()) {
         this->numOccurrences += post.GetEntries().size();
     }
 }
@@ -52,13 +52,12 @@ std::optional<PostEntry> ISRWord::Next() {
         outerPost++;
     }
 
-    int innerPostEntry = this->currentPostEntryIdx +
-                         1;  // try to move to the next adjacent entry at first
+    int innerPostEntry =
+        this->currentPostEntryIdx + 1;  // try to move to the next adjacent entry at first
 
-    const auto posts = this->postingList.GetPosts();
-    for (
-        ; outerPost < posts.size();
-        ++outerPost) {  // this for loop guaranteed to only run 0, 1, or 2 times
+    const auto posts = this->postingList->GetPosts();
+    for (; outerPost < posts.size();
+         ++outerPost) {  // this for loop guaranteed to only run 0, 1, or 2 times
         assert(outerPost >= 0 && outerPost < posts.size());
         auto post = posts[outerPost];
         const auto entries = post.GetEntries();
@@ -85,7 +84,7 @@ std::optional<PostEntry> ISRWord::Next() {
 }
 
 std::optional<PostEntry> ISRWord::NextDocument() {
-    const auto posts = this->postingList.GetPosts();
+    const auto posts = this->postingList->GetPosts();
     int nextPostIdx = this->currentPostIdx + 1;
 
     if (nextPostIdx < posts.size()) {
@@ -114,7 +113,7 @@ std::optional<PostEntry> ISRWord::Seek(size_t target) {
     // Do this with synchronization table.
     int outerPost = 0;
 
-    for (auto post : this->postingList.GetPosts()) {
+    for (auto post : this->postingList->GetPosts()) {
         int innerPostEntry = 0;
         std::string currDocumentName = post.GetDocumentName();
 

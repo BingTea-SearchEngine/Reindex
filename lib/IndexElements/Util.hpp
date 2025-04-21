@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fcntl.h>  // For O_CREAT, O_RDWR
+#include <fcntl.h>     // For O_CREAT, O_RDWR
 #include <sys/mman.h>  // For shm_open, mmap, PROT_READ, PROT_WRITE, MAP_SHARED, munmap
 #include <sys/stat.h>  // For mode constants
 #include <unistd.h>    // For ftruncate, close

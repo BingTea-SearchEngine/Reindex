@@ -42,10 +42,8 @@ void PostEntry::Print() const {
     cout << delta << " " << location_found;
 }
 
-void PostEntry::Serialize(char* base_region, size_t& offset,
-                          const PostEntry& word_occurrence) {
-    std::memcpy(base_region + offset, &word_occurrence.delta,
-                sizeof(word_occurrence.delta));
+void PostEntry::Serialize(char* base_region, size_t& offset, const PostEntry& word_occurrence) {
+    std::memcpy(base_region + offset, &word_occurrence.delta, sizeof(word_occurrence.delta));
     offset += sizeof(word_occurrence.delta);
 
     std::memcpy(base_region + offset, &word_occurrence.location_found,
@@ -56,8 +54,7 @@ void PostEntry::Serialize(char* base_region, size_t& offset,
 PostEntry PostEntry::Deserialize(char* base_region, size_t& offset) {
     PostEntry word_occurrence;
 
-    std::memcpy(&word_occurrence.delta, base_region + offset,
-                sizeof(word_occurrence.delta));
+    std::memcpy(&word_occurrence.delta, base_region + offset, sizeof(word_occurrence.delta));
     offset += sizeof(word_occurrence.delta);
 
     std::memcpy(&word_occurrence.location_found, base_region + offset,

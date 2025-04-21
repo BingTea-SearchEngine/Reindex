@@ -80,14 +80,11 @@ class PostingList {
          * @post Writes the bytes of the PostingList object into memory at the calculated region.
          * @post Updates `offset` to the next available memory location.
          */
-    static void Serialize(char* base_region, size_t& offset,
-                          const PostingList& postingList);
+    static void Serialize(char* base_region, size_t& offset, const PostingList& postingList);
 
-    static void OldSerialize(char* base_region, size_t& offset,
-                             const PostingList& postingList);
+    static void OldSerialize(char* base_region, size_t& offset, const PostingList& postingList);
 
-    static void NewSerialize(char* base_region, size_t& offset,
-                             const PostingList& postingList);
+    static void NewSerialize(char* base_region, size_t& offset, const PostingList& postingList);
 
     /**
          * @brief Deserializes a PostingList object from a specific region of memory.

@@ -32,11 +32,9 @@ void IndexChunk::AddDocument(std::string doc, std::vector<word_t> words) {
     for (word_t& word : words) {
         if (_postingLists.find(word.word) == _postingLists.end()) {
             _postingLists.insert(make_pair(word.word, PostingList(word.word)));
-            _bytesRequired +=
-                _postingLists.at(word.word).GetOverheadBytesRequired();
+            _bytesRequired += _postingLists.at(word.word).GetOverheadBytesRequired();
         }
-        _bytesRequired += _postingLists[word.word].AddWord(
-            doc, PostEntry(_offset, word.location));
+        _bytesRequired += _postingLists[word.word].AddWord(doc, PostEntry(_offset, word.location));
         _offset++;
         assert(_offset < UINT32_MAX);
     }
@@ -50,8 +48,7 @@ const PostingList& IndexChunk::GetPostingList(std::string word) {
     return _postingLists[word];
 }
 
-const std::unordered_map<std::string, PostingList>&
-IndexChunk::GetAllPostingLists() {
+const std::unordered_map<std::string, PostingList>& IndexChunk::GetAllPostingLists() const {
     return _postingLists;
 }
 
@@ -59,8 +56,7 @@ uint32_t IndexChunk::GetCurrentOffset() {
     return _offset;
 }
 
-void IndexChunk::Serialize(char* base_region, size_t& offset,
-                           IndexChunk& index) {
+void IndexChunk::Serialize(char* base_region, size_t& offset, IndexChunk& index) {
     assert(offset == 0);
 
     // Serialize document list size

@@ -172,18 +172,17 @@ class PhraseISR : public ::testing::Test {
 
     std::vector<Document> documents = {
         {"Document 1",
-         {"i", "went", "to", "the", "store", "and", "grabbed", "some",
-          "granola", "bar", "and", "then", "i", "went", "to", "another",
-          "store"}},
+         {"i", "went", "to", "the", "store", "and", "grabbed", "some", "granola", "bar", "and",
+          "then", "i", "went", "to", "another", "store"}},
         {"Document 2",
-         {"costco", "is", "the", "best", "megastore", "it", "has", "so", "many",
-          "granola", "and", "protein", "bar", "love", "costco"}},
+         {"costco", "is", "the", "best", "megastore", "it", "has", "so", "many", "granola", "and",
+          "protein", "bar", "love", "costco"}},
         {"Document 3",
-         {"i", "think", "the", "amazon", "online", "store", "is", "alright",
-          "amazon", "is", "bananas"}},
+         {"i", "think", "the", "amazon", "online", "store", "is", "alright", "amazon", "is",
+          "bananas"}},
         {"Document 4",
-         {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my",
-          "protein", "goal", "bar", "none"}}};
+         {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my", "protein", "goal",
+          "bar", "none"}}};
 
     void SetUp() override {
         uint32_t word_counter = 0;
@@ -193,8 +192,7 @@ class PhraseISR : public ::testing::Test {
                 if (index.find(word) == index.end()) {
                     index[word] = PostingList(word);
                 }
-                index[word].AddWord(doc.name,
-                                    {word_counter, wordlocation_t::body});
+                index[word].AddWord(doc.name, {word_counter, wordlocation_t::body});
                 word_counter++;
             }
         }
@@ -202,8 +200,8 @@ class PhraseISR : public ::testing::Test {
 };
 
 TEST_F(PhraseISR, SimpleNext) {
-    ISR* ISR_word_the = new ISRWord(index["the"]);
-    ISR* ISR_word_best = new ISRWord(index["best"]);
+    ISR* ISR_word_the = new ISRWord(&index["the"]);
+    ISR* ISR_word_best = new ISRWord(&index["best"]);
 
     ISR* ISR_the_best_phrase = new ISRPhrase({ISR_word_the, ISR_word_best});
 
@@ -212,8 +210,7 @@ TEST_F(PhraseISR, SimpleNext) {
     // 19 and 20
     EXPECT_EQ(ISR_the_best_phrase->Next()->GetDelta(), 19);
     EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetDelta(), 19);
-    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetLocationFound(),
-              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
     EXPECT_EQ(ISR_the_best_phrase->GetStartLocation(), 19);
     EXPECT_EQ(ISR_the_best_phrase->GetEndLocation(), 20);
     EXPECT_EQ(ISR_the_best_phrase->GetDocumentName(), "Document 2");
@@ -221,8 +218,7 @@ TEST_F(PhraseISR, SimpleNext) {
     // 45 and 46
     EXPECT_EQ(ISR_the_best_phrase->Next()->GetDelta(), 45);
     EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetDelta(), 45);
-    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetLocationFound(),
-              wordlocation_t::body);
+    EXPECT_EQ(ISR_the_best_phrase->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
     EXPECT_EQ(ISR_the_best_phrase->GetStartLocation(), 45);
     EXPECT_EQ(ISR_the_best_phrase->GetEndLocation(), 46);
     EXPECT_EQ(ISR_the_best_phrase->GetDocumentName(), "Document 4");
@@ -236,27 +232,23 @@ TEST_F(PhraseISR, SimpleNext) {
 }
 
 TEST_F(PhraseISR, SimpleBoundaryAvoidance) {
-    ISR* ISR_word_bananas = new ISRWord(index["bananas"]);
-    ISR* ISR_word_mcdonalds = new ISRWord(index["mcdonalds"]);
+    ISR* ISR_word_bananas = new ISRWord(&index["bananas"]);
+    ISR* ISR_word_mcdonalds = new ISRWord(&index["mcdonalds"]);
 
-    ISR* ISR_bananas_mcdonalds_phrase =
-        new ISRPhrase({ISR_word_bananas, ISR_word_mcdonalds});
+    ISR* ISR_bananas_mcdonalds_phrase = new ISRPhrase({ISR_word_bananas, ISR_word_mcdonalds});
 
-    EXPECT_EQ(ISR_bananas_mcdonalds_phrase->GetCurrentPostEntry(),
-              std::nullopt);
+    EXPECT_EQ(ISR_bananas_mcdonalds_phrase->GetCurrentPostEntry(), std::nullopt);
 
     EXPECT_EQ(ISR_bananas_mcdonalds_phrase->Next(), std::nullopt);
-    EXPECT_EQ(ISR_bananas_mcdonalds_phrase->GetCurrentPostEntry(),
-              std::nullopt);
+    EXPECT_EQ(ISR_bananas_mcdonalds_phrase->GetCurrentPostEntry(), std::nullopt);
 
     EXPECT_EQ(ISR_bananas_mcdonalds_phrase->Next(), std::nullopt);
-    EXPECT_EQ(ISR_bananas_mcdonalds_phrase->GetCurrentPostEntry(),
-              std::nullopt);
+    EXPECT_EQ(ISR_bananas_mcdonalds_phrase->GetCurrentPostEntry(), std::nullopt);
 }
 
 TEST_F(PhraseISR, SimpleNextDocument) {
-    ISR* ISR_word_I = new ISRWord(index["i"]);
-    ISR* ISR_word_went = new ISRWord(index["went"]);
+    ISR* ISR_word_I = new ISRWord(&index["i"]);
+    ISR* ISR_word_went = new ISRWord(&index["went"]);
 
     ISR* ISR_I_went_phrase = new ISRPhrase({ISR_word_I, ISR_word_went});
 
@@ -265,8 +257,7 @@ TEST_F(PhraseISR, SimpleNextDocument) {
     // 0 and 1
     EXPECT_EQ(ISR_I_went_phrase->NextDocument()->GetDelta(), 0);
     EXPECT_EQ(ISR_I_went_phrase->GetCurrentPostEntry()->GetDelta(), 0);
-    EXPECT_EQ(ISR_I_went_phrase->GetCurrentPostEntry()->GetLocationFound(),
-              wordlocation_t::body);
+    EXPECT_EQ(ISR_I_went_phrase->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
     EXPECT_EQ(ISR_I_went_phrase->GetStartLocation(), 0);
     EXPECT_EQ(ISR_I_went_phrase->GetEndLocation(), 1);
     EXPECT_EQ(ISR_I_went_phrase->GetDocumentName(), "Document 1");
@@ -280,29 +271,26 @@ TEST_F(PhraseISR, SimpleNextDocument) {
 }
 
 TEST_F(PhraseISR, SimpleSeekAndNext) {
-    ISR* ISR_word_online = new ISRWord(index["online"]);
-    ISR* ISR_word_store = new ISRWord(index["store"]);
+    ISR* ISR_word_online = new ISRWord(&index["online"]);
+    ISR* ISR_word_store = new ISRWord(&index["store"]);
 
-    ISR* ISR_online_store_phrase =
-        new ISRPhrase({ISR_word_online, ISR_word_store});
+    ISR* ISR_online_store_phrase = new ISRPhrase({ISR_word_online, ISR_word_store});
 
     EXPECT_EQ(ISR_online_store_phrase->GetCurrentPostEntry(), std::nullopt);
 
     // seek to 35, 36+37
     EXPECT_EQ(ISR_online_store_phrase->Seek(35)->GetDelta(), 36);
     EXPECT_EQ(ISR_online_store_phrase->GetCurrentPostEntry()->GetDelta(), 36);
-    EXPECT_EQ(
-        ISR_online_store_phrase->GetCurrentPostEntry()->GetLocationFound(),
-        wordlocation_t::body);
+    EXPECT_EQ(ISR_online_store_phrase->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
     EXPECT_EQ(ISR_online_store_phrase->GetStartLocation(), 36);
     EXPECT_EQ(ISR_online_store_phrase->GetEndLocation(), 37);
     EXPECT_EQ(ISR_online_store_phrase->GetDocumentName(), "Document 3");
 
     EXPECT_EQ(ISR_online_store_phrase->Seek(35)->GetDelta(), 36);
     EXPECT_EQ(ISR_online_store_phrase->GetCurrentPostEntry()->GetDelta(), 36);
-    EXPECT_EQ(
-        ISR_online_store_phrase->GetCurrentPostEntry()->GetLocationFound(),
-        wordlocation_t::body);
+    EXPECT_EQ(ISR_online_store_phrase->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
     EXPECT_EQ(ISR_online_store_phrase->GetStartLocation(), 36);
     EXPECT_EQ(ISR_online_store_phrase->GetEndLocation(), 37);
     EXPECT_EQ(ISR_online_store_phrase->GetDocumentName(), "Document 3");

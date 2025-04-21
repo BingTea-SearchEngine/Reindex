@@ -30,7 +30,7 @@ ISR* Constraint::Eval() const {  // placeholder for an OR ISR
 }
 
 std::string Constraint::GetString() const {  // print debugging
-    if (BCs.size() == 1) {  // collapse level if there is only one child
+    if (BCs.size() == 1) {                   // collapse level if there is only one child
         return BCs[0]->GetString();
     }
     std::stringstream ss;
@@ -47,8 +47,7 @@ std::string Constraint::GetString() const {  // print debugging
 // class Constraint
 
 // <BaseConstraint> ::= <SimpleConstaint> { [ <AndOp> ] <SimpleConstraint> } | <SimpleConstraint> <NotOp> <SimpleConstraint>
-BaseConstraint::BaseConstraint(std::vector<Expression*> SCin,
-                               std::string typein)
+BaseConstraint::BaseConstraint(std::vector<Expression*> SCin, std::string typein)
     : SCs(SCin), type(typein) {}
 
 BaseConstraint::~BaseConstraint() {
@@ -89,8 +88,7 @@ std::string BaseConstraint::GetString() const {
         ss << ")";
         return ss.str();
     } else if (type == "Not") {  // not ISR only has two fields
-        return "NotISR(" + SCs[0]->GetString() + ", " + SCs[1]->GetString() +
-               ")";
+        return "NotISR(" + SCs[0]->GetString() + ", " + SCs[1]->GetString() + ")";
     }
     return "Error";
 }
@@ -107,8 +105,7 @@ ISR* SimpleConstraint::Eval() const {  // this just needs to evaluate inner
     return inner->Eval();
 }
 
-std::string SimpleConstraint::GetString()
-    const {  // this just needs to evaluate inner
+std::string SimpleConstraint::GetString() const {  // this just needs to evaluate inner
     return inner->GetString();
 }
 // class SimpleConstraint
@@ -134,7 +131,7 @@ ISR* Phrase::Eval() const {  // placeholder for a PHRASE ISR
 }
 
 std::string Phrase::GetString() const {  // placeholder for a PHRASE ISR
-    if (SWs.size() == 1) {  // collapse level if there is only one child
+    if (SWs.size() == 1) {               // collapse level if there is only one child
         return SWs[0]->GetString();
     }
     std::stringstream ss;
@@ -167,15 +164,17 @@ std::string NestedConstraint::GetString() const {  // just needs to eval inner
 // class NestedConstraint
 
 // <SearchWord> lowest level
-SearchWord::SearchWord(std::string valuein, const std::unordered_map<std::string, PostingList>* indexin): value(valuein), index(indexin) {}
-        
-ISR* SearchWord::Eval() const{
+SearchWord::SearchWord(std::string valuein,
+                       const std::unordered_map<std::string, PostingList>* indexin)
+    : value(valuein), index(indexin) {}
+
+ISR* SearchWord::Eval() const {
     //return new ISRWord(index.getpostinglist(value)); // TODO: eventually get a posting list from the actual index
     auto it = index->find(value);
     if (it == index->end()) {
-        return nullptr; 
+        return nullptr;
     }
-    return new ISRWord(it->second);
+    return new ISRWord(&it->second);
 }
 
 std::string SearchWord::GetString() const {  // placeholder for an OR ISR

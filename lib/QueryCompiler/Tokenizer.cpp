@@ -69,8 +69,7 @@ void Tokenstream::Tokenize(const std::string& input) {
         } else {
             switch (c) {
                 case '&':
-                    if (i + 1 < input.size() &&
-                        input[i + 1] == '&') {  // skip possible second &
+                    if (i + 1 < input.size() && input[i + 1] == '&') {  // skip possible second &
                         i++;
                     }
                     AppendToken(TokenType::ANDOP, "");
@@ -92,22 +91,19 @@ void Tokenstream::Tokenize(const std::string& input) {
                     Tokens.push_back("QUOTE");
                     break;
                 case '(':
-                    AppendToken(
-                        TokenType::LPAREN,
-                        "");  // ranker does not need to know where parentheses are
+                    AppendToken(TokenType::LPAREN,
+                                "");  // ranker does not need to know where parentheses are
                     break;
                 case ')':
                     AppendToken(TokenType::RPAREN, "");
                     break;
                 default: {
                     std::string word;
-                    while (i < input.size() && !std::isspace(input[i]) &&
-                           !std::ispunct(input[i])) {
+                    while (i < input.size() && !std::isspace(input[i]) && !std::ispunct(input[i])) {
                         word += input[i++];
                     }
-                    std::transform(
-                        word.begin(), word.end(), word.begin(),
-                        [](unsigned char c) { return std::tolower(c); });
+                    std::transform(word.begin(), word.end(), word.begin(),
+                                   [](unsigned char c) { return std::tolower(c); });
                     if (!word.empty()) {
                         AppendToken(TokenType::WORD, word);
                         continue;

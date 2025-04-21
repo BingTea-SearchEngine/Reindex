@@ -63,8 +63,7 @@ void ISROr::UpdateMarkers() {
     this->nearestTerm = whichChild;
     this->nearestStartLocation = nearestStart;
     this->nearestEndLocation = nearestEnd;
-    this->currentPostEntry =
-        this->childISRs[this->nearestTerm]->GetCurrentPostEntry();
+    this->currentPostEntry = this->childISRs[this->nearestTerm]->GetCurrentPostEntry();
 }
 
 // internal helper function to determine if
@@ -146,8 +145,7 @@ std::optional<PostEntry> ISROr::NextDocument() {
     std::string prevDocumentName = this->GetDocumentName();
 
     while (this->GetDocumentName() == prevDocumentName) {
-        if (this->childISRs[this->nearestTerm]->NextDocument() ==
-            std::nullopt) {
+        if (this->childISRs[this->nearestTerm]->NextDocument() == std::nullopt) {
             this->whichChildFinished[this->nearestTerm] = true;
         }
 

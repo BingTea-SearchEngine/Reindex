@@ -37,8 +37,7 @@ TEST(BasicMetadataChunk, SerializeDeserialize) {
     int fd2 = -1;
     auto [buf2, size] = read_mmap_region(fd2, filePath);
     offset = 0;
-    MetadataChunk chunk2 =
-        MetadataChunk::Deserailize(static_cast<char*>(buf2), offset);
+    MetadataChunk chunk2 = MetadataChunk::Deserailize(static_cast<char*>(buf2), offset);
     munmap(buf2, size);
     close(fd2);
 

@@ -29,8 +29,7 @@ class Tokenstream {
    private:
     Token* head;
     Token* end;
-    std::vector<std::string>
-        Tokens;  // tokenized input in vector form for the ranker
+    std::vector<std::string> Tokens;  // tokenized input in vector form for the ranker
 
     void Tokenize(const std::string& input);
     void AppendToken(TokenType type, const std::string& value);

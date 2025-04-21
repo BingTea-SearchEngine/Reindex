@@ -13,8 +13,7 @@ class Expression {
     virtual ~Expression();
     virtual ISR* Eval() const = 0;  // placeholder for actual ISRs
 
-    virtual std::string GetString()
-        const = 0;  // prints ISR structure for debugging
+    virtual std::string GetString() const = 0;  // prints ISR structure for debugging
 };
 // class Expression
 
@@ -95,8 +94,7 @@ class SearchWord : public Expression {
     std::string value;
     const std::unordered_map<std::string, PostingList>* index;
 
-public:
-
+   public:
     SearchWord(std::string valuein, const std::unordered_map<std::string, PostingList>* indexin);
     ISR* Eval() const override;
 
