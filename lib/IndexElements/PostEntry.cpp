@@ -30,7 +30,7 @@ uint32_t PostEntry::GetDelta() const {
     return delta;
 }
 
-wordlocation_t PostEntry::GetLocationFound() {
+wordlocation_t PostEntry::GetLocationFound() const {
     return location_found;
 }
 

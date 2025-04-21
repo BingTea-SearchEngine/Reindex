@@ -8,7 +8,8 @@ ISRWord::ISRWord(const PostingList& pL)
       currentPostEntry(std::nullopt),
       currentPostEntryIdx(-1),
       absoluteLocation(-1),
-      documentName("") {
+      documentID(0),
+      numOccurrences(0) {
     this->documentCount = this->postingList.GetPosts().size();
 
     for (auto& post : this->postingList.GetPosts()) {
@@ -40,10 +41,10 @@ std::optional<PostEntry> ISRWord::GetCurrentPostEntry() {
     return this->currentPostEntry;
 }
 
-std::string ISRWord::GetDocumentName() {
+uint32_t ISRWord::GetDocumentID() {
     assert(this->currentPostEntry.has_value() &&
-           "GetDocumentName called when this ISR is not pointing to anything");
-    return this->documentName;
+           "GetDocumentID called when this ISR is not pointing to anything");
+    return this->documentID;
 }
 
 std::optional<PostEntry> ISRWord::Next() {
@@ -62,7 +63,7 @@ std::optional<PostEntry> ISRWord::Next() {
         assert(outerPost >= 0 && outerPost < posts.size());
         auto post = posts[outerPost];
         const auto entries = post.GetEntries();
-        const std::string currDocumentName = post.GetDocumentName();
+        const uint32_t documentID = post.GetDocumentID();
 
         if (innerPostEntry < entries.size()) {
             assert(innerPostEntry >= 0 && innerPostEntry < entries.size());
@@ -72,7 +73,7 @@ std::optional<PostEntry> ISRWord::Next() {
             this->currentPostEntryIdx = innerPostEntry;
             this->currentPostEntry = postEntry;
             this->absoluteLocation = postEntry.GetDelta();
-            this->documentName = currDocumentName;
+            this->documentID = documentID;
             return this->currentPostEntry;
         }
 
@@ -97,7 +98,7 @@ std::optional<PostEntry> ISRWord::NextDocument() {
         this->currentPostEntryIdx = 0;
         this->currentPostEntry = entries[0];
         this->absoluteLocation = entries[0].GetDelta();
-        this->documentName = post.GetDocumentName();
+        this->documentID = post.GetDocumentID();
         return this->currentPostEntry;
     }
 
@@ -116,7 +117,7 @@ std::optional<PostEntry> ISRWord::Seek(size_t target) {
 
     for (auto post : this->postingList.GetPosts()) {
         int innerPostEntry = 0;
-        std::string currDocumentName = post.GetDocumentName();
+        uint32_t currDocumentID = post.GetDocumentID();
 
         for (auto postEntry : post.GetEntries()) {
             if (postEntry.GetDelta() >= target) {
@@ -124,7 +125,7 @@ std::optional<PostEntry> ISRWord::Seek(size_t target) {
                 this->currentPostEntryIdx = innerPostEntry;
                 this->currentPostEntry = postEntry;
                 this->absoluteLocation = postEntry.GetDelta();
-                this->documentName = currDocumentName;
+                this->documentID = currDocumentID;
                 return this->currentPostEntry;
             }
 

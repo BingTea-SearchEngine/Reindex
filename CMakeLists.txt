@@ -29,14 +29,47 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(spdlog)
 
-include(FetchContent)
 FetchContent_Declare(
     argparse
     GIT_REPOSITORY https://github.com/p-ranav/argparse.git
 )
 FetchContent_MakeAvailable(argparse)
 
+FetchContent_Declare(
+    Gateway
+    GIT_REPOSITORY https://github.com/BingTea-SearchEngine/Gateway.git
+    GIT_TAG main
+)
+FetchContent_MakeAvailable(Gateway)
+
+FetchContent_Declare(
+    IndexInterface
+    GIT_REPOSITORY https://github.com/BingTea-SearchEngine/IndexInterface.git
+    GIT_TAG main
+)
+FetchContent_MakeAvailable(IndexInterface)
+
+find_package(OpenSSL REQUIRED)
+message(STATUS "OpenSSL Include Dir: ${OPENSSL_INCLUDE_DIR}")
+message(STATUS "OpenSSL Libraries: ${OPENSSL_LIBRARIES}")
+
+set(GATEWAY_SOURCE_DIR ${gateway_SOURCE_DIR})
+set(GATEWAY_INCLUDE_DIR "${gateway_SOURCE_DIR}/lib")
+message(STATUS "Gateway project source directory: ${GATEWAY_SOURCE_DIR}")
+message(STATUS "Gateway include directory: ${GATEWAY_INCLUDE_DIR}")
+
+set(EXPRESSIONPARSER_SOURCE_DIR ${expressionparser_SOURCE_DIR})
+set(EXPRESSIONPARSER_INCLUDE_DIR "${expressionparser_SOURCE_DIR}/lib")
+
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+
+add_library(BloomFilter INTERFACE)
+target_include_directories(BloomFilter INTERFACE ${LIB_DIR}/BloomFilter ${OPENSSL_INCLUDE_DIR})
+if(TARGET OpenSSL::Crypto)
+    target_link_libraries(BloomFilter INTERFACE OpenSSL::Crypto)
+else()
+    message(FATAL_ERROR "OpenSSL::Crypto was not found!")
+endif()
 
 add_library(IndexElements STATIC 
     ${LIB_DIR}/IndexElements/MasterChunk.cpp
@@ -53,7 +86,7 @@ target_link_libraries(IndexElements PUBLIC spdlog::spdlog)
 
 add_library(DocStream STATIC ${LIB_DIR}/DocStream/DocStream.cpp)
 target_include_directories(DocStream PUBLIC ${LIB_DIR}/DocStream)
-target_link_libraries(DocStream PUBLIC IndexElements)
+target_link_libraries(DocStream PUBLIC IndexElements BloomFilter)
 
 
 add_library(IndexStreamReaders STATIC 
@@ -66,9 +99,22 @@ add_library(IndexStreamReaders STATIC
 target_include_directories(IndexStreamReaders PUBLIC ${LIB_DIR}/IndexStreamReaders)
 target_link_libraries(IndexStreamReaders PUBLIC IndexElements)
 
+add_library(QueryCompiler STATIC
+  ${LIB_DIR}/QueryCompiler/Expression.cpp
+  ${LIB_DIR}/QueryCompiler/Parser.cpp
+  ${LIB_DIR}/QueryCompiler/Tokenizer.cpp
+)
+target_include_directories(QueryCompiler PUBLIC ${LIB_DIR}/QueryCompiler)
+target_link_libraries(QueryCompiler PUBLIC IndexStreamReaders IndexElements)
+
 add_executable(${THIS} src/reindex.cpp)
 target_link_libraries(${THIS} PUBLIC spdlog::spdlog argparse DocStream IndexElements)
 target_include_directories(${THIS} PRIVATE ${LIB_DIR}/DocStream ${LIB_DIR}/IndexElements)
+
+add_executable(IndexServer src/IndexServer.cpp)
+target_link_libraries(IndexServer PUBLIC spdlog::spdlog argparse IndexElements GatewayServer
+    IndexInterface QueryCompiler)
+target_include_directories(IndexServer PUBLIC ${LIB_DIR}/IndexElements ${GATEWAY_INCLUDE_DIR} ${EXPRESSIONPARSER_INCLUDE_DIR})
 
 add_executable(TestExample tests/TestExample.cpp)
 target_link_libraries(TestExample PRIVATE GTest::gtest_main)
@@ -100,6 +146,9 @@ target_link_libraries(TestISRPhrase PRIVATE GTest::gtest_main IndexStreamReaders
 add_executable(TestISRContainer tests/TestISRContainer.cpp)
 target_link_libraries(TestISRContainer PRIVATE GTest::gtest_main IndexStreamReaders)
 
+add_executable(TestQueryCompiler tests/TestQueryCompiler.cpp)
+target_link_libraries(TestQueryCompiler PRIVATE GTest::gtest_main QueryCompiler)
+
 include(GoogleTest)
 gtest_discover_tests(TestExample)
 gtest_discover_tests(TestMasterChunk)
@@ -112,4 +161,6 @@ gtest_discover_tests(TestISROr)
 gtest_discover_tests(TestISRAnd)
 gtest_discover_tests(TestISRPhrase)
 gtest_discover_tests(TestISRContainer)
+gtest_discover_tests(TestQueryCompiler)
 
+set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type")

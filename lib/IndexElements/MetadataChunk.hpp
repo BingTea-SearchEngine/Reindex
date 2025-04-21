@@ -1,14 +1,14 @@
 #pragma once
 
-#include <unordered_map>
 #include <iostream>
+#include <unordered_map>
 
 using std::cout, std::endl;
 
 #include "WordLocation.hpp"
 
 class MetadataChunk {
-public:
+   public:
     /*
      * @brief Default constructor for an MetadataChunk
      * */
@@ -68,7 +68,8 @@ public:
      * @post Writes the bytes of the MetadataChunk object into memory at the calculated region.
      * @post Updates `offset` to the next available memory location.
      * */
-    static void Serialize(char* base_region, size_t& offset, MetadataChunk& chunk);
+    static void Serialize(char* base_region, size_t& offset,
+                          MetadataChunk& chunk);
 
     /**
      * @brief Deserializes an MetadataChunk object from a specific region of memory.
@@ -85,13 +86,11 @@ public:
      * */
     static MetadataChunk Deserailize(char* base_region, size_t& offset);
 
-private:
-
+   private:
     // list of docs
     std::vector<std::string> _documents;
     // doc to metadata map
     std::unordered_map<std::string, metadata_t> _docMetadata;
     // Estimation of bytes required to serialize this metadata chunk. Need to test if it is accurate
     size_t _bytesRequired;
-
 };

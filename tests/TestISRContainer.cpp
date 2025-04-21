@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include "ISR.hpp"
-#include "ISRContainer.hpp"
 #include "ISRAnd.hpp"
+#include "ISRContainer.hpp"
 #include "ISRWord.hpp"
 #include "PostingList.hpp"
 
@@ -188,16 +188,18 @@ class ContainerISR : public ::testing::Test {
 
     void SetUp() override {
         uint32_t word_counter = 0;
+        uint32_t docID = 1;
         for (const auto& doc : documents) {
             for (size_t i = 0; i < doc.words.size(); ++i) {
-                const std::string& word = doc.words[i];
-                if (index.find(word) == index.end()) {
+            const std::string& word = doc.words[i];
+            if (index.find(word) == index.end()) {
                     index[word] = PostingList(word);
-                }
-                index[word].AddWord(doc.name,
-                                    {word_counter, wordlocation_t::body});
-                word_counter++;
             }
+            index[word].AddWord(docID,
+                                    {word_counter, wordlocation_t::body});
+            word_counter++;
+            }
+            docID++;
         }
     }
 };
@@ -213,22 +215,30 @@ TEST_F(ContainerISR, SimpleNext) {
 
     ISR* ISR_granola_bar_container_no_costco = new ISRContainer(ISR_granola_AND_bar, ISR_word_costco);
 
-    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetCurrentPostEntry(),
+              std::nullopt);
 
     // 8 and 9
     EXPECT_EQ(ISR_granola_bar_container_no_costco->Next()->GetDelta(), 8);
-    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetCurrentPostEntry()->GetDelta(), 8);
-    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    EXPECT_EQ(
+        ISR_granola_bar_container_no_costco->GetCurrentPostEntry()->GetDelta(),
+        8);
+    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetCurrentPostEntry()
+                  ->GetLocationFound(),
+              wordlocation_t::body);
     EXPECT_EQ(ISR_granola_bar_container_no_costco->GetStartLocation(), 8);
     EXPECT_EQ(ISR_granola_bar_container_no_costco->GetEndLocation(), 9);
-    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetDocumentName(), "Document 1");
+    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetDocumentID(),
+              1);
 
     // no more
     EXPECT_EQ(ISR_granola_bar_container_no_costco->Next(), std::nullopt);
-    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetCurrentPostEntry(),
+              std::nullopt);
 
     EXPECT_EQ(ISR_granola_bar_container_no_costco->Next(), std::nullopt);
-    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetCurrentPostEntry(), std::nullopt);
+    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetCurrentPostEntry(),
+              std::nullopt);
 }
 
 TEST_F(ContainerISR, SimpleNextDocument) {
@@ -243,18 +253,20 @@ TEST_F(ContainerISR, SimpleNextDocument) {
     // 34
     EXPECT_EQ(ISR_the_no_granola->Next()->GetDelta(), 34);
     EXPECT_EQ(ISR_the_no_granola->GetCurrentPostEntry()->GetDelta(), 34);
-    EXPECT_EQ(ISR_the_no_granola->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    EXPECT_EQ(ISR_the_no_granola->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
     EXPECT_EQ(ISR_the_no_granola->GetStartLocation(), 34);
     EXPECT_EQ(ISR_the_no_granola->GetEndLocation(), 34);
-    EXPECT_EQ(ISR_the_no_granola->GetDocumentName(), "Document 3");
+    EXPECT_EQ(ISR_the_no_granola->GetDocumentID(), 3);
 
     // 45
     EXPECT_EQ(ISR_the_no_granola->Next()->GetDelta(), 45);
     EXPECT_EQ(ISR_the_no_granola->GetCurrentPostEntry()->GetDelta(), 45);
-    EXPECT_EQ(ISR_the_no_granola->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    EXPECT_EQ(ISR_the_no_granola->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
     EXPECT_EQ(ISR_the_no_granola->GetStartLocation(), 45);
     EXPECT_EQ(ISR_the_no_granola->GetEndLocation(), 45);
-    EXPECT_EQ(ISR_the_no_granola->GetDocumentName(), "Document 4");
+    EXPECT_EQ(ISR_the_no_granola->GetDocumentID(), 4);
 
     // no more
     EXPECT_EQ(ISR_the_no_granola->Next(), std::nullopt);
@@ -276,10 +288,11 @@ TEST_F(ContainerISR, SimpleSeekAndNext) {
     // seek at 20 -> 20
     EXPECT_EQ(ISR_best_no_mcdonalds->Seek(20)->GetDelta(), 20);
     EXPECT_EQ(ISR_best_no_mcdonalds->GetCurrentPostEntry()->GetDelta(), 20);
-    EXPECT_EQ(ISR_best_no_mcdonalds->GetCurrentPostEntry()->GetLocationFound(), wordlocation_t::body);
+    EXPECT_EQ(ISR_best_no_mcdonalds->GetCurrentPostEntry()->GetLocationFound(),
+              wordlocation_t::body);
     EXPECT_EQ(ISR_best_no_mcdonalds->GetStartLocation(), 20);
     EXPECT_EQ(ISR_best_no_mcdonalds->GetEndLocation(), 20);
-    EXPECT_EQ(ISR_best_no_mcdonalds->GetDocumentName(), "Document 2");
+    EXPECT_EQ(ISR_best_no_mcdonalds->GetDocumentID(), 2);
 
     // seek at 40 -> nothing
     EXPECT_EQ(ISR_best_no_mcdonalds->Seek(40), std::nullopt);

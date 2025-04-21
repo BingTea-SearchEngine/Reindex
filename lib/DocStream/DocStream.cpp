@@ -2,21 +2,72 @@
 
 #include "DocStream.hpp"
 
+std::string strip_utf8_spaces(const std::string& input) {
+    std::string output;
+
+    for (size_t i = 0; i < input.size();) {
+        unsigned char c = input[i];
+        // ASCII space
+        if (c == 0x20) {
+            ++i;
+            continue;
+        }
+
+        // UTF-8 no-break space (U+00A0)
+        if (i + 1 < input.size() && c == 0xC2 && input[i + 1] == 0xA0) {
+            i += 2;
+            continue;
+        }
+
+        // UTF-8 en/em/thin/narrow spaces (U+2002 – U+200B or so)
+        if (i + 2 < input.size() && c == 0xE2 && input[i + 1] == 0x80) {
+            unsigned char third = input[i + 2];
+            if (third == 0x82 || third == 0x83 || third == 0x89 || third == 0xAF) {
+                i += 3;
+                continue;
+            }
+        }
+        output += c;
+        ++i;
+    }
+    return output;
+}
+
+bool is_ascii(const std::string& word) {
+    return std::all_of(word.begin(), word.end(), [](unsigned char c) {
+        return c >= 32 && c <= 126; // printable ASCII
+        // or use: return c < 128; for strict 7-bit ASCII
+    });
+}
+
 bool checkTagExists(std::string line, std::string tag) {
     if (line.rfind(tag, 0) != 0) {
-        std::cerr << "Malformed file. " << tag << " not found." << endl;
+        // std::cerr << "Malformed file. " << tag << " not found." << endl;
         return false;
     }
     return true;
 }
 
-DocStream::DocStream(std::string dirPath) : _dirPath(dirPath) {
+DocStream::DocStream(std::string dirPath, std::string dictionaryPath)
+    : _dirPath(dirPath) {
     for (const auto& entry : std::filesystem::directory_iterator(dirPath)) {
         std::string filename = entry.path().filename();
         if (filename == "logs.txt") {
             continue;
         }
         _documents.push(filename);
+    }
+
+    std::ifstream dictFile(dictionaryPath);
+    if (!dictFile.is_open()) {
+        std::cerr << "Error opening dictionary" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    std::string word;
+    while(std::getline(dictFile, word)) {
+        word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
+        _dictionary.insert(word);
     }
 }
 
@@ -33,7 +84,6 @@ DocStreamOutput DocStream::nextFile() {
         std::cerr << "Error opening file " << documentName << endl;
         return out;
     }
-
 
     std::string line;
     std::getline(document, line);
@@ -65,9 +115,14 @@ DocStreamOutput DocStream::nextFile() {
     std::getline(document, line);
     std::istringstream titleIss(line);
     std::string word;
-    size_t numTitleWords = 0;
+    uint32_t numTitleWords = 0;
     while (titleIss >> word) {
-        output.push_back(word_t{word, offset, wordlocation_t::title});
+        std::transform(word.begin(), word.end(), word.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+        word = strip_utf8_spaces(word);
+        if (is_ascii(word)) {
+            output.push_back(word_t{word, offset, wordlocation_t::title});
+        }
         ++offset;
         ++numTitleWords;
     }
@@ -87,7 +142,13 @@ DocStreamOutput DocStream::nextFile() {
     std::getline(document, line);
     std::istringstream bodyIss(line);
     while (bodyIss >> word) {
-        output.push_back(word_t{word, offset, wordlocation_t::body});
+        std::transform(word.begin(), word.end(), word.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+        word = strip_utf8_spaces(word);
+
+        if (is_ascii(word)) {
+            output.push_back(word_t{word, offset, wordlocation_t::title});
+        }
         ++offset;
     }
 
@@ -104,13 +165,15 @@ DocStreamOutput DocStream::nextFile() {
     }
 
     std::getline(document, line);
+    uint32_t numOutLinks = 0;
     std::vector<std::string> outLinks;
     while (line != "</links>") {
-        outLinks.push_back(line);
         std::getline(document, line);
+        numOutLinks++;
     }
 
-    out.metadata = {output.size(), numTitleWords, 0.0, 0.0, outLinks};
+    out.metadata = {static_cast<uint32_t>(output.size()), numTitleWords,
+                    numOutLinks, 0.0, 0.0};
 
     //Check <prank> tag
     std::getline(document, line);
@@ -119,7 +182,7 @@ DocStreamOutput DocStream::nextFile() {
     }
 
     float pageRank = 0.0;
-    if(std::getline(document, line)) {
+    if (std::getline(document, line)) {
         pageRank = std::stof(line);
     }
 
@@ -131,11 +194,11 @@ DocStreamOutput DocStream::nextFile() {
     //Check <prank> tag
     std::getline(document, line);
     if (!checkTagExists(line, "<crank>")) {
-        return out; 
+        return out;
     }
 
     float cheiRank = 0.0;
-    if(std::getline(document, line)) {
+    if (std::getline(document, line)) {
         cheiRank = std::stof(line);
     }
 
@@ -144,7 +207,8 @@ DocStreamOutput DocStream::nextFile() {
         return out;
     }
 
-    out.metadata = {output.size(), numTitleWords, pageRank, cheiRank, outLinks};
+    out.metadata.pageRank = pageRank;
+    out.metadata.cheiRank = cheiRank;
 
     return out;
 }

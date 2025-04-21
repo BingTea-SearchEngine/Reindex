@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 #include <ISR.hpp>
 #include <ISRWord.hpp>
@@ -54,13 +54,13 @@ class ISRContainer : public ISR {
     virtual std::optional<PostEntry> GetCurrentPostEntry() override;
 
     /**
-       * @brief Returns the document name this ISR is pointing at.
-       * 
-       * @return The name of the document this ISR is currently on
-       * 
-       * @pre The ISR must currently be pointing to a valid PostEntry.
-       */
-    virtual std::string GetDocumentName() override;
+     * @brief Returns the document ID this ISR is pointing at.
+     * 
+     * @return The ID of the document this ISR is currently on.
+     * 
+     * @pre The ISR must currently be pointing to a valid PostEntry.
+     */
+    virtual uint32_t GetDocumentID() override;
 
     /**
       * @brief Returns the next PostEntry that matches the occurrence of
@@ -99,5 +99,5 @@ class ISRContainer : public ISR {
     std::optional<PostEntry> currentPostEntry;
 
     /// The set of documents to skip over due to the NOT terms.
-    std::unordered_set<std::string> excludedDocuments;
+    std::unordered_set<uint32_t> excludedDocuments;
 };

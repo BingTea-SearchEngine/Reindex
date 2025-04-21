@@ -18,8 +18,8 @@
 
 #include "IndexChunk.hpp"
 #include "MetadataChunk.hpp"
-#include "WordLocation.hpp"
 #include "Util.hpp"
+#include "WordLocation.hpp"
 
 /**
  * @class MasterChunk
@@ -56,7 +56,8 @@ class MasterChunk {
      * @param doc The name of the document
      * @param words The words in the document in a vector
      * */
-    void AddDocument(std::string doc, std::vector<word_t> words, metadata_t metadata);
+    void AddDocument(std::string doc, std::vector<word_t> words,
+                     metadata_t metadata);
 
     /*
      * @brief Gets the number of documents stored by this index
@@ -80,6 +81,20 @@ class MasterChunk {
      * @brief Prints the current metadata chunk
      * */
     void PrintCurrentMetadataChunk() const;
+
+    /*
+     * @brief Return the index chunk at index i of _indexChunks
+     *
+     * @param i The index of the index. Must be less than the size of _indexChunks
+     * */
+    IndexChunk GetIndexChunk(size_t i);
+
+    /*
+     * @brief Return the metadata chunk at index i of metadata chunk
+     *
+     * @param i The index of the index. Must be less than the size of _medataChunks
+     * */
+    MetadataChunk GetMetadataChunk(size_t i);
 
     /**
      * @brief Serializes a given MasterChunk object into a specific region of memory.
@@ -123,7 +138,6 @@ class MasterChunk {
      * @brief Default constructor only to be used in the Deserialize method
      * */
     MasterChunk();
-    
 
     /*
      * @brief Serialize the current index chunk being built by calling the Serialize method on
@@ -132,7 +146,6 @@ class MasterChunk {
     void _serializeCurrIndexChunk();
 
     void _serializeCurrMetadataChunk();
-
 
     // List of index chunks and their file paths
     std::vector<std::string> _indexChunks;

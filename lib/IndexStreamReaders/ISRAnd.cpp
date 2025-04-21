@@ -26,10 +26,10 @@ std::optional<PostEntry> ISRAnd::GetCurrentPostEntry() {
     return this->currentPostEntry;
 }
 
-std::string ISRAnd::GetDocumentName() {
+uint32_t ISRAnd::GetDocumentID() {
     assert(this->currentPostEntry.has_value() &&
-           "GetDocumentName called when this ISR is not pointing to anything");
-    return this->childISRs[nearestTerm]->GetDocumentName();
+           "GetDocumentID called when this ISR is not pointing to anything");
+    return this->childISRs[nearestTerm]->GetDocumentID();
 }
 
 // helper function to update the internal marker variables
@@ -69,15 +69,17 @@ void ISRAnd::UpdateMarkers() {
 // helper function to check if all the current child ISRs
 // are pointing to the same document
 bool ISRAnd::ChildrenOnSameDocument() {
-    std::string prevDocumentName = "";
+    uint32_t prevDocumentID = 0;
+    bool first = true;
 
     for (auto& child : childISRs) {
-        if (prevDocumentName == "") {
-            prevDocumentName = child->GetDocumentName();
+        if (first) {
+            prevDocumentID = child->GetDocumentID();
+            first = false;
             continue;
         }
 
-        if (child->GetDocumentName() != prevDocumentName) {
+        if (child->GetDocumentID() != prevDocumentID) {
             return false;
         }
     }
@@ -98,15 +100,15 @@ bool ISRAnd::CatchUpStragglerISRs() {
         // .........................y
         // .....................z....
         // move forward the proper stragglers until they're hopefully on the same document as y
-        std::string potentialTargetDocument =
-            (this->childISRs)[this->farthestTerm]->GetDocumentName();
+        uint32_t potentialTargetDocument =
+            (this->childISRs)[this->farthestTerm]->GetDocumentID();
         for (int i = 0; i < childISRs.size(); ++i) {
             if (i == this->farthestTerm) {
                 continue;
             }
 
-            std::string currentDocument =
-                (this->childISRs)[i]->GetDocumentName();
+            uint32_t currentDocument =
+                (this->childISRs)[i]->GetDocumentID();
             if (currentDocument == potentialTargetDocument) {
                 continue;
             }

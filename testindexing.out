@@ -1,0 +1,6 @@
+[2025-04-18 14:58:45.133] [info] Input directory: /users/wonbinjin/index/input
+[2025-04-18 14:58:45.134] [info] Output directory: /users/wonbinjin/index/output
+[2025-04-18 14:58:45.134] [info] Dictionary path: /dictionary.txt
+[2025-04-18 14:58:45.134] [info] Chunk size: 500 MB
+[2025-04-18 14:58:45.134] [info] Chunk size: 500000000
+[2025-04-18 14:58:45.134] [info] ======= Reindex Started =======

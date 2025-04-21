@@ -9,6 +9,7 @@
 #include <regex>
 #include <sstream>
 #include <string>
+#include <unordered_set>
 
 using std::cout;
 using std::endl;
@@ -32,12 +33,11 @@ struct DocStreamOutput {
     metadata_t metadata;
 };
 
-
 class DocStream {
    public:
     // Populate _documents with file path to documents. Sort by batch number where a document is
     // named batch_number-url
-    DocStream(std::string dirPath);
+    DocStream(std::string dirPath, std::string dictionaryPath);
 
     // Parse next file in _documents priority queue
     DocStreamOutput nextFile();
@@ -47,5 +47,6 @@ class DocStream {
    private:
     std::priority_queue<std::string, std::vector<std::string>, BatchNumCompare>
         _documents;
+    std::unordered_set<std::string> _dictionary;
     std::string _dirPath;
 };

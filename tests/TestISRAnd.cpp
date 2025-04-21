@@ -187,16 +187,18 @@ class AndISR : public ::testing::Test {
 
     void SetUp() override {
         uint32_t word_counter = 0;
+        uint32_t docID = 1;
         for (const auto& doc : documents) {
             for (size_t i = 0; i < doc.words.size(); ++i) {
                 const std::string& word = doc.words[i];
                 if (index.find(word) == index.end()) {
                     index[word] = PostingList(word);
                 }
-                index[word].AddWord(doc.name,
+                index[word].AddWord(docID,
                                     {word_counter, wordlocation_t::body});
                 word_counter++;
             }
+            docID++;
         }
     }
 };
@@ -216,7 +218,7 @@ TEST_F(AndISR, SimpleNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_amazon_AND_store->GetStartLocation(), 35);
     EXPECT_EQ(ISR_amazon_AND_store->GetEndLocation(), 37);
-    EXPECT_EQ(ISR_amazon_AND_store->GetDocumentName(), "Document 3");
+    EXPECT_EQ(ISR_amazon_AND_store->GetDocumentID(), 3);
 
     // store at 37 and amazon at 40
     EXPECT_EQ(ISR_amazon_AND_store->Next()->GetDelta(), 37);
@@ -225,7 +227,7 @@ TEST_F(AndISR, SimpleNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_amazon_AND_store->GetStartLocation(), 37);
     EXPECT_EQ(ISR_amazon_AND_store->GetEndLocation(), 40);
-    EXPECT_EQ(ISR_amazon_AND_store->GetDocumentName(), "Document 3");
+    EXPECT_EQ(ISR_amazon_AND_store->GetDocumentID(), 3);
 
     // no more
     EXPECT_EQ(ISR_amazon_AND_store->Next(), std::nullopt);
@@ -250,7 +252,7 @@ TEST_F(AndISR, ComplexNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_granola_AND_bar->GetStartLocation(), 8);
     EXPECT_EQ(ISR_granola_AND_bar->GetEndLocation(), 9);
-    EXPECT_EQ(ISR_granola_AND_bar->GetDocumentName(), "Document 1");
+    EXPECT_EQ(ISR_granola_AND_bar->GetDocumentID(), 1);
 
     // granola at 26 and bar at 29
     EXPECT_EQ(ISR_granola_AND_bar->Next()->GetDelta(), 26);
@@ -259,7 +261,7 @@ TEST_F(AndISR, ComplexNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_granola_AND_bar->GetStartLocation(), 26);
     EXPECT_EQ(ISR_granola_AND_bar->GetEndLocation(), 29);
-    EXPECT_EQ(ISR_granola_AND_bar->GetDocumentName(), "Document 2");
+    EXPECT_EQ(ISR_granola_AND_bar->GetDocumentID(), 2);
 
     // no more
     EXPECT_EQ(ISR_granola_AND_bar->Next(), std::nullopt);
@@ -284,7 +286,7 @@ TEST_F(AndISR, SimpleNextDocument) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 3);
     EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 5);
-    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 1");
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentID(), 1);
 
     // the at 19 and and at 27
     EXPECT_EQ(ISR_the_AND_and->Next()->GetDelta(), 19);
@@ -293,7 +295,7 @@ TEST_F(AndISR, SimpleNextDocument) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 19);
     EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 27);
-    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 2");
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentID(), 2);
 
     // the at 45 and and at 48
     EXPECT_EQ(ISR_the_AND_and->Next()->GetDelta(), 45);
@@ -302,7 +304,7 @@ TEST_F(AndISR, SimpleNextDocument) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_the_AND_and->GetStartLocation(), 45);
     EXPECT_EQ(ISR_the_AND_and->GetEndLocation(), 48);
-    EXPECT_EQ(ISR_the_AND_and->GetDocumentName(), "Document 4");
+    EXPECT_EQ(ISR_the_AND_and->GetDocumentID(), 4);
 
     // no more
     EXPECT_EQ(ISR_the_AND_and->Next(), std::nullopt);
@@ -327,7 +329,7 @@ TEST_F(AndISR, SimpleSeekAndNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_bar_AND_and->GetStartLocation(), 5);
     EXPECT_EQ(ISR_bar_AND_and->GetEndLocation(), 9);
-    EXPECT_EQ(ISR_bar_AND_and->GetDocumentName(), "Document 1");
+    EXPECT_EQ(ISR_bar_AND_and->GetDocumentID(), 1);
 
     EXPECT_EQ(ISR_bar_AND_and->Seek(5)->GetDelta(), 5);
     EXPECT_EQ(ISR_bar_AND_and->GetCurrentPostEntry()->GetDelta(), 5);
@@ -335,7 +337,7 @@ TEST_F(AndISR, SimpleSeekAndNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_bar_AND_and->GetStartLocation(), 5);
     EXPECT_EQ(ISR_bar_AND_and->GetEndLocation(), 9);
-    EXPECT_EQ(ISR_bar_AND_and->GetDocumentName(), "Document 1");
+    EXPECT_EQ(ISR_bar_AND_and->GetDocumentID(), 1);
 
     // seek to 9, bar=9, and=10
     EXPECT_EQ(ISR_bar_AND_and->Seek(9)->GetDelta(), 9);
@@ -344,7 +346,7 @@ TEST_F(AndISR, SimpleSeekAndNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_bar_AND_and->GetStartLocation(), 9);
     EXPECT_EQ(ISR_bar_AND_and->GetEndLocation(), 10);
-    EXPECT_EQ(ISR_bar_AND_and->GetDocumentName(), "Document 1");
+    EXPECT_EQ(ISR_bar_AND_and->GetDocumentID(), 1);
 
     // seek to 27, bar=29, and=27
     EXPECT_EQ(ISR_bar_AND_and->Seek(27)->GetDelta(), 27);
@@ -353,7 +355,7 @@ TEST_F(AndISR, SimpleSeekAndNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_bar_AND_and->GetStartLocation(), 27);
     EXPECT_EQ(ISR_bar_AND_and->GetEndLocation(), 29);
-    EXPECT_EQ(ISR_bar_AND_and->GetDocumentName(), "Document 2");
+    EXPECT_EQ(ISR_bar_AND_and->GetDocumentID(), 2);
 
     // seek to 28, bar=53, and=48
     EXPECT_EQ(ISR_bar_AND_and->Seek(28)->GetDelta(), 48);
@@ -362,7 +364,7 @@ TEST_F(AndISR, SimpleSeekAndNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_bar_AND_and->GetStartLocation(), 48);
     EXPECT_EQ(ISR_bar_AND_and->GetEndLocation(), 53);
-    EXPECT_EQ(ISR_bar_AND_and->GetDocumentName(), "Document 4");
+    EXPECT_EQ(ISR_bar_AND_and->GetDocumentID(), 4);
 
     // seek to 49, nothing
     EXPECT_EQ(ISR_bar_AND_and->Seek(49), std::nullopt);

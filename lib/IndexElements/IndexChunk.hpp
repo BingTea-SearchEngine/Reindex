@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <unordered_map>
-#include <iostream>
 #include <unordered_set>
 
 using std::cout, std::endl;
@@ -12,7 +11,6 @@ using std::cout, std::endl;
 
 class IndexChunk {
    public:
-
     /*
      * @brief Default constructor for an Index Chunk
      * */
@@ -47,7 +45,14 @@ class IndexChunk {
      * @param The word to look for
      * @return PostingList for that word
      * */
-    PostingList GetPostingList(std::string word);
+    const PostingList& GetPostingList(std::string word);
+
+    /*
+     * @brief Get all posting lists to feed into expression parser
+     *
+     * @return Entire Posting list for this index chunk
+     * */
+    const std::unordered_map<std::string, PostingList>& GetAllPostingLists();
 
     /*
      * @brief Prints the contents of the IndexChunk
@@ -91,8 +96,16 @@ class IndexChunk {
     static IndexChunk Deserailize(char* base_region, size_t& offset);
 
    private:
+    friend class MasterChunk;
     // Set of documents in this index chunk
     std::vector<std::string> _documents;
+
+    // map from document ID to document name
+    std::unordered_map<uint32_t, std::string> docID_to_doc_name;
+
+    // int documentID (monotonically increasing)
+    uint32_t documentID;
+
     // Word to posting list map
     std::unordered_map<std::string, PostingList> _postingLists;
     // Estimation of bytes required to serialize this index chunk. Need to test if it is accurate

@@ -1,11 +1,11 @@
 #pragma once
 
+#include <cassert>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <cassert>
 
-enum class wordlocation_t {
+enum class wordlocation_t : uint8_t {
     title = 0,
     bold = 1,
     body = 2,
@@ -44,30 +44,21 @@ struct word_t {
     }
 };
 
-
-
 struct metadata_t {
-    size_t numWords;
-    size_t numTitleWords;
+    uint32_t numWords;
+    uint32_t numTitleWords;
+    uint32_t numOutLinks;
     float pageRank;
     float cheiRank;
-    std::vector<std::string> outLinks;
 
     friend std::ostream& operator<<(std::ostream& os, const metadata_t& m);
 
     friend bool operator==(const metadata_t& lhs, const metadata_t& rhs);
 
     size_t getBytes() {
-        size_t bytes = sizeof(numWords) + sizeof(numTitleWords) + sizeof(pageRank) + sizeof(cheiRank);
-        for(const auto &link : outLinks) {
-            bytes += link.size() + 1;
-        }
-
+        size_t bytes = sizeof(numWords) + sizeof(numTitleWords) +
+                       sizeof(numOutLinks) + sizeof(pageRank) +
+                       sizeof(cheiRank);
         return bytes;
     }
-
 };
-
-
-
-
