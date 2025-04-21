@@ -22,14 +22,16 @@ struct Token {
 class Tokenstream {
    public:
     Tokenstream(const std::string& input);
+    ~Tokenstream();
 
-    Token* GetHead() const;
-    Token* MatchToken(TokenType typein);
+    Token* GetCurrent() const;
+    const Token* MatchToken(TokenType typein);
 
    private:
     Token* head;
     Token* end;
-    std::vector<std::string> Tokens;  // tokenized input in vector form for the ranker
+    Token* current;
+    std::vector<std::string> Tokens; // tokenized input in vector form for the ranker
 
     void Tokenize(const std::string& input);
     void AppendToken(TokenType type, const std::string& value);

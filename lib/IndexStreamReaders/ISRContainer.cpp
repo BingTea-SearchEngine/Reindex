@@ -9,6 +9,11 @@ ISRContainer::ISRContainer(ISR* includedISR, ISR* excludedISR)
         excludedDocuments.insert(excludedISR->GetDocumentName());
         excludedISR->NextDocument();
     }
+    delete excludedISR;
+}
+
+ISRContainer::~ISRContainer(){
+    delete included;
 }
 
 int ISRContainer::GetStartLocation() {

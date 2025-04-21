@@ -9,19 +9,27 @@ Tokenstream::Tokenstream(const std::string& input) {
     head = nullptr;
     end = nullptr;
     Tokenize(input);
+    current = head;
 }
 
-Token* Tokenstream::GetHead() const {
-    return head;
-}
-
-Token* Tokenstream::MatchToken(TokenType typein) {
-    // returns and consumes the head token if it matches the type
-    if (head && head->type == typein) {
-        Token* current = head;
+Tokenstream::~Tokenstream(){
+    while(head){
+        Token* curr = head;
         head = head->next;
-        current->next = nullptr;
-        return current;
+        delete curr;
+    }
+}
+
+Token* Tokenstream::GetCurrent() const{
+    return current;
+}
+
+const Token* Tokenstream::MatchToken(TokenType typein){
+    // returns and consumes the current token if it matches the type
+    if (current && current->type == typein){
+        Token* out = current;
+        current = current->next;
+        return out;
     }
     return nullptr;
 }

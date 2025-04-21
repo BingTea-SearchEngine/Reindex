@@ -231,6 +231,8 @@ TEST_F(AndISR, SimpleNext) {
 
     EXPECT_EQ(ISR_amazon_AND_store->Next(), std::nullopt);
     EXPECT_EQ(ISR_amazon_AND_store->GetCurrentPostEntry(), std::nullopt);
+
+    delete ISR_amazon_AND_store;
 }
 
 TEST_F(AndISR, ComplexNext) {
@@ -263,6 +265,8 @@ TEST_F(AndISR, ComplexNext) {
 
     EXPECT_EQ(ISR_granola_AND_bar->Next(), std::nullopt);
     EXPECT_EQ(ISR_granola_AND_bar->GetCurrentPostEntry(), std::nullopt);
+
+    delete ISR_granola_AND_bar;
 }
 
 TEST_F(AndISR, SimpleNextDocument) {
@@ -303,6 +307,8 @@ TEST_F(AndISR, SimpleNextDocument) {
 
     EXPECT_EQ(ISR_the_AND_and->Next(), std::nullopt);
     EXPECT_EQ(ISR_the_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+    delete ISR_the_AND_and;
 }
 
 TEST_F(AndISR, SimpleSeekAndNext) {
@@ -355,6 +361,8 @@ TEST_F(AndISR, SimpleSeekAndNext) {
     // seek to 49, nothing
     EXPECT_EQ(ISR_bar_AND_and->Seek(49), std::nullopt);
     EXPECT_EQ(ISR_bar_AND_and->GetCurrentPostEntry(), std::nullopt);
+
+    delete ISR_bar_AND_and;
 }
 
 TEST_F(AndISR, SimpleBoundaryAvoidance) {
@@ -370,4 +378,6 @@ TEST_F(AndISR, SimpleBoundaryAvoidance) {
 
     EXPECT_EQ(ISR_bananas_AND_mcdonalds->Next(), std::nullopt);
     EXPECT_EQ(ISR_bananas_AND_mcdonalds->GetCurrentPostEntry(), std::nullopt);
+
+    delete ISR_bananas_AND_mcdonalds;
 }

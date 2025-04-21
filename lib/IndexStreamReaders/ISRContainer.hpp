@@ -27,6 +27,11 @@ class ISRContainer : public ISR {
     ISRContainer(ISR* included, ISR* excluded);
 
     /**
+     * @brief Deletes all children ISRs
+    */
+    ~ISRContainer() override;
+
+    /**
      * @brief Returns the absolute location of the earliest occurrence
      *        among the included ISR at this moment.
      * 

@@ -21,6 +21,11 @@ class ISRAnd : public ISR {
     ISRAnd(std::vector<ISR*> children);
 
     /**
+     * @brief Deletes all children ISRs
+    */
+    ~ISRAnd() override;
+
+    /**
      * @brief Returns the absolute location of the earliest occurrence
      *        among the child ISRs at this moment.
      * 

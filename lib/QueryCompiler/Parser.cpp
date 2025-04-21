@@ -80,18 +80,18 @@ Expression* Parser::FindSimpleConstraint() {
 
 // <Phrase> ::= '"' { <SearchWord> } '"'
 Expression* Parser::FindPhrase() {
-    Token* openQuote = stream.MatchToken(TokenType::QUOTE);
-    if (!openQuote) {
+    const Token* openQuote = stream.MatchToken(TokenType::QUOTE);
+    if(!openQuote){
         return nullptr;
     }
     std::vector<Expression*> SWs;
-    while (true) {
-        Token* closingQuote = stream.MatchToken(TokenType::QUOTE);
-        if (closingQuote) {
+    while(true){
+        const Token* closingQuote = stream.MatchToken(TokenType::QUOTE);
+        if(closingQuote){
             break;
         }
-        Token* endToken = stream.MatchToken(TokenType::END);
-        if (endToken) {
+        const Token* endToken = stream.MatchToken(TokenType::END);
+        if(endToken){
             return nullptr;
         }
         Expression* sw = FindSearchWord();
@@ -117,9 +117,9 @@ Expression* Parser::FindNestedConstraint() {
 }
 
 // <SearchWord> lowest level
-Expression* Parser::FindSearchWord() {
-    Token* t = stream.MatchToken(TokenType::WORD);
-    if (t) {
+Expression* Parser::FindSearchWord(){
+    const Token* t = stream.MatchToken(TokenType::WORD);
+    if(t){
         return new SearchWord(t->value, index);
     }
     return nullptr;
@@ -127,7 +127,7 @@ Expression* Parser::FindSearchWord() {
 
 Expression* Parser::Parse() {
     Expression* expr = FindConstraint();
-    if (!stream.GetHead() || stream.GetHead()->type != TokenType::END) {
+    if(!stream.GetCurrent() || stream.GetCurrent()->type != TokenType::END){
         return nullptr;
     }
     return expr;
