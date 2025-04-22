@@ -298,6 +298,7 @@ int main(int argc, char** argv) {
     MasterChunk master = MasterChunk::Deserailize(static_cast<char*>(buf), offset);
     munmap(buf, size);
     close(fd);
+    cout << "After deserialize master" << endl;
 
     IndexServer indexServer(port, maxClients, indexPath, htmlPath, matchCount, waitTimeMS, master);
     spdlog::info("======= Index Server Started =======");
