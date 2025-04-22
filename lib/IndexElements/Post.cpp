@@ -80,11 +80,11 @@ Post Post::Deserialize(char* base_region, size_t& offset) {
     uint32_t num_of_words;
     std::memcpy(&num_of_words, base_region + offset, sizeof(num_of_words));
     offset += sizeof(num_of_words);
-    post.entries.resize(num_of_words);
+    post.entries.reserve(num_of_words);
 
     // Deserialize each PostEntry
     for (size_t i = 0; i < num_of_words; ++i) {
-        post.entries[i] = std::move(PostEntry::Deserialize(base_region, offset));
+        post.entries.emplace_back(PostEntry::Deserialize(base_region, offset));
     }
 
     return post;

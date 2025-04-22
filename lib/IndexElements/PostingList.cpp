@@ -185,7 +185,7 @@ PostingList PostingList::OldDeserialize(char* base_region, size_t& offset) {
     // Deserialize each post in the vector
     for (size_t i = 0; i < num_of_posts; ++i) {
         // postingList.posts[i] = Post::Deserialize(base_region, offset);
-        postingList.posts.emplace_back(std::move(Post::Deserialize(base_region, offset)));
+        postingList.posts.emplace_back(Post::Deserialize(base_region, offset));
     }
 
     return postingList;
