@@ -4,6 +4,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <unordered_set>
+#include <memory>
 
 using std::cout, std::endl;
 
@@ -109,7 +110,7 @@ class IndexChunk {
      * @pre `base_region + offset` must point to a valid serialized MasterChunk object.
      * @post A IndexChunk object is created and the offset is updated.
      * */
-    static IndexChunk Deserailize(char* base_region, size_t& offset);
+    static std::unique_ptr<IndexChunk> Deserailize(char* base_region, size_t& offset);
 
    private:
     friend class MasterChunk;

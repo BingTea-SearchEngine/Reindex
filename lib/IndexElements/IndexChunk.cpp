@@ -105,9 +105,9 @@ void IndexChunk::Serialize(char* base_region, size_t& offset, IndexChunk& index)
     }
 }
 
-IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
+std::unique_ptr<IndexChunk> IndexChunk::Deserailize(char* base_region, size_t& offset) {
     assert(offset == 0);
-    IndexChunk index;
+    auto index = std::make_unique<IndexChunk>();
 
     // Read docID_to_doc_name
     size_t num_mappings = 0;
@@ -129,7 +129,7 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
         offset += doc_name_size;
 
         // insert the entry
-        index.docID_to_doc_name[ID] = actualDocName;
+        index->docID_to_doc_name[ID] = actualDocName;
     }
     // Read number of words
     size_t num_words = 0;
@@ -145,8 +145,8 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
         prevOffset = offset;
         if (change > 100000) { 
         }
-        index._postingLists.emplace(pl.GetWord(), std::move(pl));
+        index->_postingLists.emplace(pl.GetWord(), std::move(pl));
     }
 
-    return std::move(index);
+    return index;
 }

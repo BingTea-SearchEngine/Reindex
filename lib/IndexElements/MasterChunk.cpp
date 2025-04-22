@@ -156,12 +156,11 @@ std::unique_ptr<IndexChunk> MasterChunk::GetIndexChunk(size_t i) {
     std::string indexFilePath = _indexChunks[i];
     int fd = -1;
     auto [buf, size] = read_mmap_region(fd, indexFilePath);
-    cout << "size: " << size << endl;
     size_t offset = 0;
-    IndexChunk chunk = IndexChunk::Deserailize(static_cast<char*>(buf), offset);
+    std::unique_ptr<IndexChunk> chunk = IndexChunk::Deserailize(static_cast<char*>(buf), offset);
     munmap(buf, size);
     close(fd);
-    return std::make_unique<IndexChunk>(chunk);
+    return chunk;
 }
 
 std::unique_ptr<MetadataChunk> MasterChunk::GetMetadataChunk(size_t i) {
