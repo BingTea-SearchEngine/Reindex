@@ -5,6 +5,7 @@
 #include <sys/stat.h>  // For mode constants
 #include <unistd.h>    // For ftruncate, close
 #include <utility>
+#include <algorithm>
 
 #include <stdexcept>
 #include <string>

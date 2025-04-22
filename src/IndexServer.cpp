@@ -75,7 +75,13 @@ search_results IndexServer::findDocuments(std::string query, int matchCount, int
         }
         Parser parser(query, &currIndexChunk->GetAllPostingLists());
         Expression* expr = parser.Parse();
+        if (!expr) {
+            return {};
+        }
         auto ISR = expr->Eval();
+        if (!ISR) {
+            return {};
+        }
         ISR->NextDocument();
 
         while (ISR->GetCurrentPostEntry() != std::nullopt) {
@@ -109,7 +115,6 @@ search_results IndexServer::findDocuments(std::string query, int matchCount, int
                     break;  // we did Next() and that caused us to move on to a brand new document
                 }
             }
-            cout << docName << " " << numTitleOccurences << " " << numBodyOccurences << endl;
             search_result_t docData(docName, data.numWords, data.numTitleWords, data.numOutLinks,
                                     numTitleOccurences, numBodyOccurences, data.pageRank,
                                     data.cheiRank, data.docNum, data.docStartOffset,
