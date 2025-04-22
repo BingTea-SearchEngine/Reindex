@@ -169,6 +169,7 @@ PostingList PostingList::OldDeserialize(char* base_region, size_t& offset) {
     uint16_t word_size;
     std::memcpy(&word_size, base_region + offset, sizeof(word_size));
     offset += sizeof(word_size);
+    cout << "word_size " << word_size << endl;
 
     // Deserialize the word associated with the PostingList
     std::string word(word_size, '\0');
@@ -180,6 +181,7 @@ PostingList PostingList::OldDeserialize(char* base_region, size_t& offset) {
     size_t num_of_posts;
     std::memcpy(&num_of_posts, base_region + offset, sizeof(num_of_posts));
     offset += sizeof(num_of_posts);
+    cout << "num of posts " << num_of_posts << endl;
     postingList.posts.reserve(num_of_posts);
 
     // Deserialize each post in the vector
