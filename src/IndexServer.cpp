@@ -8,15 +8,11 @@ IndexServer::IndexServer(int port, int maxClients, std::string indexaPath, std::
       _waitTimeMS(waitTime),
       _master(master) {
     _primaryIndexChunk = _master.GetIndexChunk(0);
-    cout << "After index chunk primary" << endl;
     _primaryMetadataChunk = _master.GetMetadataChunk(0);
-    cout << "After primary chunk 1" << endl;
     if (_master.GetChunkList().size() > 1) {
         _secondaryIndexChunk = _master.GetIndexChunk(1);
-        cout << "After index chunk seocndary" << endl;
         _secondaryMetadataChunk = _master.GetMetadataChunk(1);
     }
-    cout << "After secondary chunk" << endl;
 }
 
 void IndexServer::Start() {
@@ -141,7 +137,6 @@ search_results IndexServer::findDocuments(std::string query, int matchCount, int
                     break;
                 }
             }
-            cout << docName << " " << numTitleOccurences << " " << numBodyOccurences << endl;
             search_result_t docData(docName, data.numWords, data.numTitleWords, data.numOutLinks,
                                     numTitleOccurences, numBodyOccurences, data.pageRank,
                                     data.cheiRank, data.docNum, data.docStartOffset,
