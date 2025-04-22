@@ -28,9 +28,9 @@ struct search_result_t {
     float cheiRank;
     uint32_t numTitleMatch;
     uint32_t numBodyMatch;
-    uint32_t docNum;          // For snippet retrieval
-    uint32_t docStartOffset;  // For snippet retrieval
-    uint32_t matchAbsoluteOffset;
+    uint32_t docNum;               // For snippet retrieval
+    uint32_t docStartOffset;       // For snippet retrieval
+    uint32_t matchAbsoluteOffset;  // For snippet retrieval
     float rankingScore;
 
     search_result_t(std::string url, uint32_t numWords, uint32_t numTitleWords,
@@ -65,6 +65,7 @@ struct search_result_t {
 
     friend std::ostream& operator<<(std::ostream& os, const search_result_t& r) {
         os << "{"
+           << "numWords=" << r.url << ", "
            << "numWords=" << r.numWords << ", "
            << "numTitleWords=" << r.numTitleWords << ", "
            << "numOutLinks=" << r.numOutLinks << ", "

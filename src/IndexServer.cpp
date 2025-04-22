@@ -35,7 +35,7 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
     spdlog::info("Query: {}", msg.query);
 
     // Parser query
-    search_results docs = findDocuments(msg.query, 1000, 15000);
+    search_results docs = findDocuments(msg.query, _matchCount, _waitTimeMS);
     spdlog::info("Got {} results", docs.size());
 
     // Some kind of ranking
@@ -44,9 +44,11 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
     std::vector<doc_t> results;
     for (size_t i = 0; i < std::min(docs.size(), (size_t)10); ++i) {
         search_result_t result = docs[i];
+        cout << result << endl;
         auto [title, snippet] = getTitleAndSnippet(result, 10);
         results.push_back(doc_t{result.url, result.numWords, result.numTitleWords,
-                                result.numOutLinks, result.pageRank, result.cheiRank, snippet,
+                                result.numOutLinks, result.numTitleMatch, result.numBodyMatch,
+                                result.pageRank, result.cheiRank, result.rankingScore, snippet,
                                 title});
     }
 
@@ -71,28 +73,39 @@ search_results IndexServer::findDocuments(std::string query, int matchCount, int
             currIndexChunk = _primaryIndexChunk.get();
             currMetadataChunk = _primaryMetadataChunk.get();
         } else {
+            spdlog::info("Getting non primary index chunk {}", chunkIndex);
             tempIndexChunk = std::move(_master.GetIndexChunk(chunkIndex));
             tempMetadataChunk = std::move(_master.GetMetadataChunk(chunkIndex));
 
             currIndexChunk = tempIndexChunk.get();
             currMetadataChunk = tempMetadataChunk.get();
         }
+
         auto endTime = std::chrono::steady_clock::now();
         double time =
             std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
         if (time > timeUpperLimitMs) {
             break;
         }
+
         Parser parser(query, &currIndexChunk->GetAllPostingLists());
         Expression* expr = parser.Parse();
         if (!expr) {
             return {};
         }
         auto ISR = expr->Eval();
+
+        endTime = std::chrono::steady_clock::now();
+        time =
+            std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+        if (time > timeUpperLimitMs) {
+            break;
+        }
+
         if (!ISR) {
             return {};
         }
-        ISR->NextDocument();
+        ISR->Next();
 
         while (ISR->GetCurrentPostEntry() != std::nullopt) {
             if (docs.size() == matchCount)
@@ -111,7 +124,7 @@ search_results IndexServer::findDocuments(std::string query, int matchCount, int
 
             int numTitleOccurences = 0;
             int numBodyOccurences = 0;
-            while (ISR->Next() != std::nullopt) {
+            while (ISR->GetCurrentPostEntry() != std::nullopt) {
                 std::optional<PostEntry> entry = ISR->GetCurrentPostEntry();
                 if (ISR->GetDocumentID() == docId) {
                     if (entry->GetLocationFound() == wordlocation_t::title) {
@@ -129,12 +142,17 @@ search_results IndexServer::findDocuments(std::string query, int matchCount, int
                 if (time > timeUpperLimitMs) {
                     break;
                 }
+                ISR->Next();
             }
             search_result_t docData(docName, data.numWords, data.numTitleWords, data.numOutLinks,
                                     numTitleOccurences, numBodyOccurences, data.pageRank,
                                     data.cheiRank, data.docNum, data.docStartOffset,
                                     absolute_location);
             docs.push_back(docData);
+            endTime = std::chrono::steady_clock::now();
+            time =
+                std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime)
+                    .count();
         }
         delete ISR;
         chunkIndex++;

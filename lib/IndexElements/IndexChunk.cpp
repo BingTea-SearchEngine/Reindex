@@ -143,8 +143,7 @@ std::unique_ptr<IndexChunk> IndexChunk::Deserailize(char* base_region, size_t& o
         // index._postingLists[pl.GetWord()] = std::move(pl);
         size_t change = offset - prevOffset;
         prevOffset = offset;
-        if (change > 100000) { 
-        }
+        if (change > 100000) {}
         index->_postingLists.emplace(pl.GetWord(), std::move(pl));
     }
 
