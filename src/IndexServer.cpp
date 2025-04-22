@@ -9,10 +9,6 @@ IndexServer::IndexServer(int port, int maxClients, std::string indexaPath, std::
       _master(master) {
     _primaryIndexChunk = _master.GetIndexChunk(0);
     _primaryMetadataChunk = _master.GetMetadataChunk(0);
-    if (_master.GetChunkList().size() > 1) {
-        _secondaryIndexChunk = _master.GetIndexChunk(1);
-        _secondaryMetadataChunk = _master.GetMetadataChunk(1);
-    }
 }
 
 void IndexServer::Start() {
@@ -74,9 +70,6 @@ search_results IndexServer::findDocuments(std::string query, int matchCount, int
         if (chunkIndex == 0) {
             currIndexChunk = _primaryIndexChunk.get();
             currMetadataChunk = _primaryMetadataChunk.get();
-        } else if (chunkIndex == 1) {
-            currIndexChunk = _secondaryIndexChunk.get();
-            currMetadataChunk = _secondaryMetadataChunk.get();
         } else {
             tempIndexChunk = std::move(_master.GetIndexChunk(chunkIndex));
             tempMetadataChunk = std::move(_master.GetMetadataChunk(chunkIndex));
