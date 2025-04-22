@@ -147,7 +147,7 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
         index._postingLists.emplace(pl.GetWord(), std::move(pl));
         size_t change = offset - prevOffset;
         prevOffset = offset;
-        if (change > 1000) { 
+        if (change > 10000) { 
             cout << i << " " << change <<endl;
         }
     }
