@@ -105,6 +105,7 @@ class PostingList {
     static PostingList NewDeserialize(char* base_region, size_t& offset);
 
    private:
+    friend class IndexChunk;
     /// The word associated with this PostingList
     std::string word;
 
