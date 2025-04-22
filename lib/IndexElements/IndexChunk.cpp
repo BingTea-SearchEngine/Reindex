@@ -112,7 +112,6 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
     // Read docID_to_doc_name
     size_t num_mappings = 0;
     std::memcpy(&num_mappings, base_region + offset, sizeof(num_mappings));
-    cout << "num mappings " << num_mappings << endl;
     offset += sizeof(num_mappings);
 
     for (size_t _ = 0; _ < num_mappings; ++_) {
@@ -123,7 +122,6 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
         size_t doc_name_size = 0;
         std::memcpy(&doc_name_size, base_region + offset, sizeof(doc_name_size));
         offset += sizeof(doc_name_size);
-        cout << "doc name sizeu " << doc_name_size << endl;
 
         // CHECK BACK HERE LATER //////////////////////////////////////////////////////////////////////////////
         std::string actualDocName(doc_name_size, '\0');
@@ -138,7 +136,6 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
     size_t num_words = 0;
     std::memcpy(&num_words, base_region + offset, sizeof(num_words));
     offset += sizeof(num_words);
-    cout << "num words " << num_words << endl;
 
     //Read each posting list
     for (size_t i = 0; i < num_words; ++i) {
