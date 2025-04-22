@@ -131,13 +131,10 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
         // insert the entry
         index.docID_to_doc_name[ID] = actualDocName;
     }
-    cout << "After getting mappings " << index.GetBytesRequired() << endl;
-    cout << offset << endl;
     // Read number of words
     size_t num_words = 0;
     std::memcpy(&num_words, base_region + offset, sizeof(num_words));
     offset += sizeof(num_words);
-    cout << num_words << endl;
 
     //Read each posting list
     size_t prevOffset = offset;
@@ -147,12 +144,9 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
         size_t change = offset - prevOffset;
         prevOffset = offset;
         if (change > 100000) { 
-            cout << i << " " << change <<endl;
-            cout << pl.posts.size() << endl;
         }
         index._postingLists.emplace(pl.GetWord(), std::move(pl));
     }
 
-    cout << "After for loop"  << endl;
     return std::move(index);
 }
