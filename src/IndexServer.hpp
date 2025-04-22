@@ -89,7 +89,7 @@ struct SearchResultCompare {
 class IndexServer {
    public:
     IndexServer(int port, int maxClients, std::string indexPath, std::string htmlPath,
-                MasterChunk master);
+                int matchCount, int waitTimeMS, MasterChunk master);
 
     void Start();
 
@@ -112,4 +112,7 @@ class IndexServer {
     std::unique_ptr<MetadataChunk> _secondaryMetadataChunk;
 
     std::string _htmlDir;
+
+    int _matchCount;
+    int _waitTimeMS;
 };

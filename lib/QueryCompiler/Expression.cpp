@@ -23,12 +23,11 @@ ISR* Constraint::Eval() const {  // placeholder for an OR ISR
         return BCs[0]->Eval();
     }
     std::vector<ISR*> children;
-    for(int i = 0; i < BCs.size(); i++){
+    for (int i = 0; i < BCs.size(); i++) {
         ISR* result = BCs[i]->Eval();
-        if(result){
+        if (result) {
             children.push_back(result);
-        }
-        else{
+        } else {
             for (ISR* child : children) {
                 delete child;
             }
@@ -70,12 +69,11 @@ ISR* BaseConstraint::Eval() const {
         return SCs[0]->Eval();
     }
     std::vector<ISR*> children;
-    for(int i = 0; i < SCs.size(); i++){
+    for (int i = 0; i < SCs.size(); i++) {
         ISR* result = SCs[i]->Eval();
-        if(result){
+        if (result) {
             children.push_back(result);
-        }
-        else{
+        } else {
             for (ISR* child : children) {
                 delete child;
             }
@@ -142,12 +140,11 @@ ISR* Phrase::Eval() const {  // placeholder for a PHRASE ISR
         return SWs[0]->Eval();
     }
     std::vector<ISR*> children;
-    for(int i = 0; i < SWs.size(); i++){
+    for (int i = 0; i < SWs.size(); i++) {
         ISR* result = SWs[i]->Eval();
-        if(result){
+        if (result) {
             children.push_back(result);
-        }
-        else{
+        } else {
             for (ISR* child : children) {
                 delete child;
             }

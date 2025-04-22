@@ -191,11 +191,10 @@ TEST_F(QueryCompilerTest, Invalid) {
     Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
-    std::cout<<expr->GetString()<<std::endl;
+    std::cout << expr->GetString() << std::endl;
 
     ISR* root = expr->Eval();
     EXPECT_EQ(root, nullptr);
 
     delete expr;
 }
-

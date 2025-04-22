@@ -1,10 +1,18 @@
 #include "IndexServer.hpp"
 
 IndexServer::IndexServer(int port, int maxClients, std::string indexaPath, std::string htmlPath,
-                         MasterChunk master)
-    : _server(Server(port, maxClients)), _htmlDir(htmlPath), _master(master) {
+                         int matchCount, int waitTime, MasterChunk master)
+    : _server(Server(port, maxClients)),
+      _htmlDir(htmlPath),
+      _matchCount(matchCount),
+      _waitTimeMS(waitTime),
+      _master(master) {
     _primaryIndexChunk = _master.GetIndexChunk(0);
     _primaryMetadataChunk = _master.GetMetadataChunk(0);
+    if (_master.GetChunkList().size() > 1) {
+        _secondaryIndexChunk = _master.GetIndexChunk(1);
+        _secondaryMetadataChunk = _master.GetMetadataChunk(1);
+    }
 }
 
 void IndexServer::Start() {
@@ -31,7 +39,7 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
     spdlog::info("Query: {}", msg.query);
 
     // Parser query
-    search_results docs = findDocuments(msg.query, 100, 10000);
+    search_results docs = findDocuments(msg.query, 1000, 15000);
     spdlog::info("Got {} results", docs.size());
 
     // Some kind of ranking
@@ -51,8 +59,11 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
 
 search_results IndexServer::findDocuments(std::string query, int matchCount, int timeUpperLimitMs) {
     search_results docs;
-    const IndexChunk* currIndexChunk = _primaryIndexChunk.get();
-    const MetadataChunk* currMetadataChunk = _primaryMetadataChunk.get();
+    const IndexChunk* currIndexChunk = nullptr;
+    const MetadataChunk* currMetadataChunk = nullptr;
+
+    std::unique_ptr<IndexChunk> tempIndexChunk;
+    std::unique_ptr<MetadataChunk> tempMetadataChunk;
 
     size_t chunkIndex = 0;
     size_t numChunks = _master.NumChunks();
@@ -60,12 +71,18 @@ search_results IndexServer::findDocuments(std::string query, int matchCount, int
     auto startTime = std::chrono::steady_clock::now();
     while (docs.size() < matchCount && chunkIndex < numChunks) {
         spdlog::info("Checking chunk index {}", chunkIndex);
-        if (chunkIndex != 0) {
-            _secondaryIndexChunk = _master.GetIndexChunk(chunkIndex);
-            _secondaryMetadataChunk = _master.GetMetadataChunk(chunkIndex);
-
+        if (chunkIndex == 0) {
+            currIndexChunk = _primaryIndexChunk.get();
+            currMetadataChunk = _primaryMetadataChunk.get();
+        } else if (chunkIndex == 1) {
             currIndexChunk = _secondaryIndexChunk.get();
             currMetadataChunk = _secondaryMetadataChunk.get();
+        } else {
+            tempIndexChunk = std::move(_master.GetIndexChunk(chunkIndex));
+            tempMetadataChunk = std::move(_master.GetMetadataChunk(chunkIndex));
+
+            currIndexChunk = tempIndexChunk.get();
+            currMetadataChunk = tempMetadataChunk.get();
         }
         auto endTime = std::chrono::steady_clock::now();
         double time =
@@ -101,9 +118,7 @@ search_results IndexServer::findDocuments(std::string query, int matchCount, int
 
             int numTitleOccurences = 0;
             int numBodyOccurences = 0;
-            while (
-                ISR->Next() !=
-                std::nullopt) {  // try to move forward to hopefully still be on the same document
+            while (ISR->Next() != std::nullopt) {
                 std::optional<PostEntry> entry = ISR->GetCurrentPostEntry();
                 if (ISR->GetDocumentID() == docId) {
                     if (entry->GetLocationFound() == wordlocation_t::title) {
@@ -114,7 +129,15 @@ search_results IndexServer::findDocuments(std::string query, int matchCount, int
                 } else {
                     break;  // we did Next() and that caused us to move on to a brand new document
                 }
+                auto endTime = std::chrono::steady_clock::now();
+                double time =
+                    std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime)
+                        .count();
+                if (time > timeUpperLimitMs) {
+                    break;
+                }
             }
+            cout << docName << " " << numTitleOccurences << " " << numBodyOccurences << endl;
             search_result_t docData(docName, data.numWords, data.numTitleWords, data.numOutLinks,
                                     numTitleOccurences, numBodyOccurences, data.pageRank,
                                     data.cheiRank, data.docNum, data.docStartOffset,
@@ -238,6 +261,16 @@ int main(int argc, char** argv) {
 
     program.add_argument("-h", "--htmlinput").required().help("Directory html files are located");
 
+    program.add_argument("-c", "--count")
+        .default_value(100)
+        .help("Number of mathes to look for before stopping index search")
+        .scan<'i', int>();
+
+    program.add_argument("-t", "--time")
+        .default_value(1000)
+        .help("Max time on how long to search index for ")
+        .scan<'i', int>();
+
     try {
         program.parse_args(argc, argv);
     } catch (const std::exception& err) {
@@ -250,10 +283,14 @@ int main(int argc, char** argv) {
     int maxClients = program.get<int>("-m");
     std::string indexPath = program.get<std::string>("-i");
     std::string htmlPath = program.get<std::string>("-h");
+    int matchCount = program.get<int>("-c");
+    int waitTimeMS = program.get<int>("-t");
 
     spdlog::info("Port {}", port);
     spdlog::info("Max clients {}", maxClients);
     spdlog::info("Index Path {}", indexPath);
+    spdlog::info("Match count {}", matchCount);
+    spdlog::info("Wait time in ms {}", waitTimeMS);
 
     int fd = -1;
     auto [buf, size] = read_mmap_region(fd, indexPath + "masterchunk");
@@ -262,7 +299,7 @@ int main(int argc, char** argv) {
     munmap(buf, size);
     close(fd);
 
-    IndexServer indexServer(port, maxClients, indexPath, htmlPath, master);
+    IndexServer indexServer(port, maxClients, indexPath, htmlPath, matchCount, waitTimeMS, master);
     spdlog::info("======= Index Server Started =======");
     indexServer.Start();
 }
