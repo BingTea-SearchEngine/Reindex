@@ -148,5 +148,6 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
         cout << offset << endl;
     }
 
+    cout << "After for loop"  << endl;
     return std::move(index);
 }
