@@ -112,23 +112,31 @@ void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words, metada
     // If too big write to disk and reinitialize _currIndexChunk
     if (_currIndexChunk.GetBytesRequired() > _chunkSize ||
         _currMetadataChunk.GetBytesRequired() > _chunkSize) {
-        spdlog::info("Flushing");
-        spdlog::info("Offset reached {}", _currIndexChunk._offset);
         Flush();
-        spdlog::info("Done Flushing, number of index chunks: {}", _indexChunks.size());
-        spdlog::info("Number of documents indexed so far {}", _numDocuments);
     }
     metadata.docStartOffset = _currIndexChunk.GetCurrentOffset();
     _currIndexChunk.AddDocument(doc, words);
     _currMetadataChunk.AddDocument(doc, metadata);
     _numDocuments++;
+    if (_numDocuments % 10000 == 0) {
+        spdlog::info("{} indexed", _numDocuments);
+    }
 }
 
 void MasterChunk::Flush() {
+    spdlog::info("Flushing");
+    spdlog::info("Offset reached {}", _currIndexChunk._offset);
     _serializeCurrIndexChunk();
     _serializeCurrMetadataChunk();
     _currIndexChunk = IndexChunk();
     _currMetadataChunk = MetadataChunk();
+    spdlog::info("Done Flushing, number of index chunks: {}", _indexChunks.size());
+    spdlog::info("Number of documents indexed so far {}", _numDocuments);
+}
+
+size_t MasterChunk::NumChunks() {
+    assert(_indexChunks.size() == _metadataChunks.size());
+    return _indexChunks.size();
 }
 
 void MasterChunk::PrintCurrentIndexChunk() const {

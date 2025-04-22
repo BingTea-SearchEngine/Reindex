@@ -184,23 +184,22 @@ class OrISR : public ::testing::Test {
          {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my", "protein", "goal",
           "bar", "none"}}};
 
-        void SetUp() override {
+    void SetUp() override {
         uint32_t word_counter = 0;
         uint32_t docID = 1;
         for (const auto& doc : documents) {
-                for (size_t i = 0; i < doc.words.size(); ++i) {
+            for (size_t i = 0; i < doc.words.size(); ++i) {
                 const std::string& word = doc.words[i];
                 if (index.find(word) == index.end()) {
-                        index[word] = PostingList(word);
+                    index[word] = PostingList(word);
                 }
-                index[word].AddWord(docID,
-                                        {word_counter, wordlocation_t::body});
+                index[word].AddWord(docID, {word_counter, wordlocation_t::body});
                 word_counter++;
-                }
-                docID++;
+            }
+            docID++;
         }
-        }
-        };
+    }
+};
 
 TEST_F(OrISR, SimpleNext) {
     ISR* ISR_word_protein = new ISRWord(&index["protein"]);

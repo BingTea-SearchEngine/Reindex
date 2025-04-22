@@ -10,8 +10,8 @@ ISROr::ISROr(std::vector<ISR*> children)
       nearestStartLocation(-1),
       nearestEndLocation(-1) {}
 
-ISROr::~ISROr(){
-    for(auto child : childISRs){
+ISROr::~ISROr() {
+    for (auto child : childISRs) {
         delete child;
     }
 }
@@ -151,8 +151,7 @@ std::optional<PostEntry> ISROr::NextDocument() {
     uint32_t prevDocumentID = this->GetDocumentID();
 
     while (this->GetDocumentID() == prevDocumentID) {
-        if (this->childISRs[this->nearestTerm]->NextDocument() ==
-            std::nullopt) {
+        if (this->childISRs[this->nearestTerm]->NextDocument() == std::nullopt) {
             this->whichChildFinished[this->nearestTerm] = true;
         }
 

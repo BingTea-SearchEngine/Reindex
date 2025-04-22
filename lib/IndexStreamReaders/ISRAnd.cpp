@@ -10,8 +10,8 @@ ISRAnd::ISRAnd(std::vector<ISR*> children)
       nearestStartLocation(-1),
       nearestEndLocation(-1) {}
 
-ISRAnd::~ISRAnd(){
-    for(auto child : childISRs){
+ISRAnd::~ISRAnd() {
+    for (auto child : childISRs) {
         delete child;
     }
 }
@@ -105,15 +105,13 @@ bool ISRAnd::CatchUpStragglerISRs() {
         // .........................y
         // .....................z....
         // move forward the proper stragglers until they're hopefully on the same document as y
-        uint32_t potentialTargetDocument =
-            (this->childISRs)[this->farthestTerm]->GetDocumentID();
+        uint32_t potentialTargetDocument = (this->childISRs)[this->farthestTerm]->GetDocumentID();
         for (int i = 0; i < childISRs.size(); ++i) {
             if (i == this->farthestTerm) {
                 continue;
             }
 
-            uint32_t currentDocument =
-                (this->childISRs)[i]->GetDocumentID();
+            uint32_t currentDocument = (this->childISRs)[i]->GetDocumentID();
             if (currentDocument == potentialTargetDocument) {
                 continue;
             }

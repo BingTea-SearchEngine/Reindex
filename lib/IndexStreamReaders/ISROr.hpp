@@ -24,7 +24,7 @@ class ISROr : public ISR {
      * @brief Deletes all children ISRs
     */
     ~ISROr() override;
-    
+
     /**
      * @brief Returns the absolute location of the earliest occurrence
      *        among the child ISRs at this moment.

@@ -93,8 +93,7 @@ TEST(BasicPostingList, TestAddWord) {
 
     // First post
     EXPECT_EQ(posts[0].GetDocumentID(), 1);
-    auto wordEntries1 =
-        posts[0].GetEntries();  // Get entries for the first post
+    auto wordEntries1 = posts[0].GetEntries();  // Get entries for the first post
     EXPECT_EQ(wordEntries1[0].GetDelta(), w1.GetDelta());
     EXPECT_EQ(wordEntries1[0].GetLocationFound(), w1.GetLocationFound());
     EXPECT_EQ(wordEntries1[1].GetDelta(), w2.GetDelta());
@@ -102,8 +101,7 @@ TEST(BasicPostingList, TestAddWord) {
 
     // Second post
     EXPECT_EQ(posts[1].GetDocumentID(), 2);
-    auto wordEntries2 =
-        posts[1].GetEntries();  // Get entries for the second post
+    auto wordEntries2 = posts[1].GetEntries();  // Get entries for the second post
     EXPECT_EQ(wordEntries2[0].GetDelta(), w3.GetDelta());
     EXPECT_EQ(wordEntries2[0].GetLocationFound(), w3.GetLocationFound());
 }

@@ -7,85 +7,6 @@ IndexServer::IndexServer(int port, int maxClients, std::string indexaPath, std::
     _primaryMetadataChunk = _master.GetMetadataChunk(0);
 }
 
-std::string IndexServer::getSnippet(metadata_t docMetadata, uint32_t matchOffset, int delta) {
-    std::string filePath = _htmlDir + std::to_string(docMetadata.docNum) + ".parsed";
-    std::ifstream file(filePath);
-    if (!file) {
-        std::cerr << "Error openning " << filePath << endl;
-        return "";
-    }
-
-    int docRelativeMatchOffset = matchOffset - docMetadata.docStartOffset;
-    if (docRelativeMatchOffset < 0) {
-        return "";
-    }
-
-    int snippetStartOffset = std::max(docRelativeMatchOffset - delta, 0);
-    cout << snippetStartOffset << " " << docRelativeMatchOffset << endl;
-
-    std::string snippet;
-
-    std::string line;
-    std::getline(file, line);  // URL and Doc num line
-    std::getline(file, line);  // get <title> tag
-    std::getline(file, line);  // get titles
-
-    std::istringstream titleIss(line);
-    std::string word;
-    uint32_t offset = 0;
-    bool snippetFound = false;
-    while (titleIss >> word) {
-        if (offset == snippetStartOffset) {
-            snippet += word;
-            snippet += " ";
-            snippetFound = true;
-            offset++;
-            break;
-        }
-        ++offset;
-    }
-
-    if (snippetFound) {
-        while (titleIss >> word) {
-            snippet += word;
-            snippet += " ";
-            if (offset == docRelativeMatchOffset + delta) {
-                break;
-            }
-            ++offset;
-        }
-        return snippet;
-    }
-
-    std::getline(file, line);  // get </title>
-    std::getline(file, line);  // get <words>
-    std::getline(file, line);  // get words
-    std::istringstream wordIss(line);
-    while (wordIss >> word) {
-        if (offset == snippetStartOffset) {
-            snippet += word;
-            snippet += " ";
-            snippetFound = true;
-            offset++;
-            break;
-        }
-        ++offset;
-    }
-
-    if (snippetFound) {
-        while (wordIss >> word) {
-            if (offset == docRelativeMatchOffset + delta) {
-                break;
-            }
-            snippet += word;
-            snippet += " ";
-            ++offset;
-        }
-    }
-
-    return snippet;
-}
-
 void IndexServer::Start() {
     while (true) {
         std::vector<Message> messages = _server.GetMessagesBlocking();
@@ -110,41 +31,34 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
     spdlog::info("Query: {}", msg.query);
 
     // Parser query
-    std::vector<std::pair<std::string, search_result_t>> docs = findDocuments(msg.query, 100);
-
+    search_results docs = findDocuments(msg.query, 100, 10000);
     spdlog::info("Got {} results", docs.size());
 
     // Some kind of ranking
+    rank(docs);
 
     std::vector<doc_t> results;
-    for (const auto& [url, metadata] : docs) {
+    for (size_t i = 0; i < std::min(docs.size(), (size_t)10); ++i) {
+        search_result_t result = docs[i];
+        auto [title, snippet] = getTitleAndSnippet(result, 10);
+        results.push_back(doc_t{result.url, result.numWords, result.numTitleWords,
+                                result.numOutLinks, result.pageRank, result.cheiRank, snippet,
+                                title});
     }
-
-    // documents.push_back(
-    //     doc_t{"https://wwww.google.com", 5, 1231, 4, 0.4, 0.5, "This is google.com"});
-    // ;
-    // documents.push_back(
-    //     doc_t{"https://www.twitter.com", 5, 1231, 5, 0.4, 0.5, "This is twitter.com"});
-    // documents.push_back(
-    //     doc_t{"https://www.nytimes.com", 5, 1231, 6, 0.4, 0.5, "this is nytimes.com"});
-    // documents.push_back(doc_t{"https://www.washingtonpost.com", 5, 1231, 7, 0.4, 0.5,
-    //                           "This is washintongpost.com"});
-    // documents.push_back(doc_t{"https://www.ft.com", 5, 1231, 5, 0.4, 0.5, "This is ft.com"});
-
-    metadata_t docMetadata = _primaryMetadataChunk->GetMetadata("https://news.google.com/");
-    cout << getSnippet(docMetadata, 461, 10) << endl;
 
     return IndexMessage{IndexMessageType::DOCUMENTS, "", results};
 }
 
-std::vector<std::pair<std::string, search_result_t>> IndexServer::findDocuments(std::string query,
-                                                                           int matchCount) {
-    std::vector<std::pair<std::string, search_result_t>> docs;
+search_results IndexServer::findDocuments(std::string query, int matchCount, int timeUpperLimitMs) {
+    search_results docs;
     const IndexChunk* currIndexChunk = _primaryIndexChunk.get();
     const MetadataChunk* currMetadataChunk = _primaryMetadataChunk.get();
 
     size_t chunkIndex = 0;
-    while (docs.size() < matchCount) {
+    size_t numChunks = _master.NumChunks();
+
+    auto startTime = std::chrono::steady_clock::now();
+    while (docs.size() < matchCount && chunkIndex < numChunks) {
         spdlog::info("Checking chunk index {}", chunkIndex);
         if (chunkIndex != 0) {
             _secondaryIndexChunk = _master.GetIndexChunk(chunkIndex);
@@ -152,6 +66,12 @@ std::vector<std::pair<std::string, search_result_t>> IndexServer::findDocuments(
 
             currIndexChunk = _secondaryIndexChunk.get();
             currMetadataChunk = _secondaryMetadataChunk.get();
+        }
+        auto endTime = std::chrono::steady_clock::now();
+        double time =
+            std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+        if (time > timeUpperLimitMs) {
+            break;
         }
         Parser parser(query, &currIndexChunk->GetAllPostingLists());
         Expression* expr = parser.Parse();
@@ -161,25 +81,140 @@ std::vector<std::pair<std::string, search_result_t>> IndexServer::findDocuments(
         while (ISR->GetCurrentPostEntry() != std::nullopt) {
             if (docs.size() == matchCount)
                 break;
+            auto endTime = std::chrono::steady_clock::now();
+            double time =
+                std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+            if (time > timeUpperLimitMs) {
+                break;
+            }
 
-            std::string docName = ISR->GetDocumentName();
+            uint32_t docId = ISR->GetDocumentID();
+            uint32_t absolute_location = ISR->GetStartLocation();
+            std::string docName = currIndexChunk->GetDocName(docId);
             metadata_t data = currMetadataChunk->GetMetadata(docName);
-            search_result_t docData {
-                data.numWords,
-                data.numTitleWords,
-                data.numOutLinks,
-                data.pageRank,
-                data.cheiRank,
-                data.docNum,
-                data.docStartOffset
-            };
-            docs.push_back({docName, docData});
-            ISR->NextDocument();
+
+            int numTitleOccurences = 0;
+            int numBodyOccurences = 0;
+            while (
+                ISR->Next() !=
+                std::nullopt) {  // try to move forward to hopefully still be on the same document
+                std::optional<PostEntry> entry = ISR->GetCurrentPostEntry();
+                if (ISR->GetDocumentID() == docId) {
+                    if (entry->GetLocationFound() == wordlocation_t::title) {
+                        numTitleOccurences++;
+                    } else {
+                        numBodyOccurences++;
+                    }
+                } else {
+                    break;  // we did Next() and that caused us to move on to a brand new document
+                }
+            }
+            cout << docName << " " << numTitleOccurences << " " << numBodyOccurences << endl;
+            search_result_t docData(docName, data.numWords, data.numTitleWords, data.numOutLinks,
+                                    numTitleOccurences, numBodyOccurences, data.pageRank,
+                                    data.cheiRank, data.docNum, data.docStartOffset,
+                                    absolute_location);
+            docs.push_back(docData);
         }
         delete ISR;
         chunkIndex++;
     }
     return docs;
+}
+
+void IndexServer::rank(search_results& input) {
+    std::sort(input.begin(), input.end(), [](const search_result_t& a, const search_result_t& b) {
+        return a.rankingScore > b.rankingScore;
+    });
+}
+
+std::pair<std::string, std::string> IndexServer::getTitleAndSnippet(search_result_t docMetadata,
+                                                                    int delta) {
+    std::string filePath = _htmlDir + std::to_string(docMetadata.docNum) + ".parsed";
+    std::ifstream file(filePath);
+    if (!file) {
+        std::cerr << "Error openning " << filePath << endl;
+        return {"", ""};
+    }
+
+    int docRelativeMatchOffset = docMetadata.matchAbsoluteOffset - docMetadata.docStartOffset;
+    if (docRelativeMatchOffset < 0) {
+        return {"", ""};
+    }
+
+    int snippetStartOffset = std::max(docRelativeMatchOffset - delta, 0);
+
+    std::string title;
+    std::string snippet;
+
+    std::string line;
+    std::getline(file, line);  // URL and Doc num line
+    std::getline(file, line);  // get <title> tag
+    std::getline(file, line);  // get titles
+
+    std::istringstream titleIss(line);
+    title = line;
+    std::string word;
+    uint32_t offset = 0;
+    bool snippetFound = false;
+    while (titleIss >> word) {
+        word = strip_utf8_spaces(word);
+        if (!is_ascii(word))
+            continue;
+
+        if (offset == snippetStartOffset) {
+            snippet += word;
+            snippet += " ";
+            snippetFound = true;
+            offset++;
+            break;
+        }
+        ++offset;
+    }
+
+    if (snippetFound) {
+        while (titleIss >> word) {
+            snippet += word;
+            snippet += " ";
+            if (offset == docRelativeMatchOffset + delta) {
+                break;
+            }
+            ++offset;
+        }
+        return {title, snippet};
+    }
+
+    std::getline(file, line);  // get </title>
+    std::getline(file, line);  // get <words>
+    std::getline(file, line);  // get words
+    std::istringstream wordIss(line);
+    while (wordIss >> word) {
+        word = strip_utf8_spaces(word);
+        if (!is_ascii(word))
+            continue;
+
+        if (offset == snippetStartOffset) {
+            snippet += word;
+            snippet += " ";
+            snippetFound = true;
+            offset++;
+            break;
+        }
+        ++offset;
+    }
+
+    if (snippetFound) {
+        while (wordIss >> word) {
+            if (offset == docRelativeMatchOffset + delta) {
+                break;
+            }
+            snippet += word;
+            snippet += " ";
+            ++offset;
+        }
+    }
+
+    return {title, snippet};
 }
 
 int main(int argc, char** argv) {

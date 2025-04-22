@@ -10,8 +10,8 @@ ISRPhrase::ISRPhrase(std::vector<ISR*> children)
       nearestStartLocation(-1),
       nearestEndLocation(-1) {}
 
-ISRPhrase::~ISRPhrase(){
-    for(auto child : childISRs){
+ISRPhrase::~ISRPhrase() {
+    for (auto child : childISRs) {
         delete child;
     }
 }
@@ -106,18 +106,15 @@ bool ISRPhrase::CatchUpStragglerISRs() {
         // .................y........
         // .........................z
         // move forward the proper stragglers until they're hopefully RIGHT NEXT TO z
-        uint32_t potentialTargetDocument =
-            (this->childISRs)[this->farthestTerm]->GetDocumentID();
-        size_t baselineLocation =
-            (this->childISRs)[this->farthestTerm]->GetStartLocation();
+        uint32_t potentialTargetDocument = (this->childISRs)[this->farthestTerm]->GetDocumentID();
+        size_t baselineLocation = (this->childISRs)[this->farthestTerm]->GetStartLocation();
 
         for (int i = 0; i < childISRs.size(); ++i) {
             if (i == this->farthestTerm) {
                 continue;
             }
 
-            uint32_t currentDocument =
-                (this->childISRs)[i]->GetDocumentID();
+            uint32_t currentDocument = (this->childISRs)[i]->GetDocumentID();
             size_t currLocation = (this->childISRs)[i]->GetStartLocation();
 
             // let's say there are child ISRs a, b, c, and d

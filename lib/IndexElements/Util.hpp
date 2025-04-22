@@ -9,6 +9,9 @@
 #include <stdexcept>
 #include <string>
 
+std::string strip_utf8_spaces(const std::string& input);
+
+bool is_ascii(const std::string& word);
 /*
  * @brief Create a memory mapped region
  *

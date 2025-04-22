@@ -7,10 +7,10 @@
 
 #include <cassert>
 #include <cstring>
-#include <string>
-#include <vector>
 #include <filesystem>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <spdlog/fmt/bundled/ranges.h>
 #include <spdlog/sinks/basic_file_sink.h>
@@ -94,6 +94,12 @@ class MasterChunk {
      * @param i The index of the index. Must be less than the size of _medataChunks
      * */
     std::unique_ptr<MetadataChunk> GetMetadataChunk(size_t i);
+
+    /*
+     * @brief Return the number of chunks in this index server
+     *
+     * */
+    size_t NumChunks();
 
     /**
      * @brief Serializes a given MasterChunk object into a specific region of memory.

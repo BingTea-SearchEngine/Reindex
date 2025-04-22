@@ -190,13 +190,12 @@ class ContainerISR : public ::testing::Test {
         uint32_t docID = 1;
         for (const auto& doc : documents) {
             for (size_t i = 0; i < doc.words.size(); ++i) {
-            const std::string& word = doc.words[i];
-            if (index.find(word) == index.end()) {
+                const std::string& word = doc.words[i];
+                if (index.find(word) == index.end()) {
                     index[word] = PostingList(word);
-            }
-            index[word].AddWord(docID,
-                                    {word_counter, wordlocation_t::body});
-            word_counter++;
+                }
+                index[word].AddWord(docID, {word_counter, wordlocation_t::body});
+                word_counter++;
             }
             docID++;
         }
@@ -224,8 +223,7 @@ TEST_F(ContainerISR, SimpleNext) {
               wordlocation_t::body);
     EXPECT_EQ(ISR_granola_bar_container_no_costco->GetStartLocation(), 8);
     EXPECT_EQ(ISR_granola_bar_container_no_costco->GetEndLocation(), 9);
-    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetDocumentID(),
-              1);
+    EXPECT_EQ(ISR_granola_bar_container_no_costco->GetDocumentID(), 1);
 
     // no more
     EXPECT_EQ(ISR_granola_bar_container_no_costco->Next(), std::nullopt);

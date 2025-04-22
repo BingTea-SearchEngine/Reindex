@@ -19,8 +19,7 @@ void Post::AddWord(PostEntry word) {
 }
 
 void Post::Print() const {
-    cout << "\tPost{ " << docID << " }: " << entries.size()
-         << " entries" << endl;
+    cout << "\tPost{ " << docID << " }: " << entries.size() << " entries" << endl;
     cout << "\t\t";
     for (const PostEntry& entry : entries) {
         entry.Print();

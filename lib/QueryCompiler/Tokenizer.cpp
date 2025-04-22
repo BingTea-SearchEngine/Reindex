@@ -12,21 +12,21 @@ Tokenstream::Tokenstream(const std::string& input) {
     current = head;
 }
 
-Tokenstream::~Tokenstream(){
-    while(head){
+Tokenstream::~Tokenstream() {
+    while (head) {
         Token* curr = head;
         head = head->next;
         delete curr;
     }
 }
 
-Token* Tokenstream::GetCurrent() const{
+Token* Tokenstream::GetCurrent() const {
     return current;
 }
 
-const Token* Tokenstream::MatchToken(TokenType typein){
+const Token* Tokenstream::MatchToken(TokenType typein) {
     // returns and consumes the current token if it matches the type
-    if (current && current->type == typein){
+    if (current && current->type == typein) {
         Token* out = current;
         current = current->next;
         return out;

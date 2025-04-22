@@ -193,8 +193,7 @@ class AndISR : public ::testing::Test {
                 if (index.find(word) == index.end()) {
                     index[word] = PostingList(word);
                 }
-                index[word].AddWord(docID,
-                                    {word_counter, wordlocation_t::body});
+                index[word].AddWord(docID, {word_counter, wordlocation_t::body});
                 word_counter++;
             }
             docID++;

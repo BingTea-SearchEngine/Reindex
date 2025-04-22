@@ -12,7 +12,7 @@ ISRContainer::ISRContainer(ISR* includedISR, ISR* excludedISR)
     delete excludedISR;
 }
 
-ISRContainer::~ISRContainer(){
+ISRContainer::~ISRContainer() {
     delete included;
 }
 
