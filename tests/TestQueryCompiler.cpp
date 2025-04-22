@@ -185,3 +185,17 @@ TEST_F(QueryCompilerTest, PhraseORNOT) {
     delete expr;
     delete root;
 }
+
+TEST_F(QueryCompilerTest, Invalid) {
+    std::string input = "These words are not in the index";
+    Parser parser(input, &index);
+    Expression* expr = parser.Parse();
+    ASSERT_NE(expr, nullptr);
+    std::cout<<expr->GetString()<<std::endl;
+
+    ISR* root = expr->Eval();
+    EXPECT_EQ(root, nullptr);
+
+    delete expr;
+}
+

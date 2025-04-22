@@ -23,8 +23,17 @@ ISR* Constraint::Eval() const {  // placeholder for an OR ISR
         return BCs[0]->Eval();
     }
     std::vector<ISR*> children;
-    for (int i = 0; i < BCs.size(); i++) {
-        children.push_back(BCs[i]->Eval());
+    for(int i = 0; i < BCs.size(); i++){
+        ISR* result = BCs[i]->Eval();
+        if(result){
+            children.push_back(result);
+        }
+        else{
+            for (ISR* child : children) {
+                delete child;
+            }
+            return nullptr;
+        }
     }
     return new ISROr(children);
 }
@@ -61,8 +70,17 @@ ISR* BaseConstraint::Eval() const {
         return SCs[0]->Eval();
     }
     std::vector<ISR*> children;
-    for (int i = 0; i < SCs.size(); i++) {
-        children.push_back(SCs[i]->Eval());
+    for(int i = 0; i < SCs.size(); i++){
+        ISR* result = SCs[i]->Eval();
+        if(result){
+            children.push_back(result);
+        }
+        else{
+            for (ISR* child : children) {
+                delete child;
+            }
+            return nullptr;
+        }
     }
     if (type == "And") {
         return new ISRAnd(children);
@@ -124,8 +142,17 @@ ISR* Phrase::Eval() const {  // placeholder for a PHRASE ISR
         return SWs[0]->Eval();
     }
     std::vector<ISR*> children;
-    for (int i = 0; i < SWs.size(); i++) {
-        children.push_back(SWs[i]->Eval());
+    for(int i = 0; i < SWs.size(); i++){
+        ISR* result = SWs[i]->Eval();
+        if(result){
+            children.push_back(result);
+        }
+        else{
+            for (ISR* child : children) {
+                delete child;
+            }
+            return nullptr;
+        }
     }
     return new ISRPhrase(children);
 }
