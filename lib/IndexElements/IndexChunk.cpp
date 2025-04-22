@@ -144,13 +144,13 @@ IndexChunk IndexChunk::Deserailize(char* base_region, size_t& offset) {
     for (size_t i = 0; i < num_words; ++i) {
         PostingList pl = PostingList::Deserialize(base_region, offset);
         // index._postingLists[pl.GetWord()] = std::move(pl);
-        index._postingLists.emplace(pl.GetWord(), std::move(pl));
         size_t change = offset - prevOffset;
         prevOffset = offset;
         if (change > 100000) { 
             cout << i << " " << change <<endl;
             cout << pl.posts.size() << endl;
         }
+        index._postingLists.emplace(pl.GetWord(), std::move(pl));
     }
 
     cout << "After for loop"  << endl;
