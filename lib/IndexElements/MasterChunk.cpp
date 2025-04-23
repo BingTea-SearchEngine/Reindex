@@ -116,6 +116,7 @@ void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words, metada
     }
     metadata.docStartOffset = _currIndexChunk.GetCurrentOffset();
     _currIndexChunk.AddDocument(doc, words);
+    metadata.docEndOffset = _currIndexChunk.GetCurrentOffset();
     _currMetadataChunk.AddDocument(doc, metadata);
     _numDocuments++;
     if (_numDocuments % 10000 == 0) {

@@ -51,6 +51,7 @@ struct metadata_t {
     float cheiRank;
     uint32_t docNum;          // For snippet retrieval
     uint32_t docStartOffset;  // For snippet retrieval
+    uint32_t docEndOffset;  // For ISR
 
     friend std::ostream& operator<<(std::ostream& os, const metadata_t& m);
 
@@ -59,7 +60,7 @@ struct metadata_t {
     size_t getBytes() {
         size_t bytes = sizeof(numWords) + sizeof(numTitleWords) + sizeof(numOutLinks) +
                        sizeof(pageRank) + sizeof(cheiRank) + sizeof(docNum) +
-                       sizeof(docStartOffset);
+                       sizeof(docStartOffset) + sizeof(docEndOffset);
         return bytes;
     }
 };
