@@ -46,7 +46,7 @@ std::vector<Post> PostingList::GetPosts() const {
 
 void PostingList::Serialize(char* base_region, size_t& offset, const PostingList& postingList) {
     // PostingList::NewSerialize(base_region, offset, postingList);
-    PostingList::OldSerialize(base_region, offset, postingList);
+    PostingList::NewSerialize(base_region, offset, postingList);
 }
 
 void PostingList::OldSerialize(char* base_region, size_t& offset, const PostingList& postingList) {
@@ -159,7 +159,7 @@ void PostingList::NewSerialize(char* base_region, size_t& offset, const PostingL
 
 PostingList PostingList::Deserialize(char* base_region, size_t& offset) {
     // return PostingList::NewDeserialize(base_region, offset);
-    return PostingList::OldDeserialize(base_region, offset);
+    return PostingList::NewDeserialize(base_region, offset);
 }
 
 PostingList PostingList::OldDeserialize(char* base_region, size_t& offset) {
