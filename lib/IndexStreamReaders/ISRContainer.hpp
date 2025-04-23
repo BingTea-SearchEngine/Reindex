@@ -97,4 +97,7 @@ class ISRContainer : public ISR {
 
     /// The excluded ISR structure.
     ISR* excluded;
+
+    /// private internal helper function
+    std::optional<PostEntry> MatchNotOnExcluded();
 };

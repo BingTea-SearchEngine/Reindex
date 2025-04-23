@@ -30,15 +30,12 @@ uint32_t ISRContainer::GetDocumentID() {
     return this->included->GetDocumentID();
 }
 
-std::optional<PostEntry> ISRContainer::Next() {
-    if (this->included->Next() == std::nullopt) {
-        return std::nullopt;
-    }
-
-    if (this->excluded->GetCurrentPostEntry() == std::nullopt) {
-        return this->included->GetCurrentPostEntry();
-    }
-
+// INTERNAL HELPER FUNCTION
+// precondition: at the very beginning of calling this,
+// the included and excluded must both be pointing to something meaningful
+// this function finds the next match for Included while making sure to
+// ignore documents dictated by Excluded
+std::optional<PostEntry> ISRContainer::MatchNotOnExcluded() {
     while (true) {
         uint32_t includedDocID = this->included->GetDocumentID();
         uint32_t excludedDocID = this->excluded->GetDocumentID();
@@ -66,6 +63,18 @@ std::optional<PostEntry> ISRContainer::Next() {
     }
 }
 
+std::optional<PostEntry> ISRContainer::Next() {
+    if (this->included->Next() == std::nullopt) {
+        return std::nullopt;
+    }
+
+    if (this->excluded->GetCurrentPostEntry() == std::nullopt) {
+        return this->included->GetCurrentPostEntry();
+    }
+
+    return this->MatchNotOnExcluded();
+}
+
 std::optional<PostEntry> ISRContainer::NextDocument() {
     if (this->included->NextDocument() == std::nullopt) {
         return std::nullopt;
@@ -75,31 +84,7 @@ std::optional<PostEntry> ISRContainer::NextDocument() {
         return this->included->GetCurrentPostEntry();
     }
 
-    while (true) {
-        uint32_t includedDocID = this->included->GetDocumentID();
-        uint32_t excludedDocID = this->excluded->GetDocumentID();
-
-        if (includedDocID < excludedDocID) {
-            return this->included->GetCurrentPostEntry();
-        }
-        else if (includedDocID == excludedDocID) {
-            // try again
-            this->included->NextDocument();
-            this->excluded->NextDocument();
-        }
-        else {
-            // move forward excluded ISR
-            this->excluded->NextDocument();
-        }
-
-        if (this->included->GetCurrentPostEntry() == std::nullopt) {
-            return std::nullopt;
-        }
-
-        if (this->excluded->GetCurrentPostEntry() == std::nullopt) {
-            return this->included->GetCurrentPostEntry();
-        }
-    }
+    return this->MatchNotOnExcluded();
 }
 
 std::optional<PostEntry> ISRContainer::Seek(size_t target) {
@@ -113,29 +98,5 @@ std::optional<PostEntry> ISRContainer::Seek(size_t target) {
         return this->included->GetCurrentPostEntry();
     }
 
-    while (true) {
-        uint32_t includedDocID = this->included->GetDocumentID();
-        uint32_t excludedDocID = this->excluded->GetDocumentID();
-
-        if (includedDocID < excludedDocID) {
-            return this->included->GetCurrentPostEntry();
-        }
-        else if (includedDocID == excludedDocID) {
-            // try again
-            this->included->NextDocument();
-            this->excluded->NextDocument();
-        }
-        else {
-            // move forward excluded ISR
-            this->excluded->NextDocument();
-        }
-
-        if (this->included->GetCurrentPostEntry() == std::nullopt) {
-            return std::nullopt;
-        }
-
-        if (this->excluded->GetCurrentPostEntry() == std::nullopt) {
-            return this->included->GetCurrentPostEntry();
-        }
-    }
+    return this->MatchNotOnExcluded();
 }
