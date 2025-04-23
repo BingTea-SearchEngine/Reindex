@@ -121,6 +121,7 @@ void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words, metada
     _numDocuments++;
     if (_numDocuments % 10000 == 0) {
         spdlog::info("{} indexed", _numDocuments);
+        spdlog::info("getrusage {}", getBytesUsed());
     }
 }
 
@@ -211,3 +212,4 @@ void MasterChunk::_serializeCurrMetadataChunk() {
     }
     close(fd);
 }
+

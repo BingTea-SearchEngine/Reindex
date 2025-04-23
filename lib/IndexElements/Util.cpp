@@ -66,3 +66,11 @@ std::pair<void*, size_t> read_mmap_region(int& fd, std::string filename) {
 
     return {mappedRegion, fileSize};
 }
+
+long getBytesUsed() {
+    struct rusage usage;
+    int ret;
+    ret = getrusage(RUSAGE_SELF, &usage);
+    return usage.ru_maxrss;
+}
+
