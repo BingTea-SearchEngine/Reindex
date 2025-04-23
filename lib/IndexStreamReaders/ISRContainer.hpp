@@ -95,9 +95,6 @@ class ISRContainer : public ISR {
     /// the included ISR structure this ISR is primarily trying to find occurrences of
     ISR* included;
 
-    /// The current PostEntry this ISR is pointing at.
-    std::optional<PostEntry> currentPostEntry;
-
-    /// The set of documents to skip over due to the NOT terms.
-    std::unordered_set<uint32_t> excludedDocuments;
+    /// The excluded ISR structure.
+    ISR* excluded;
 };
