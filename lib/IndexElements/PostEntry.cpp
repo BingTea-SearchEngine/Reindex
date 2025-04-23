@@ -35,7 +35,7 @@ wordlocation_t PostEntry::GetLocationFound() const {
 }
 
 size_t PostEntry::GetBytesRequired() {
-    return sizeof(delta) + sizeof(location_found);
+    return sizeof(PostEntry);
 }
 
 void PostEntry::Print() const {

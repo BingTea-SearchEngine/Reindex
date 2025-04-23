@@ -11,6 +11,7 @@ MasterChunk::MasterChunk(std::string outputDir, size_t chunkSize)
     std::filesystem::create_directories(_metadataDir);
     assert(std::filesystem::exists(_indexDir) && std::filesystem::is_directory(_indexDir));
     assert(std::filesystem::exists(_metadataDir) && std::filesystem::is_directory(_metadataDir));
+    _currIndexChunk = std::make_unique<IndexChunk>();
 }
 
 void MasterChunk::Serialize(char* baseRegion, size_t& offset, MasterChunk& master) {
@@ -110,27 +111,27 @@ void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words, metada
     // spdlog::info("Adding {}", doc);
     // Check if index will become too big
     // If too big write to disk and reinitialize _currIndexChunk
-    if (_currIndexChunk.GetBytesRequired() > _chunkSize ||
+    if (_currIndexChunk->GetBytesRequired() > _chunkSize ||
         _currMetadataChunk.GetBytesRequired() > _chunkSize) {
+        spdlog::info("Get bytes required {}: {}", _indexChunks.size(), _currIndexChunk->GetBytesRequired());
         Flush();
     }
-    metadata.docStartOffset = _currIndexChunk.GetCurrentOffset();
-    _currIndexChunk.AddDocument(doc, words);
-    metadata.docEndOffset = _currIndexChunk.GetCurrentOffset();
+    metadata.docStartOffset = _currIndexChunk->GetCurrentOffset();
+    _currIndexChunk->AddDocument(doc, words);
+    metadata.docEndOffset = _currIndexChunk->GetCurrentOffset();
     _currMetadataChunk.AddDocument(doc, metadata);
     _numDocuments++;
     if (_numDocuments % 10000 == 0) {
         spdlog::info("{} indexed", _numDocuments);
-        spdlog::info("getrusage {}", getBytesUsed());
     }
 }
 
 void MasterChunk::Flush() {
     spdlog::info("Flushing");
-    spdlog::info("Offset reached {}", _currIndexChunk._offset);
+    spdlog::info("Offset reached {}", _currIndexChunk->_offset);
     _serializeCurrIndexChunk();
     _serializeCurrMetadataChunk();
-    _currIndexChunk = IndexChunk();
+    _currIndexChunk.reset(new IndexChunk());
     _currMetadataChunk = MetadataChunk();
     spdlog::info("Done Flushing, number of index chunks: {}", _indexChunks.size());
     spdlog::info("Number of documents indexed so far {}", _numDocuments);
@@ -143,7 +144,7 @@ size_t MasterChunk::NumChunks() {
 
 void MasterChunk::PrintCurrentIndexChunk() const {
     cout << "---------- Index Chunk " << _indexChunks.size() << " ----------" << endl;
-    _currIndexChunk.Print();
+    _currIndexChunk->Print();
     cout << "---------- Index Chunk " << _indexChunks.size() << " ----------" << endl;
 }
 
@@ -187,7 +188,7 @@ void MasterChunk::_serializeCurrIndexChunk() {
     assert(fd != -1);
 
     size_t offset = 0;
-    IndexChunk::Serialize(static_cast<char*>(base_region), offset, _currIndexChunk);
+    IndexChunk::Serialize(static_cast<char*>(base_region), offset, *_currIndexChunk);
     munmap(base_region, _chunkSize * 2);
     if (ftruncate(fd, offset) == -1) {
         perror("Error truncating file");

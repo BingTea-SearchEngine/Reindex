@@ -23,11 +23,11 @@ DocStream::DocStream(std::string dirPath, std::string dictionaryPath) : _dirPath
         exit(EXIT_FAILURE);
     }
 
-    std::string word;
-    while (std::getline(dictFile, word)) {
-        word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
-        _dictionary.insert(word);
-    }
+    // std::string word;
+    // while (std::getline(dictFile, word)) {
+    //     word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());
+    //     _dictionary.insert(word);
+    // }
 }
 
 DocStreamOutput DocStream::nextFile() {
@@ -106,7 +106,6 @@ DocStreamOutput DocStream::nextFile() {
         std::transform(word.begin(), word.end(), word.begin(),
                        [](unsigned char c) { return std::tolower(c); });
         word = strip_utf8_spaces(word);
-
         if (is_ascii(word)) {
             output.push_back(word_t{word, offset, wordlocation_t::body});
         }

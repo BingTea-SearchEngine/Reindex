@@ -161,7 +161,7 @@ class MasterChunk {
     std::string _indexDir;
     std::string _metadataDir;
     // The current index chunk being built
-    IndexChunk _currIndexChunk;
+    std::unique_ptr<IndexChunk> _currIndexChunk;
     // The current metadata chunk being built
     MetadataChunk _currMetadataChunk;
     // The threshold size of an index chunk

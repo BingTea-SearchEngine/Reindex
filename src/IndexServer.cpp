@@ -6,7 +6,7 @@ IndexServer::IndexServer(int port, int maxClients, std::string indexaPath, std::
       _htmlDir(htmlPath),
       _matchCount(matchCount),
       _waitTimeMS(waitTime),
-      _master(master) {
+      _master(std::move(master)) {
     _primaryIndexChunk = _master.GetIndexChunk(0);
     _primaryMetadataChunk = _master.GetMetadataChunk(0);
 }
@@ -309,7 +309,7 @@ int main(int argc, char** argv) {
     munmap(buf, size);
     close(fd);
 
-    IndexServer indexServer(port, maxClients, indexPath, htmlPath, matchCount, waitTimeMS, master);
+    IndexServer indexServer(port, maxClients, indexPath, htmlPath, matchCount, waitTimeMS, std::move(master));
     spdlog::info("======= Index Server Started =======");
     indexServer.Start();
 }
