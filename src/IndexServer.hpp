@@ -90,12 +90,14 @@ struct SearchResultCompare {
 class IndexServer {
    public:
     IndexServer(int port, int maxClients, std::string indexPath, std::string htmlPath,
-                int matchCount, int waitTimeMS, MasterChunk master);
+                int matchCount, int waitTimeMS, int numChunksLoaded, MasterChunk master);
 
     void Start();
 
    private:
-    search_results findDocuments(std::string query, int matchCount, int timeUpperLimitMs);
+    search_results findDocuments(std::string query);
+
+    void searchChunk(std::string query, size_t chunkIndex, int matchCount, search_results* reuslts);
 
     std::pair<std::string, std::string> getTitleAndSnippet(search_result_t docMetadata, int delta);
 
@@ -112,8 +114,12 @@ class IndexServer {
     std::unique_ptr<MetadataChunk> _primaryMetadataChunk;
     std::unique_ptr<MetadataChunk> _secondaryMetadataChunk;
 
+    std::vector<std::unique_ptr<IndexChunk>> _indexChunks;
+    std::vector<std::unique_ptr<MetadataChunk>> _metadataChunks;
+
     std::string _htmlDir;
 
     int _matchCount;
     int _waitTimeMS;
+    int _numChunksLoaded;
 };

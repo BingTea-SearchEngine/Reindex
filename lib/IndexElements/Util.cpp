@@ -73,4 +73,3 @@ long getBytesUsed() {
     ret = getrusage(RUSAGE_SELF, &usage);
     return usage.ru_maxrss;
 }
-

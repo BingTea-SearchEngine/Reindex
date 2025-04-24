@@ -113,7 +113,8 @@ void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words, metada
     // If too big write to disk and reinitialize _currIndexChunk
     if (_currIndexChunk->GetBytesRequired() > _chunkSize ||
         _currMetadataChunk.GetBytesRequired() > _chunkSize) {
-        spdlog::info("Get bytes required {}: {}", _indexChunks.size(), _currIndexChunk->GetBytesRequired());
+        spdlog::info("Get bytes required {}: {}", _indexChunks.size(),
+                     _currIndexChunk->GetBytesRequired());
         Flush();
     }
     metadata.docStartOffset = _currIndexChunk->GetCurrentOffset();
@@ -213,4 +214,3 @@ void MasterChunk::_serializeCurrMetadataChunk() {
     }
     close(fd);
 }
-

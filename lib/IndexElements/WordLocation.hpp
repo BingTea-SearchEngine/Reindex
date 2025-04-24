@@ -51,7 +51,7 @@ struct metadata_t {
     float cheiRank;
     uint32_t docNum;          // For snippet retrieval
     uint32_t docStartOffset;  // For snippet retrieval
-    uint32_t docEndOffset;  // For ISR
+    uint32_t docEndOffset;    // For ISR
 
     friend std::ostream& operator<<(std::ostream& os, const metadata_t& m);
 

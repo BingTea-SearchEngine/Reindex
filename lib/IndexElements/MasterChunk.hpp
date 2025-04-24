@@ -16,7 +16,6 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
-
 #include "IndexChunk.hpp"
 #include "MetadataChunk.hpp"
 #include "Util.hpp"
@@ -169,4 +168,3 @@ class MasterChunk {
     // The number of documents indexed
     int _numDocuments;
 };
-
