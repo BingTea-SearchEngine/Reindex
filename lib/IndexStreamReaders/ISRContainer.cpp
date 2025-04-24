@@ -8,6 +8,10 @@ ISRContainer::ISRContainer(ISR* includedISR, ISR* excludedISR)
         excluded->NextDocument();
 }
 
+ISRContainer::~ISRContainer() {
+    delete included;
+}
+
 int ISRContainer::GetStartLocation() {
     assert(this->included->GetCurrentPostEntry().has_value() &&
            "GetStartLocation called when this ISR is not pointing to anything");
