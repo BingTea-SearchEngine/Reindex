@@ -136,7 +136,6 @@ MetadataChunk MetadataChunk::Deserailize(char* base_region, size_t& offset) {
 
         metadata_t metadata{numWords, numTitleWords, numOutLinks,   pageRank,
                             cheiRank, docNum,        docStartOffset};
-        cout << pageRank << " " << cheiRank << endl;
         chunk._docMetadata.insert(make_pair(docname, metadata));
     }
 
