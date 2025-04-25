@@ -34,7 +34,7 @@ std::string strip_utf8_spaces(const std::string& input) {
 bool valid(const std::string& word) {
     // return word.size() > 2 && skipWords.find(word) == skipWords.end() &&
     //        std::regex_match(word, validWordRegex);
-    return word.size() > 2 && skipWords.find(word) == skipWords.end() &&
+    return skipWords.find(word) == skipWords.end() &&
            std::all_of(word.begin(), word.end(),
                        [](char c) {
                            return std::isalnum(c) || c == '+' || c == '-' || c == '_' || c == '.';

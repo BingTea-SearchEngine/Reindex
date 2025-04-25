@@ -16,7 +16,7 @@
 const static std::regex validWordRegex("^[a-zA-Z0-9_+\\-.]*[a-zA-Z][a-zA-Z0-9_+\\-.]*$");
 const static std::unordered_set<std::string> skipWords = {
     "a",     "an",    "the",    "and",     "or",      "but",   "if",    "then",    "else",
-    "when",  "where", "while",  "of",      "at",      "by",    "for",   "to",      "in",
+    "when",  "where", "while",  "at",      "by",    "for",   "to",      "in",
     "on",    "from",  "up",     "down",    "with",    "about", "as",    "into",    "like",
     "over",  "after", "before", "between", "without", "under", "again", "further", "once",
     "just",  "only",  "same",   "so",      "too",     "very",  "can",   "will",    "should",
