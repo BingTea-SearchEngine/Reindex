@@ -114,4 +114,7 @@ class ISRPhrase : public ISR {
 
     /// internal helper function
     bool CatchUpStragglerISRs();
+
+    bool OldCatchUpStragglerISRs();
+    bool NewCatchUpStragglerISRs();
 };
