@@ -101,6 +101,9 @@ class ISRWord : public ISR {
      */
     virtual std::optional<PostEntry> Seek(size_t target) override;
 
+    std::optional<PostEntry> OldSeek(size_t target);
+    std::optional<PostEntry> NewSeek(size_t target);
+
    private:
     /// The postingList associated with this ISRWord
     const PostingList& postingList;

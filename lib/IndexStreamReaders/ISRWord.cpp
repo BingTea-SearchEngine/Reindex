@@ -108,11 +108,10 @@ std::optional<PostEntry> ISRWord::NextDocument() {
 }
 
 std::optional<PostEntry> ISRWord::Seek(size_t target) {
-    // TODO: implement seeking for PostingList
-    // so that we can do something like this?
-    // but then how would internal state change?
-    // return this->postingList->Seek(target);
-    // Do this with synchronization table.
+    return ISRWord::NewSeek(target);
+}
+
+std::optional<PostEntry> ISRWord::OldSeek(size_t target) {
     int outerPost = 0;
 
     for (auto post : this->postingList.GetPosts()) {
@@ -136,6 +135,64 @@ std::optional<PostEntry> ISRWord::Seek(size_t target) {
     }
 
     // no PostEntry was found at a location >= target
+    this->currentPostEntry = std::nullopt;
+    return std::nullopt;
+}
+
+std::optional<PostEntry> ISRWord::NewSeek(size_t target) {
+    const auto& posts = this->postingList.GetPosts();
+    const auto& sync_table = this->postingList.GetSyncTable();
+
+    // Step 1: Binary search sync_table
+    size_t left = 0, right = sync_table.size();
+    size_t start_idx = 0;
+    while (left < right) {
+        size_t mid = (left + right) / 2;
+        assert(mid >= 0 && mid < sync_table.size());
+        if (sync_table[mid].position <= target) {
+            start_idx = mid;
+            left = mid + 1;
+        } else {
+            right = mid;
+        }
+    }
+
+    // Step 2: Start linear scan from sync_table[start_idx]
+    this->currentPostIdx = 0;
+    this->currentPostEntryIdx = 0;
+    
+    if (start_idx < sync_table.size()) {
+        const auto& sync = sync_table[start_idx];
+
+        this->currentPostIdx = sync.post_idx;
+        this->currentPostEntryIdx = sync.entry_idx;
+    }
+    bool first = true;
+    for (size_t post_idx = this->currentPostIdx; post_idx < posts.size(); ++post_idx) {
+        const Post& post = posts[post_idx];
+        size_t entry_start = 0;
+
+        if (first) {
+            entry_start = this->currentPostEntryIdx;
+            first = false;
+        }
+
+        const auto& entries = post.GetEntries();
+
+        for (size_t entry_idx = entry_start; entry_idx < entries.size(); ++entry_idx) {
+            const PostEntry& entry = entries[entry_idx];
+            if (entry.GetDelta() >= target) {
+                this->currentPostIdx = post_idx;
+                this->currentPostEntryIdx = entry_idx;
+                this->currentPostEntry = entry;
+                this->absoluteLocation = entry.GetDelta();
+                this->documentID = post.GetDocumentID();
+                return this->currentPostEntry;
+            }
+        }
+    }
+
+    // No match found
     this->currentPostEntry = std::nullopt;
     return std::nullopt;
 }

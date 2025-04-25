@@ -15,6 +15,10 @@ std::string PostingList::GetWord() {
     return word;
 }
 
+std::vector<SyncPoint> PostingList::GetSyncTable() const {
+    return sync_table;
+}
+
 size_t PostingList::AddWord(uint32_t docID, PostEntry word) {
     size_t bytesRequired = 0;
     if (posts.empty()) {

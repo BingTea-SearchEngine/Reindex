@@ -37,11 +37,11 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
     // Rank?
 
     std::vector<doc_t> documents;
-    documents.push_back(doc_t{"https://wwww.google.com", 5, 1231, 4, 0.4, 0.5});
-    documents.push_back(doc_t{"https://www.twitter.com", 5, 1231, 5, 0.4, 0.5});
-    documents.push_back(doc_t{"https://www.nytimes.com", 5, 1231, 6, 0.4, 0.5});
-    documents.push_back(doc_t{"https://www.washingtonpost.com", 5, 1231, 7, 0.4, 0.5});
-    documents.push_back(doc_t{"https://www.ft.com", 5, 1231, 5, 0.4, 0.5});
+    // documents.push_back(doc_t{"https://wwww.google.com", 5, 1231, 4, 0.4, 0.5});
+    // documents.push_back(doc_t{"https://www.twitter.com", 5, 1231, 5, 0.4, 0.5});
+    // documents.push_back(doc_t{"https://www.nytimes.com", 5, 1231, 6, 0.4, 0.5});
+    // documents.push_back(doc_t{"https://www.washingtonpost.com", 5, 1231, 7, 0.4, 0.5});
+    // documents.push_back(doc_t{"https://www.ft.com", 5, 1231, 5, 0.4, 0.5});
 
     return IndexMessage{IndexMessageType::DOCUMENTS, "", documents};
 }
