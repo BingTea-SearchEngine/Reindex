@@ -123,5 +123,6 @@ gtest_discover_tests(TestISROr)
 gtest_discover_tests(TestISRAnd)
 gtest_discover_tests(TestISRPhrase)
 gtest_discover_tests(TestISRContainer)
+gtest_discover_tests(TestQueryCompiler)
 
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type")
