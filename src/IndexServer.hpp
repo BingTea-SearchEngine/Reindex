@@ -26,6 +26,8 @@ struct search_result_t {
     uint32_t numOutLinks;
     float pageRank;
     float cheiRank;
+    int community;
+    int communityCount;
     uint32_t numTitleMatch;
     uint32_t numBodyMatch;
     uint32_t docNum;               // For snippet retrieval

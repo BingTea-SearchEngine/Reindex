@@ -39,9 +39,13 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
     }
     spdlog::info("Query: {}", msg.query);
 
-    // Parser query
+    auto start = std::chrono::steady_clock::now();
+
     search_results docs = findDocuments(msg.query);
-    spdlog::info("Got {} results", docs.size());
+
+    auto end = std::chrono::steady_clock::now();
+    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    spdlog::info("Got {} results in {}", docs.size(), time);
 
     // Some kind of ranking
     rank(docs);
@@ -49,12 +53,11 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
     std::vector<doc_t> results;
     for (size_t i = 0; i < docs.size(); ++i) {
         search_result_t result = docs[i];
-        cout << result << endl;
         auto [title, snippet] = getTitleAndSnippet(result, 10);
         results.push_back(doc_t{result.url, result.numWords, result.numTitleWords,
                                 result.numOutLinks, result.numTitleMatch, result.numBodyMatch,
-                                result.pageRank, result.cheiRank, result.rankingScore, snippet,
-                                title});
+                                result.pageRank, result.cheiRank, result.community,
+                                result.communityCount, result.rankingScore, snippet, title});
     }
 
     return IndexMessage{IndexMessageType::DOCUMENTS, "", results};
@@ -78,8 +81,7 @@ search_results IndexServer::findDocuments(std::string query) {
         docs.insert(docs.end(), initialSearchResults[i].begin(), initialSearchResults[i].end());
     }
     auto endTime = std::chrono::steady_clock::now();
-    auto time =
-        std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
     if (docs.size() >= _matchCount || time >= _waitTimeMS) {
         return docs;
     }
@@ -131,7 +133,6 @@ void IndexServer::searchChunk(std::string query, size_t chunkIndex, int matchCou
         return;
     }
     ISR->Next();
-
 
     auto startTime = std::chrono::steady_clock::now();
     while (ISR->GetCurrentPostEntry() != std::nullopt) {
@@ -215,7 +216,7 @@ std::pair<std::string, std::string> IndexServer::getTitleAndSnippet(search_resul
     bool snippetFound = false;
     while (titleIss >> word) {
         word = strip_utf8_spaces(word);
-        if (!is_ascii(word))
+        if (!valid(word))
             continue;
 
         if (offset == snippetStartOffset) {
@@ -246,7 +247,7 @@ std::pair<std::string, std::string> IndexServer::getTitleAndSnippet(search_resul
     std::istringstream wordIss(line);
     while (wordIss >> word) {
         word = strip_utf8_spaces(word);
-        if (!is_ascii(word))
+        if (!valid(word))
             continue;
 
         if (offset == snippetStartOffset) {
@@ -333,6 +334,7 @@ int main(int argc, char** argv) {
     MasterChunk master = MasterChunk::Deserailize(static_cast<char*>(buf), offset);
     munmap(buf, size);
     close(fd);
+    spdlog::info("Num chunks in index {}", master.GetChunkList().size());
 
     IndexServer indexServer(port, maxClients, indexPath, htmlPath, matchCount, waitTimeMS,
                             numChunksLoaded, std::move(master));

@@ -49,6 +49,8 @@ struct metadata_t {
     uint32_t numOutLinks;
     float pageRank;
     float cheiRank;
+    int community;
+    int communityCount;
     uint32_t docNum;          // For snippet retrieval
     uint32_t docStartOffset;  // For snippet retrieval
     uint32_t docEndOffset;    // For ISR
@@ -59,8 +61,9 @@ struct metadata_t {
 
     size_t getBytes() {
         size_t bytes = sizeof(numWords) + sizeof(numTitleWords) + sizeof(numOutLinks) +
-                       sizeof(pageRank) + sizeof(cheiRank) + sizeof(docNum) +
-                       sizeof(docStartOffset) + sizeof(docEndOffset);
+                       sizeof(pageRank) + sizeof(cheiRank) + sizeof(community) +
+                       sizeof(communityCount) + sizeof(docNum) + sizeof(docStartOffset) +
+                       sizeof(docEndOffset);
         return bytes;
     }
 };

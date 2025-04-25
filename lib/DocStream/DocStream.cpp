@@ -67,6 +67,7 @@ DocStreamOutput DocStream::nextFile() {
     // Check <title> tag
     std::getline(document, line);
     if (!checkTagExists(line, "<title>")) {
+        std::cerr << documentName << std::endl;
         return out;
     }
 
@@ -81,7 +82,7 @@ DocStreamOutput DocStream::nextFile() {
         std::transform(word.begin(), word.end(), word.begin(),
                        [](unsigned char c) { return std::tolower(c); });
         word = strip_utf8_spaces(word);
-        if (is_ascii(word)) {
+        if (valid(word)) {
             output.push_back(word_t{word, offset, wordlocation_t::title});
         }
         ++offset;
@@ -91,12 +92,14 @@ DocStreamOutput DocStream::nextFile() {
     // Check </title> tag
     std::getline(document, line);
     if (!checkTagExists(line, "</title>")) {
+        std::cerr << documentName << std::endl;
         return out;
     }
 
     // Check <words>  tag
     std::getline(document, line);
     if (!checkTagExists(line, "<words>")) {
+        std::cerr << documentName << std::endl;
         return out;
     }
 
@@ -106,7 +109,7 @@ DocStreamOutput DocStream::nextFile() {
         std::transform(word.begin(), word.end(), word.begin(),
                        [](unsigned char c) { return std::tolower(c); });
         word = strip_utf8_spaces(word);
-        if (is_ascii(word)) {
+        if (valid(word)) {
             output.push_back(word_t{word, offset, wordlocation_t::body});
         }
         ++offset;
@@ -114,6 +117,7 @@ DocStreamOutput DocStream::nextFile() {
 
     std::getline(document, line);
     if (!checkTagExists(line, "</words>")) {
+        std::cerr << documentName << std::endl;
         return out;
     }
     out.words = output;
@@ -121,6 +125,7 @@ DocStreamOutput DocStream::nextFile() {
     // Check <links>  tag
     std::getline(document, line);
     if (!checkTagExists(line, "<links>")) {
+        std::cerr << documentName << std::endl;
         return out;
     }
 
@@ -132,43 +137,76 @@ DocStreamOutput DocStream::nextFile() {
         numOutLinks++;
     }
 
-    out.metadata = {
-        static_cast<uint32_t>(output.size()), numTitleWords, numOutLinks, 0.0, 0.0, docNum};
+    out.metadata.numWords = static_cast<uint32_t>(output.size());
+    out.metadata.numTitleWords = numTitleWords;
+    out.metadata.numOutLinks = numOutLinks;
+    out.metadata.docNum = docNum;
 
     //Check <prank> tag
     std::getline(document, line);
     if (!checkTagExists(line, "<prank>")) {
+        std::cerr << documentName << std::endl;
         return out;
     }
-
     float pageRank = 0.0;
     if (std::getline(document, line)) {
         pageRank = std::stof(line);
     }
-
     std::getline(document, line);
     if (!checkTagExists(line, "</prank>")) {
+        std::cerr << documentName << std::endl;
         return out;
     }
 
     //Check <prank> tag
     std::getline(document, line);
     if (!checkTagExists(line, "<crank>")) {
+        std::cerr << documentName << std::endl;
         return out;
     }
-
     float cheiRank = 0.0;
     if (std::getline(document, line)) {
         cheiRank = std::stof(line);
     }
-
     std::getline(document, line);
     if (!checkTagExists(line, "</crank>")) {
         return out;
     }
 
+    std::getline(document, line);
+    if (!checkTagExists(line, "<community>")) {
+        std::cerr << documentName << std::endl;
+        return out;
+    }
+    int community = -1;
+    if (std::getline(document, line)) {
+        community = std::stof(line);
+    }
+    std::getline(document, line);
+    if (!checkTagExists(line, "</community>")) {
+        std::cerr << documentName << std::endl;
+        return out;
+    }
+
+    std::getline(document, line);
+    if (!checkTagExists(line, "<communitycount>")) {
+        std::cerr << documentName << std::endl;
+        return out;
+    }
+    int communityCount = -1;
+    if (std::getline(document, line)) {
+        communityCount = std::stof(line);
+    }
+    std::getline(document, line);
+    if (!checkTagExists(line, "</communitycount>")) {
+        std::cerr << documentName << std::endl;
+        return out;
+    }
+
     out.metadata.pageRank = pageRank;
     out.metadata.cheiRank = cheiRank;
+    out.metadata.community = community;
+    out.metadata.communityCount = communityCount;
 
     return out;
 }

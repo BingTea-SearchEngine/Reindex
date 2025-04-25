@@ -198,3 +198,12 @@ TEST_F(QueryCompilerTest, Invalid) {
 
     delete expr;
 }
+
+TEST_F(QueryCompilerTest, Test) {
+    std::string input = "university of michigan";
+    Parser parser(input, &index);
+    Expression* expr = parser.Parse();
+    auto ISR = expr->Eval();
+    ASSERT_NE(ISR, nullptr);
+    delete expr;
+}

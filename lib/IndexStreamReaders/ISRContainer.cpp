@@ -3,9 +3,8 @@
 #include "ISRContainer.hpp"
 
 ISRContainer::ISRContainer(ISR* includedISR, ISR* excludedISR)
-    : included(includedISR),
-      excluded(excludedISR) {
-        excluded->NextDocument();
+    : included(includedISR), excluded(excludedISR) {
+    excluded->NextDocument();
 }
 
 ISRContainer::~ISRContainer() {
@@ -46,13 +45,11 @@ std::optional<PostEntry> ISRContainer::MatchNotOnExcluded() {
 
         if (includedDocID < excludedDocID) {
             return this->included->GetCurrentPostEntry();
-        }
-        else if (includedDocID == excludedDocID) {
+        } else if (includedDocID == excludedDocID) {
             // try again
             this->included->NextDocument();
             this->excluded->NextDocument();
-        }
-        else {
+        } else {
             // move forward excluded ISR
             this->excluded->NextDocument();
         }

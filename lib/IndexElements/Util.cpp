@@ -31,11 +31,21 @@ std::string strip_utf8_spaces(const std::string& input) {
     return output;
 }
 
-bool is_ascii(const std::string& word) {
-    return std::all_of(word.begin(), word.end(), [](unsigned char c) {
-        return c >= 32 && c <= 126;  // printable ASCII
-        // or use: return c < 128; for strict 7-bit ASCII
-    });
+bool valid(const std::string& word) {
+    // return word.size() > 2 && skipWords.find(word) == skipWords.end() &&
+    //        std::regex_match(word, validWordRegex);
+    return word.size() > 2 && skipWords.find(word) == skipWords.end() &&
+           std::all_of(word.begin(), word.end(),
+                       [](char c) {
+                           return std::isalnum(c) || c == '+' || c == '-' || c == '_' || c == '.';
+                       }) &&
+           std::any_of(word.begin(), word.end(), ::isalpha);
+
+    // return std::any_of(word.begin(), word.end(), ::isalpha);
+    // return std::all_of(word.begin(), word.end(), [](unsigned char c) {
+    //     return c >= 32 && c <= 126;  // printable ASCII
+    //     // or use: return c < 128; for strict 7-bit ASCII
+    // });
 }
 
 void* create_mmap_region(int& fd, size_t size, std::string filename) {
