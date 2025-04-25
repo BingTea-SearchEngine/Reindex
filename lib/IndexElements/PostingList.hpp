@@ -115,5 +115,11 @@ class PostingList {
     std::vector<Post> posts;
 
     /// A synchronization table for efficient access
-    std::unordered_map<uint32_t, std::tuple<size_t>> sync_table;
+    struct SyncPoint {
+     size_t position;    // Absolute word position
+     size_t post_idx;    // Index into posts vector
+     size_t entry_idx;   // Index into Post's PostEntry vector
+    };
+     
+    std::vector<SyncPoint> sync_table;
 };

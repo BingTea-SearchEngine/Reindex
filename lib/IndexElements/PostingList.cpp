@@ -215,6 +215,7 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
     offset += sizeof(num_posts);
     list.posts.resize(num_posts);
 
+    size_t total_num_entries = 0;
     uint32_t prev_pos = 0;
     for (size_t i = 0; i < num_posts; ++i) {
         uint32_t docID = 0;
@@ -230,6 +231,7 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
         size_t num_entries;
         std::memcpy(&num_entries, base_region + offset, sizeof(num_entries));
         offset += sizeof(num_entries);
+        total_num_entries += num_entries;
 
         for (uint32_t j = 0; j < num_entries; ++j) {
             size_t bytes_read = 0;
@@ -248,6 +250,29 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
         }
 
         list.posts[i] = post;
+    }
+
+    // Craft the synchronization table
+    size_t sync_freq = std::max(size_t(1), size_t(std::sqrt(total_num_entries)));
+    size_t entry_counter = 0; // put in a synchronization point every sqrt(N) PostEntries, where N is the total number of PostEntries
+
+    for (size_t post_idx = 0; post_idx < list.posts.size(); ++post_idx) {
+        const Post& post = list.posts[post_idx];
+        const auto& postEntries = post.GetEntries();
+
+        for (size_t entry_idx = 0; entry_idx < postEntries.size(); ++entry_idx) {
+            const PostEntry& entry = postEntries[entry_idx];
+
+            if (entry_counter % sync_freq == 0 || entry_counter == 0) {
+                list.sync_table.push_back({
+                    .position = entry.GetDelta(),
+                    .post_idx = post_idx,
+                    .entry_idx = entry_idx
+                });
+            }
+
+            ++entry_counter;
+        }
     }
 
     return list;
