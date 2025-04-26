@@ -6,9 +6,9 @@
 #include "Post.hpp"
 
 struct SyncPoint {
-     size_t position;    // Absolute word position
-     size_t post_idx;    // Index into posts vector
-     size_t entry_idx;   // Index into Post's PostEntry vector
+    size_t position;   // Absolute word position
+    size_t post_idx;   // Index into posts vector
+    size_t entry_idx;  // Index into Post's PostEntry vector
 };
 
 /**
@@ -56,7 +56,7 @@ class PostingList {
          * @param docID The ID of the document where the word is found.
          * @param word The PostEntry object that contains the word occurrence information.
          */
-    size_t AddWord(uint32_t docID,  size_t earliestOccurrenceInDoc, PostEntry word);
+    size_t AddWord(uint32_t docID, size_t earliestOccurrenceInDoc, PostEntry word);
 
     /**
          * @brief Retrieves the list of posts associated with this PostingList.

@@ -27,11 +27,6 @@ class ISRContainer : public ISR {
     ISRContainer(ISR* included, ISR* excluded);
 
     /**
-     * @brief Deletes all children ISRs
-    */
-    ~ISRContainer() override;
-
-    /**
      * @brief Returns the absolute location of the earliest occurrence
      *        among the included ISR at this moment.
      * 
@@ -102,9 +97,9 @@ class ISRContainer : public ISR {
     /// the included ISR structure this ISR is primarily trying to find occurrences of
     ISR* included;
 
-    /// The excluded ISR structure.
-    ISR* excluded;
+    /// The current PostEntry this ISR is pointing at.
+    std::optional<PostEntry> currentPostEntry;
 
-    /// private internal helper function
-    std::optional<PostEntry> MatchNotOnExcluded();
+    /// The set of documents to skip over due to the NOT terms.
+    std::unordered_set<uint32_t> excludedDocuments;
 };

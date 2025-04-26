@@ -116,18 +116,15 @@ bool ISRPhrase::OldCatchUpStragglerISRs() {
         // .................y........
         // .........................z
         // move forward the proper stragglers until they're hopefully RIGHT NEXT TO z
-        uint32_t potentialTargetDocument =
-            (this->childISRs)[this->farthestTerm]->GetDocumentID();
-        size_t baselineLocation =
-            (this->childISRs)[this->farthestTerm]->GetStartLocation();
+        uint32_t potentialTargetDocument = (this->childISRs)[this->farthestTerm]->GetDocumentID();
+        size_t baselineLocation = (this->childISRs)[this->farthestTerm]->GetStartLocation();
 
         for (int i = 0; i < childISRs.size(); ++i) {
             if (i == this->farthestTerm) {
                 continue;
             }
 
-            uint32_t currentDocument =
-                (this->childISRs)[i]->GetDocumentID();
+            uint32_t currentDocument = (this->childISRs)[i]->GetDocumentID();
             size_t currLocation = (this->childISRs)[i]->GetStartLocation();
 
             // let's say there are child ISRs a, b, c, and d
@@ -138,8 +135,7 @@ bool ISRPhrase::OldCatchUpStragglerISRs() {
             int expectedLocationDifference = i - this->farthestTerm;
 
             if ((currentDocument == potentialTargetDocument) &&
-                (currLocation - baselineLocation ==
-                expectedLocationDifference)) {
+                (currLocation - baselineLocation == expectedLocationDifference)) {
                 continue;
             }
 
@@ -193,7 +189,8 @@ bool ISRPhrase::NewCatchUpStragglerISRs() {
             }
 
             // that means this child ISR passed none of the checks and needs to move
-            if ((this->childISRs)[i]->Seek((int) baselineLocation + expectedLocationDifference) == std::nullopt) {
+            if ((this->childISRs)[i]->Seek((int)baselineLocation + expectedLocationDifference) ==
+                std::nullopt) {
                 // this child ISR reached the end of its line, thus impossible
                 // to now have all ISRs form a phrase
                 return false;
@@ -212,19 +209,19 @@ bool ISRPhrase::NewCatchUpStragglerISRs() {
         bool somehow_consecutive = true;
         int prevOccurrence;
         bool first = true;
-    
+
         for (auto& child : childISRs) {
             if (first) {
                 prevOccurrence = child->GetStartLocation();
                 first = false;
                 continue;
             }
-    
+
             if (child->GetStartLocation() != prevOccurrence + 1) {
                 somehow_consecutive = false;
                 break;
             }
-    
+
             prevOccurrence = child->GetStartLocation();
         }
 

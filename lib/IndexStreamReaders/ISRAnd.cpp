@@ -152,17 +152,16 @@ bool ISRAnd::NewCatchUpStragglerISRs() {
         // .........................y
         // .....................z....
         // move forward the proper stragglers until they're hopefully on the same document as y
-        uint32_t potentialTargetDocument =
-            (this->childISRs)[this->farthestTerm]->GetDocumentID();
-        size_t beginningOfTargetDocument = (this->childISRs)[this->farthestTerm]->GetDocumentStart();
+        uint32_t potentialTargetDocument = (this->childISRs)[this->farthestTerm]->GetDocumentID();
+        size_t beginningOfTargetDocument =
+            (this->childISRs)[this->farthestTerm]->GetDocumentStart();
 
         for (int i = 0; i < childISRs.size(); ++i) {
             if (i == this->farthestTerm) {
                 continue;
             }
 
-            uint32_t currentDocument =
-                (this->childISRs)[i]->GetDocumentID();
+            uint32_t currentDocument = (this->childISRs)[i]->GetDocumentID();
             if (currentDocument == potentialTargetDocument) {
                 continue;
             }

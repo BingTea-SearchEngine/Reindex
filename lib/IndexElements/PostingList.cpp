@@ -264,7 +264,8 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
 
     // Craft the synchronization table
     size_t sync_freq = std::max(size_t(1), size_t(std::sqrt(total_num_entries)));
-    size_t entry_counter = 0; // put in a synchronization point every sqrt(N) PostEntries, where N is the total number of PostEntries
+    size_t entry_counter =
+        0;  // put in a synchronization point every sqrt(N) PostEntries, where N is the total number of PostEntries
 
     for (size_t post_idx = 0; post_idx < list.posts.size(); ++post_idx) {
         const Post& post = list.posts[post_idx];
@@ -274,11 +275,8 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
             const PostEntry& entry = postEntries[entry_idx];
 
             if (entry_counter % sync_freq == 0 || entry_counter == 0) {
-                list.sync_table.push_back({
-                    .position = entry.GetDelta(),
-                    .post_idx = post_idx,
-                    .entry_idx = entry_idx
-                });
+                list.sync_table.push_back(
+                    {.position = entry.GetDelta(), .post_idx = post_idx, .entry_idx = entry_idx});
             }
 
             ++entry_counter;

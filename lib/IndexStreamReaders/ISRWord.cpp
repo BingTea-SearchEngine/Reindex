@@ -148,8 +148,8 @@ std::optional<PostEntry> ISRWord::OldSeek(size_t target) {
 }
 
 std::optional<PostEntry> ISRWord::NewSeek(size_t target) {
-    const auto& posts = this->postingList.GetPosts();
-    const auto& sync_table = this->postingList.GetSyncTable();
+    const auto& posts = this->postingList->GetPosts();
+    const auto& sync_table = this->postingList->GetSyncTable();
 
     // Step 1: Binary search sync_table
     size_t left = 0, right = sync_table.size();
@@ -168,7 +168,7 @@ std::optional<PostEntry> ISRWord::NewSeek(size_t target) {
     // Step 2: Start linear scan from sync_table[start_idx]
     this->currentPostIdx = 0;
     this->currentPostEntryIdx = 0;
-    
+
     if (start_idx < sync_table.size()) {
         const auto& sync = sync_table[start_idx];
 

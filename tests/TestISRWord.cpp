@@ -183,32 +183,24 @@ class WordISR : public ::testing::Test {
          {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my", "protein", "goal",
           "bar", "none"}}};
 
-          void SetUp() override {
-                uint32_t word_counter = 0;
-                uint32_t docID = 1;
-                for (const auto& doc : documents) {
-                    for (size_t i = 0; i < doc.words.size(); ++i) {
-                        const std::string& word = doc.words[i];
-                        if (index.find(word) == index.end()) {
-                            index[word] = PostingList(word);
-                        }
-                        if (docID == 1) {
-                            index[word].AddWord(docID, 0, {word_counter, wordlocation_t::body});
-                        }
-                        else if (docID == 2) {
-                            index[word].AddWord(docID, 17, {word_counter, wordlocation_t::body});
-                        }
-                        else if (docID == 3) {
-							index[word].AddWord(docID, 32, {word_counter, wordlocation_t::body});
-                        }
-                        else {
-							index[word].AddWord(docID, 43, {word_counter, wordlocation_t::body});
-                        }
-                        word_counter++;
-                    }
-                    docID++;
+    void SetUp() override {
+        uint32_t word_counter = 0;
+        uint32_t docID = 1;
+        for (const auto& doc : documents) {
+            for (size_t i = 0; i < doc.words.size(); ++i) {
+                const std::string& word = doc.words[i];
+                if (index.find(word) == index.end()) {
+                    index[word] = PostingList(word);
                 }
-                index[word].AddWord(docID, {word_counter, wordlocation_t::body});
+                if (docID == 1) {
+                    index[word].AddWord(docID, 0, {word_counter, wordlocation_t::body});
+                } else if (docID == 2) {
+                    index[word].AddWord(docID, 17, {word_counter, wordlocation_t::body});
+                } else if (docID == 3) {
+                    index[word].AddWord(docID, 32, {word_counter, wordlocation_t::body});
+                } else {
+                    index[word].AddWord(docID, 43, {word_counter, wordlocation_t::body});
+                }
                 word_counter++;
             }
             docID++;

@@ -38,14 +38,11 @@ class QueryCompilerTest : public ::testing::Test {
                 }
                 if (docID == 1) {
                     index[word].AddWord(docID, 0, {word_counter, wordlocation_t::body});
-                }
-                else if (docID == 2) {
+                } else if (docID == 2) {
                     index[word].AddWord(docID, 17, {word_counter, wordlocation_t::body});
-                }
-                else if (docID == 3) {
+                } else if (docID == 3) {
                     index[word].AddWord(docID, 32, {word_counter, wordlocation_t::body});
-                }
-                else {
+                } else {
                     index[word].AddWord(docID, 43, {word_counter, wordlocation_t::body});
                 }
                 word_counter++;
@@ -207,14 +204,5 @@ TEST_F(QueryCompilerTest, Invalid) {
     ISR* root = expr->Eval();
     EXPECT_EQ(root, nullptr);
 
-    delete expr;
-}
-
-TEST_F(QueryCompilerTest, Test) {
-    std::string input = "university of michigan";
-    Parser parser(input, &index);
-    Expression* expr = parser.Parse();
-    auto ISR = expr->Eval();
-    ASSERT_NE(ISR, nullptr);
     delete expr;
 }

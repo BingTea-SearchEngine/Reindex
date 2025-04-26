@@ -4,7 +4,8 @@
 
 Post::Post() {}
 
-Post::Post(uint32_t docID, size_t earliestOccurrenceInDoc) : docID(docID), docStart(earliestOccurrenceInDoc), entries() {}
+Post::Post(uint32_t docID, size_t earliestOccurrenceInDoc)
+    : docID(docID), docStart(earliestOccurrenceInDoc), entries() {}
 
 uint32_t Post::GetDocumentID() const {
     return docID;
