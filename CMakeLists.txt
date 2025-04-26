@@ -149,6 +149,9 @@ target_link_libraries(TestISRContainer PRIVATE GTest::gtest_main IndexStreamRead
 add_executable(TestQueryCompiler tests/TestQueryCompiler.cpp)
 target_link_libraries(TestQueryCompiler PRIVATE GTest::gtest_main QueryCompiler)
 
+add_executable(TestISRSynchronizationTable tests/TestISRSynchronizationTable.cpp)
+target_link_libraries(TestISRSynchronizationTable PRIVATE GTest::gtest_main IndexStreamReaders)
+
 include(GoogleTest)
 gtest_discover_tests(TestExample)
 gtest_discover_tests(TestMasterChunk)
@@ -162,5 +165,6 @@ gtest_discover_tests(TestISRAnd)
 gtest_discover_tests(TestISRPhrase)
 gtest_discover_tests(TestISRContainer)
 gtest_discover_tests(TestQueryCompiler)
+gtest_discover_tests(TestISRSynchronizationTable)
 
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type")
