@@ -158,9 +158,9 @@ TEST(BasicSyncTable, SpeedComparisonPhrase) {
 
     ISR* ISR_mcdonalds_burgers_phrase = new ISRPhrase({ISR_word_mcdonalds, ISR_word_burgers});
 
-    // ISRWord::OldSeek AND ISRAnd::OldCatchUpStragglerISRs took on average 1.6 seconds
-    // ISRWord::OldSeek AND ISRAnd::NewCatchUpStragglerISRs took on average 0.008 seconds
-    // ISRWord::NewSeek AND ISRAnd::NewCatchUpStragglerISRs took on average 0.005 seconds
+    // ISRWord::OldSeek AND ISRPhrase::OldCatchUpStragglerISRs took on average 1.6 seconds
+    // ISRWord::OldSeek AND ISRPhrase::NewCatchUpStragglerISRs took on average 0.008 seconds
+    // ISRWord::NewSeek AND ISRPhrase::NewCatchUpStragglerISRs took on average 0.005 seconds
     // these results make sense
     std::vector<uint32_t> matching_documents;
 
