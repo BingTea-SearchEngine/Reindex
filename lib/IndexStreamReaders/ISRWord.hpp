@@ -56,6 +56,8 @@ class ISRWord : public ISR {
      */
     virtual uint32_t GetDocumentID() override;
 
+    virtual size_t GetDocumentStart() override;
+
     /**
      * @brief Returns the number of documents that this term appears in
      *        (ie the number of Posts).
@@ -123,6 +125,9 @@ class ISRWord : public ISR {
 
     /// The ID of the document this ISR is currently pointing at.
     uint32_t documentID;
+
+    /// Of the document this ISR is pointing at, what is its absolute start?
+    size_t docStart;
 
     /// The amount of documents that this word appears in.
     int documentCount;

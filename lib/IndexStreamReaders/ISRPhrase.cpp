@@ -32,6 +32,12 @@ uint32_t ISRPhrase::GetDocumentID() {
     return this->childISRs[nearestTerm]->GetDocumentID();
 }
 
+size_t ISRPhrase::GetDocumentStart() {
+    assert(this->currentPostEntry.has_value() &&
+           "GetDocumentStart called when this ISR is not pointing to anything");
+    return this->childISRs[nearestTerm]->GetDocumentStart();
+}
+
 // PRECONDITION: for this helper function to be called,
 //               ALL of the children must be valid still
 void ISRPhrase::UpdateMarkers() {

@@ -56,7 +56,7 @@ class PostingList {
          * @param docID The ID of the document where the word is found.
          * @param word The PostEntry object that contains the word occurrence information.
          */
-    size_t AddWord(uint32_t docID, PostEntry word);
+    size_t AddWord(uint32_t docID,  size_t earliestOccurrenceInDoc, PostEntry word);
 
     /**
          * @brief Retrieves the list of posts associated with this PostingList.

@@ -47,6 +47,12 @@ uint32_t ISRWord::GetDocumentID() {
     return this->documentID;
 }
 
+size_t ISRWord::GetDocumentStart() {
+    assert(this->currentPostEntry.has_value() &&
+           "GetDocumentStart called when this ISR is not pointing to anything");
+    return this->docStart;
+}
+
 std::optional<PostEntry> ISRWord::Next() {
     int outerPost = this->currentPostIdx;
     if (outerPost == -1) {
@@ -74,6 +80,7 @@ std::optional<PostEntry> ISRWord::Next() {
             this->currentPostEntry = postEntry;
             this->absoluteLocation = postEntry.GetDelta();
             this->documentID = documentID;
+            this->docStart = post.GetEarliestStart();
             return this->currentPostEntry;
         }
 
@@ -99,6 +106,7 @@ std::optional<PostEntry> ISRWord::NextDocument() {
         this->currentPostEntry = entries[0];
         this->absoluteLocation = entries[0].GetDelta();
         this->documentID = post.GetDocumentID();
+        this->docStart = post.GetEarliestStart();
         return this->currentPostEntry;
     }
 
@@ -125,6 +133,7 @@ std::optional<PostEntry> ISRWord::OldSeek(size_t target) {
                 this->currentPostEntry = postEntry;
                 this->absoluteLocation = postEntry.GetDelta();
                 this->documentID = currDocumentID;
+                this->docStart = post.GetEarliestStart();
                 return this->currentPostEntry;
             }
 
@@ -187,6 +196,7 @@ std::optional<PostEntry> ISRWord::NewSeek(size_t target) {
                 this->currentPostEntry = entry;
                 this->absoluteLocation = entry.GetDelta();
                 this->documentID = post.GetDocumentID();
+                this->docStart = post.GetEarliestStart();
                 return this->currentPostEntry;
             }
         }

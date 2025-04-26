@@ -24,7 +24,7 @@ class Post {
          * 
          * @param docID The ID of the document.
         */
-    Post(uint32_t docID);
+    Post(uint32_t docID, size_t earliestOccurrenceInDoc);
 
     /**
          * @brief Returns the ID of this document that this Post represents.
@@ -32,6 +32,9 @@ class Post {
          * @return The document's ID.
          */
     uint32_t GetDocumentID() const;
+
+    // gets the earliest start variable
+    size_t GetEarliestStart() const;
 
     /**
          * @brief Returns a vector containing all word occurrences (PostEntry objects) in the post.
@@ -95,6 +98,9 @@ class Post {
    private:
     /// The ID of the document.
     uint32_t docID;
+
+    /// The absolute word location of the first word in this document.
+    size_t docStart;
 
     /// A vector containing the word occurrences (PostEntry objects) in the document that
     /// pertain to the specifc word this PostingList represents.

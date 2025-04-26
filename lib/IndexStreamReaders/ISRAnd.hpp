@@ -56,6 +56,8 @@ class ISRAnd : public ISR {
      */
     virtual uint32_t GetDocumentID() override;
 
+    virtual size_t GetDocumentStart() override;
+
     /**
      * @brief Returns the next PostEntry that matches the occurrence of
      * this word that this ISR is looking for and advances the ISR forward.
@@ -112,4 +114,7 @@ class ISRAnd : public ISR {
 
     /// internal helper function
     bool CatchUpStragglerISRs();
+
+    bool OldCatchUpStragglerISRs();
+    bool NewCatchUpStragglerISRs();
 };

@@ -193,8 +193,18 @@ class WordISR : public ::testing::Test {
                         if (index.find(word) == index.end()) {
                             index[word] = PostingList(word);
                         }
-                        index[word].AddWord(docID,
-                                            {word_counter, wordlocation_t::body});
+                        if (docID == 1) {
+                            index[word].AddWord(docID, 0, {word_counter, wordlocation_t::body});
+                        }
+                        else if (docID == 2) {
+                            index[word].AddWord(docID, 17, {word_counter, wordlocation_t::body});
+                        }
+                        else if (docID == 3) {
+							index[word].AddWord(docID, 32, {word_counter, wordlocation_t::body});
+                        }
+                        else {
+							index[word].AddWord(docID, 43, {word_counter, wordlocation_t::body});
+                        }
                         word_counter++;
                     }
                     docID++;

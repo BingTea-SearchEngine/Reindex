@@ -34,6 +34,12 @@ uint32_t ISRContainer::GetDocumentID() {
     return this->included->GetDocumentID();
 }
 
+size_t ISRContainer::GetDocumentStart() {
+    assert(this->currentPostEntry.has_value() &&
+           "GetDocumentStart called when this ISR is not pointing to anything");
+    return this->included->GetDocumentStart();
+}
+
 std::optional<PostEntry> ISRContainer::Next() {
     while (this->included->Next() != std::nullopt) {
         this->currentPostEntry = this->included->GetCurrentPostEntry();

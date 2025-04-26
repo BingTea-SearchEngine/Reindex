@@ -83,9 +83,9 @@ TEST(BasicPostingList, TestAddWord) {
     PostEntry w1 = {0, wordlocation_t::title};
     PostEntry w2 = {1, wordlocation_t::body};
     PostEntry w3 = {2, wordlocation_t::bold};
-    pl.AddWord(1, w1);
-    pl.AddWord(1, w2);
-    pl.AddWord(2, w3);
+    pl.AddWord(1, 0, w1);
+    pl.AddWord(1, 1, w2);
+    pl.AddWord(2, 2, w3);
 
     // Access posts using GetPosts()
     auto posts = pl.GetPosts();
@@ -129,14 +129,14 @@ void test_serializiation() {
     PostEntry word_occurrence_6 = {200010, wordlocation_t::title};
     PostEntry word_occurrence_7 = {200015, wordlocation_t::body};
 
-    postingList->AddWord(1, word_occurrence_1);
-    postingList->AddWord(1, word_occurrence_2);
-    postingList->AddWord(1, word_occurrence_3);
+    postingList->AddWord(1, 123000, word_occurrence_1);
+    postingList->AddWord(1, 123000, word_occurrence_2);
+    postingList->AddWord(1, 123000, word_occurrence_3);
 
-    postingList->AddWord(2, word_occurrence_4);
-    postingList->AddWord(2, word_occurrence_5);
-    postingList->AddWord(2, word_occurrence_6);
-    postingList->AddWord(2, word_occurrence_7);
+    postingList->AddWord(2, 200000, word_occurrence_4);
+    postingList->AddWord(2, 200000, word_occurrence_5);
+    postingList->AddWord(2, 200000, word_occurrence_6);
+    postingList->AddWord(2, 200000, word_occurrence_7);
 
     size_t offset = 0;
     PostingList::NewSerialize(static_cast<char*>(base_region), offset,
