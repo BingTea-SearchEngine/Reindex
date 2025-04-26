@@ -38,6 +38,12 @@ uint32_t ISROr::GetDocumentID() {
     return (this->childISRs)[this->nearestTerm]->GetDocumentID();
 }
 
+size_t ISROr::GetDocumentStart() {
+    assert(this->currentPostEntry.has_value() &&
+           "GetDocumentStart called when this ISR is not pointing to anything");
+    return this->childISRs[nearestTerm]->GetDocumentStart();
+}
+
 // helper function to update the internal marker variables
 // when any of the ISRs get moved around
 // PRECONDITION: this helper function must only be called when

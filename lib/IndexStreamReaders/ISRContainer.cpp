@@ -33,33 +33,18 @@ uint32_t ISRContainer::GetDocumentID() {
     return this->included->GetDocumentID();
 }
 
-// INTERNAL HELPER FUNCTION
-// precondition: at the very beginning of calling this,
-// the included and excluded must both be pointing to something meaningful
-// this function finds the next match for Included while making sure to
-// ignore documents dictated by Excluded
-std::optional<PostEntry> ISRContainer::MatchNotOnExcluded() {
-    while (true) {
-        uint32_t includedDocID = this->included->GetDocumentID();
-        uint32_t excludedDocID = this->excluded->GetDocumentID();
+size_t ISRContainer::GetDocumentStart() {
+    assert(this->currentPostEntry.has_value() &&
+           "GetDocumentStart called when this ISR is not pointing to anything");
+    return this->included->GetDocumentStart();
+}
 
-        if (includedDocID < excludedDocID) {
-            return this->included->GetCurrentPostEntry();
-        } else if (includedDocID == excludedDocID) {
-            // try again
-            this->included->NextDocument();
-            this->excluded->NextDocument();
-        } else {
-            // move forward excluded ISR
-            this->excluded->NextDocument();
-        }
-
-        if (this->included->GetCurrentPostEntry() == std::nullopt) {
-            return std::nullopt;
-        }
-
-        if (this->excluded->GetCurrentPostEntry() == std::nullopt) {
-            return this->included->GetCurrentPostEntry();
+std::optional<PostEntry> ISRContainer::Next() {
+    while (this->included->Next() != std::nullopt) {
+        this->currentPostEntry = this->included->GetCurrentPostEntry();
+        if (this->excludedDocuments.find(this->included->GetDocumentID()) ==
+            this->excludedDocuments.end()) {
+            return this->currentPostEntry;
         }
     }
 }

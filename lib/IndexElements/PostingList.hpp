@@ -5,6 +5,12 @@
 
 #include "Post.hpp"
 
+struct SyncPoint {
+     size_t position;    // Absolute word position
+     size_t post_idx;    // Index into posts vector
+     size_t entry_idx;   // Index into Post's PostEntry vector
+};
+
 /**
  * @class PostingList
  * @brief Represents a list of posts associated with a specific word in an index chunk.
@@ -42,13 +48,15 @@ class PostingList {
          */
     std::string GetWord();
 
+    std::vector<SyncPoint> GetSyncTable() const;
+
     /**
          * @brief Adds a new word (PostEntry) to the list of posts in this PostingList.
          *
          * @param docID The ID of the document where the word is found.
          * @param word The PostEntry object that contains the word occurrence information.
          */
-    size_t AddWord(uint32_t docID, PostEntry word);
+    size_t AddWord(uint32_t docID,  size_t earliestOccurrenceInDoc, PostEntry word);
 
     /**
          * @brief Retrieves the list of posts associated with this PostingList.
@@ -113,5 +121,5 @@ class PostingList {
     std::vector<Post> posts;
 
     /// A synchronization table for efficient access
-    std::unordered_map<uint32_t, std::tuple<size_t>> sync_table;
+    std::vector<SyncPoint> sync_table;
 };

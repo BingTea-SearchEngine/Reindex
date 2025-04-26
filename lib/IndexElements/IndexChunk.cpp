@@ -30,6 +30,7 @@ void IndexChunk::AddDocument(std::string doc, std::vector<word_t> words) {
     // _documents.push_back(doc);
 
     docID_to_doc_name[documentID] = doc;
+    size_t earliestOccurrenceInDoc = _offset;
 
     // Iterate over words
     for (word_t& word : words) {
@@ -37,8 +38,8 @@ void IndexChunk::AddDocument(std::string doc, std::vector<word_t> words) {
             _postingLists.insert(make_pair(word.word, PostingList(word.word)));
             _bytesRequired += _postingLists.at(word.word).GetOverheadBytesRequired();
         }
-        _bytesRequired +=
-            _postingLists[word.word].AddWord(documentID, PostEntry(_offset, word.location));
+        _bytesRequired += _postingLists[word.word].AddWord(
+            documentID, earliestOccurrenceInDoc, PostEntry(_offset, word.location));
         _offset++;
         assert(_offset < UINT32_MAX);
     }

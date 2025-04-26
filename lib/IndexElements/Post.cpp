@@ -4,10 +4,14 @@
 
 Post::Post() {}
 
-Post::Post(uint32_t docID) : docID(docID), entries() {}
+Post::Post(uint32_t docID, size_t earliestOccurrenceInDoc) : docID(docID), docStart(earliestOccurrenceInDoc), entries() {}
 
 uint32_t Post::GetDocumentID() const {
     return docID;
+}
+
+size_t Post::GetEarliestStart() const {
+    return docStart;
 }
 
 std::vector<PostEntry> Post::GetEntries() const {
