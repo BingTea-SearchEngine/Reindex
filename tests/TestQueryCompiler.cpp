@@ -130,9 +130,6 @@ TEST_F(QueryCompilerTest, ORAND) {
     EXPECT_EQ(root->GetDocumentID(), 2);
 
     post = root->Next();
-    EXPECT_EQ(root->GetDocumentID(), 2);
-
-    post = root->Next();
     EXPECT_EQ(root->GetDocumentID(), 4);
 
     post = root->Next();
