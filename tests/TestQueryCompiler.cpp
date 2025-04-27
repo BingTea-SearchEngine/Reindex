@@ -32,11 +32,11 @@ class QueryCompilerTest : public ::testing::Test {
                 if (docID == 1) {
                     index[word].AddWord(docID, 0, {word_counter, wordlocation_t::body});
                 } else if (docID == 2) {
-                    index[word].AddWord(docID, 17, {word_counter, wordlocation_t::body});
+                    index[word].AddWord(docID, 9, {word_counter, wordlocation_t::body});
                 } else if (docID == 3) {
-                    index[word].AddWord(docID, 32, {word_counter, wordlocation_t::body});
+                    index[word].AddWord(docID, 18, {word_counter, wordlocation_t::body});
                 } else {
-                    index[word].AddWord(docID, 43, {word_counter, wordlocation_t::body});
+                    index[word].AddWord(docID, 27, {word_counter, wordlocation_t::body});
                 }
                 word_counter++;
             }
@@ -125,6 +125,9 @@ TEST_F(QueryCompilerTest, ORAND) {
     auto post = root->Next();
     ASSERT_TRUE(post.has_value());
     EXPECT_EQ(root->GetDocumentID(), 1);
+
+    post = root->Next();
+    EXPECT_EQ(root->GetDocumentID(), 2);
 
     post = root->Next();
     EXPECT_EQ(root->GetDocumentID(), 2);
