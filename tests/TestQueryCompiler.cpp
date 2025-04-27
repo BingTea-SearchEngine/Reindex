@@ -14,11 +14,15 @@ class QueryCompilerTest : public ::testing::Test {
     };
 
     std::vector<Document> documents = {
-        {"Document 1", {"went", "store", "grabbed", "some", "granola", "bar", "went", "another", "store"}},
-        {"Document 2", {"costco", "best", "megastore", "many", "granola", "protein", "bar", "love", "costco"}},
-        {"Document 3", {"think", "amazon", "online", "store", "alright", "amazon", "bananas", "university", "michigan"}},
-        {"Document 4", {"mcdonalds", "best", "food", "fulfills", "my", "protein", "goal", "bar", "none"}}
-    };
+        {"Document 1",
+         {"went", "store", "grabbed", "some", "granola", "bar", "went", "another", "store"}},
+        {"Document 2",
+         {"costco", "best", "megastore", "many", "granola", "protein", "bar", "love", "costco"}},
+        {"Document 3",
+         {"think", "amazon", "online", "store", "alright", "amazon", "bananas", "university",
+          "michigan"}},
+        {"Document 4",
+         {"mcdonalds", "best", "food", "fulfills", "my", "protein", "goal", "bar", "none"}}};
 
     void SetUp() override {
         uint32_t word_counter = 0;
@@ -204,7 +208,7 @@ TEST_F(QueryCompilerTest, Test) {
     std::string input = "university of michigan";
     Parser parser(input, &index);
     Expression* expr = parser.Parse();
-    std::cout<<expr->GetString()<<std::endl;
+    std::cout << expr->GetString() << std::endl;
     auto ISR = expr->Eval();
     ASSERT_NE(ISR, nullptr);
     delete expr;

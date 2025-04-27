@@ -36,15 +36,17 @@ struct search_result_t {
     float rankingScore;
 
     search_result_t(std::string url, uint32_t numWords, uint32_t numTitleWords,
-                    uint32_t numOutLinks, float pageRank, float cheiRank, uint32_t numTitleMatch,
-                    uint32_t numBodyMatch, uint32_t docNum, uint32_t docStartOffset,
-                    uint32_t matchAbsoluteOffset)
+                    uint32_t numOutLinks, float pageRank, float cheiRank, int community,
+                    int communityCount, uint32_t numTitleMatch, uint32_t numBodyMatch,
+                    uint32_t docNum, uint32_t docStartOffset, uint32_t matchAbsoluteOffset)
         : url(std::move(url)),
           numWords(numWords),
           numTitleWords(numTitleWords),
           numOutLinks(numOutLinks),
           pageRank(pageRank),
           cheiRank(cheiRank),
+          community(community),
+          communityCount(communityCount),
           numTitleMatch(numTitleMatch),
           numBodyMatch(numBodyMatch),
           docNum(docNum),
@@ -73,6 +75,8 @@ struct search_result_t {
            << "numOutLinks=" << r.numOutLinks << ", "
            << "pageRank=" << r.pageRank << ", "
            << "cheiRank=" << r.cheiRank << ", "
+           << "community=" << r.community << ", "
+           << "communityCount=" << r.communityCount << ", "
            << "docNum=" << r.docNum << ", "
            << "docStartOffset=" << r.docStartOffset << ", "
            << "matchAbsoluteOffset=" << r.matchAbsoluteOffset << "staticScore=" << r.rankingScore

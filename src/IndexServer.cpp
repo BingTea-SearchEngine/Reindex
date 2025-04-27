@@ -167,8 +167,9 @@ void IndexServer::searchChunk(std::string query, size_t chunkIndex, int matchCou
             ISR->Next();
         }
         search_result_t docData(docName, data.numWords, data.numTitleWords, data.numOutLinks,
-                                data.pageRank, data.cheiRank, numTitleOccurences, numBodyOccurences,
-                                data.docNum, data.docStartOffset, absolute_location);
+                                data.pageRank, data.cheiRank, data.community, data.communityCount,
+                                numTitleOccurences, numBodyOccurences, data.docNum,
+                                data.docStartOffset, absolute_location);
         auto endTime = std::chrono::steady_clock::now();
         auto time =
             std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();

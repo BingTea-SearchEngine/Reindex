@@ -13,13 +13,13 @@
 #include <string>
 
 const static std::unordered_set<std::string> skipWords = {
-    "a",     "an",     "the",     "and",     "or",   "of", "but",   "if",      "then",   "else",
-    "when",  "where",  "while",   "at",      "by",    "for",   "to",      "in",     "on",
-    "from",  "up",     "down",    "with",    "about", "as",    "into",    "like",   "over",
-    "after", "before", "between", "without", "under", "again", "further", "once",   "just",
-    "only",  "same",   "so",      "too",     "very",  "can",   "will",    "should", "would",
-    "could", "is",     "am",      "are",     "was",   "were",  "be",      "been",   "being",
-    "have",  "has",    "had",     "do",      "does",  "did",   "not",     "i"};
+    "a",     "an",    "the",    "and",     "or",      "of",    "but",   "if",      "then",
+    "else",  "when",  "where",  "while",   "at",      "by",    "for",   "to",      "in",
+    "on",    "from",  "up",     "down",    "with",    "about", "as",    "into",    "like",
+    "over",  "after", "before", "between", "without", "under", "again", "further", "once",
+    "just",  "only",  "same",   "so",      "too",     "very",  "can",   "will",    "should",
+    "would", "could", "is",     "am",      "are",     "was",   "were",  "be",      "been",
+    "being", "have",  "has",    "had",     "do",      "does",  "did",   "not",     "i"};
 
 std::string strip_utf8_spaces(const std::string& input);
 

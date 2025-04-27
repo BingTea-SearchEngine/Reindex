@@ -1,8 +1,8 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <unordered_set>
 #include <regex>
+#include <string>
+#include <unordered_set>
+#include <vector>
 
 #include "Util.hpp"
 

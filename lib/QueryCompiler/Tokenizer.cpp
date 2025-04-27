@@ -68,10 +68,10 @@ void Tokenstream::Tokenize(const std::string& input) {
             } else if (word == "NOT") {
                 AppendToken(TokenType::NOTOP, "-");
                 Tokens.push_back("NOT");
-            }
-            else{
-                std::transform(word.begin(), word.end(), word.begin(),[](unsigned char c){ return std::tolower(c); });
-                if(skipWords.find(word) == skipWords.end()){
+            } else {
+                std::transform(word.begin(), word.end(), word.begin(),
+                               [](unsigned char c) { return std::tolower(c); });
+                if (skipWords.find(word) == skipWords.end()) {
                     AppendToken(TokenType::WORD, word);
                     Tokens.push_back(word);
                 }
@@ -112,7 +112,8 @@ void Tokenstream::Tokenize(const std::string& input) {
                     while (i < input.size() && !std::isspace(input[i]) && !std::ispunct(input[i])) {
                         word += input[i++];
                     }
-                    std::transform(word.begin(), word.end(), word.begin(),[](unsigned char c){ return std::tolower(c); });
+                    std::transform(word.begin(), word.end(), word.begin(),
+                                   [](unsigned char c) { return std::tolower(c); });
                     if (!word.empty() && skipWords.find(word) == skipWords.end()) {
                         AppendToken(TokenType::WORD, word);
                         Tokens.push_back(word);
