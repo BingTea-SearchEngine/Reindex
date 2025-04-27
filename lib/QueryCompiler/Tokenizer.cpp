@@ -76,8 +76,10 @@ void Tokenstream::Tokenize(const std::string& input){
             }
             else{
                 std::transform(word.begin(), word.end(), word.begin(),[](unsigned char c){ return std::tolower(c); });
-                AppendToken(TokenType::WORD, word);
-                Tokens.push_back(word);
+                if(skipWords.find(word) == skipWords.end() && std::regex_match(word, validWordRegex)){
+                    AppendToken(TokenType::WORD, word);
+                    Tokens.push_back(word);
+                }
             }
         }
         else{
@@ -117,8 +119,9 @@ void Tokenstream::Tokenize(const std::string& input){
                         word += input[i++];
                     }
                     std::transform(word.begin(), word.end(), word.begin(),[](unsigned char c){ return std::tolower(c); });
-                    if (!word.empty()) {
+                    if (!word.empty() && skipWords.find(word) == skipWords.end() && std::regex_match(word, validWordRegex)) {
                         AppendToken(TokenType::WORD, word);
+                        Tokens.push_back(word);
                         continue;
                     }
                 }

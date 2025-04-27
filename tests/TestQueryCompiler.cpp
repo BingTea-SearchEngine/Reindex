@@ -14,15 +14,10 @@ protected:
     };
 
     std::vector<Document> documents = {
-        {"Document 1", {"i", "went", "to", "the", "store", "and", "grabbed", "some",
-                        "granola", "bar", "and", "then", "i", "went", "to", "another",
-                        "store"}},
-        {"Document 2", {"costco", "is", "the", "best", "megastore", "it", "has", "so", "many",
-                        "granola", "and", "protein", "bar", "love", "costco"}},
-        {"Document 3", {"i", "think", "the", "amazon", "online", "store", "is", "alright",
-                        "amazon", "is", "bananas"}},
-        {"Document 4", {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my",
-                        "protein", "goal", "bar", "none"}}
+        {"Document 1", {"went", "store", "grabbed", "some", "granola", "bar", "went", "another", "store"}},
+        {"Document 2", {"costco", "best", "megastore", "many", "granola", "protein", "bar", "love", "costco"}},
+        {"Document 3", {"think", "amazon", "online", "store", "alright", "amazon", "bananas", "university", "michigan"}},
+        {"Document 4", {"mcdonalds", "best", "food", "fulfills", "my", "protein", "goal", "bar", "none"}}
     };
 
     void SetUp() override {
@@ -198,6 +193,7 @@ TEST_F(QueryCompilerTest, Test) {
     std::string input = "university of michigan";
     Parser parser(input, &index);
     Expression* expr = parser.Parse();
+    std::cout<<expr->GetString()<<std::endl;
     auto ISR = expr->Eval();
     ASSERT_NE(ISR, nullptr);
     delete expr;
