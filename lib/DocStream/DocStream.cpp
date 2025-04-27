@@ -16,8 +16,6 @@ DocStream::DocStream(std::string dirPath, std::string dictionaryPath) : _dirPath
         }
         _documents.push(filename);
     }
-    cout << _documents.size() << endl;
-
     // std::string word;
     // while (std::getline(dictFile, word)) {
     //     word.erase(std::remove_if(word.begin(), word.end(), ::isspace), word.end());

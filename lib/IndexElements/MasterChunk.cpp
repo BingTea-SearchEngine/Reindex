@@ -111,13 +111,16 @@ void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words, metada
     // spdlog::info("Adding {}", doc);
     // Check if index will become too big
     // If too big write to disk and reinitialize _currIndexChunk
+    cout << metadata.docNum << endl;
     if (_currIndexChunk->GetBytesRequired() > _chunkSize ||
         _currMetadataChunk.GetBytesRequired() > _chunkSize) {
         Flush();
     }
     metadata.docStartOffset = _currIndexChunk->GetCurrentOffset();
     _currIndexChunk->AddDocument(doc, words);
+    cout << "Done index add" << endl;
     metadata.docEndOffset = _currIndexChunk->GetCurrentOffset();
+    cout << "Done meta add" << endl;
     _currMetadataChunk.AddDocument(doc, metadata);
     _numDocuments++;
     if (_numDocuments % 10000 == 0) {
