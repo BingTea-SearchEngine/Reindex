@@ -53,6 +53,7 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
     std::vector<doc_t> results;
     for (size_t i = 0; i < docs.size(); ++i) {
         search_result_t result = docs[i];
+        cout << result << endl;
         auto [title, snippet] = getTitleAndSnippet(result, 10);
         results.push_back(doc_t{result.url, result.numWords, result.numTitleWords,
                                 result.numOutLinks, result.numTitleMatch, result.numBodyMatch,
