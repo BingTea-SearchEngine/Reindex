@@ -16,12 +16,7 @@ DocStream::DocStream(std::string dirPath, std::string dictionaryPath) : _dirPath
         }
         _documents.push(filename);
     }
-
-    std::ifstream dictFile(dictionaryPath);
-    if (!dictFile.is_open()) {
-        std::cerr << "Error opening dictionary" << std::endl;
-        exit(EXIT_FAILURE);
-    }
+    cout << _documents.size() << endl;
 
     // std::string word;
     // while (std::getline(dictFile, word)) {
