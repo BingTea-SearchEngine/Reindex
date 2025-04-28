@@ -1,10 +1,8 @@
 #include <cassert>
 
 #include "ISRContainer.hpp"
-
 ISRContainer::ISRContainer(ISR* includedISR, ISR* excludedISR)
-    : included(includedISR),
-      currentPostEntry(std::nullopt) {
+    : included(includedISR), currentPostEntry(std::nullopt) {
     excludedISR->NextDocument();
     while (excludedISR->GetCurrentPostEntry() != std::nullopt) {
         excludedDocuments.insert(excludedISR->GetDocumentID());
@@ -32,6 +30,12 @@ uint32_t ISRContainer::GetDocumentID() {
     assert(this->currentPostEntry.has_value() &&
            "GetDocumentID called when this ISR is not pointing to anything");
     return this->included->GetDocumentID();
+}
+
+size_t ISRContainer::GetDocumentStart() {
+    assert(this->currentPostEntry.has_value() &&
+           "GetDocumentStart called when this ISR is not pointing to anything");
+    return this->included->GetDocumentStart();
 }
 
 std::optional<PostEntry> ISRContainer::Next() {

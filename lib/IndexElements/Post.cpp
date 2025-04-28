@@ -4,10 +4,15 @@
 
 Post::Post() {}
 
-Post::Post(uint32_t docID) : docID(docID), entries() {}
+Post::Post(uint32_t docID, size_t earliestOccurrenceInDoc)
+    : docID(docID), docStart(earliestOccurrenceInDoc), entries() {}
 
 uint32_t Post::GetDocumentID() const {
     return docID;
+}
+
+size_t Post::GetEarliestStart() const {
+    return docStart;
 }
 
 std::vector<PostEntry> Post::GetEntries() const {
@@ -19,8 +24,7 @@ void Post::AddWord(PostEntry word) {
 }
 
 void Post::Print() const {
-    cout << "\tPost{ " << docID << " }: " << entries.size()
-         << " entries" << endl;
+    cout << "\tPost{ " << docID << " }: " << entries.size() << " entries" << endl;
     cout << "\t\t";
     for (const PostEntry& entry : entries) {
         entry.Print();
@@ -81,12 +85,11 @@ Post Post::Deserialize(char* base_region, size_t& offset) {
     uint32_t num_of_words;
     std::memcpy(&num_of_words, base_region + offset, sizeof(num_of_words));
     offset += sizeof(num_of_words);
-    post.entries.resize(num_of_words);
+    post.entries.reserve(num_of_words);
 
     // Deserialize each PostEntry
     for (size_t i = 0; i < num_of_words; ++i) {
-        post.entries[i] =
-            std::move(PostEntry::Deserialize(base_region, offset));
+        post.entries.emplace_back(PostEntry::Deserialize(base_region, offset));
     }
 
     return post;

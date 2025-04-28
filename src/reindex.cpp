@@ -10,13 +10,9 @@
 
 int main(int argc, char** argv) {
     argparse::ArgumentParser program("reindex");
-    program.add_argument("-i", "--input")
-        .required()
-        .help("Specify the input directory.");
+    program.add_argument("-i", "--input").required().help("Specify the input directory.");
 
-    program.add_argument("-o", "--output")
-        .required()
-        .help("Specify the output directory.");
+    program.add_argument("-o", "--output").required().help("Specify the output directory.");
 
     program.add_argument("-d", "--dictionary")
         .default_value("../dictionary.txt")

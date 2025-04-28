@@ -18,7 +18,7 @@ class ISRWord : public ISR {
      *
      * @param pL A posting list for a particular word.
      */
-    ISRWord(const PostingList& pL);
+    ISRWord(const PostingList* pL);
 
     /**
      * @brief Returns the absolute location of the earliest occurrence
@@ -55,6 +55,8 @@ class ISRWord : public ISR {
      * @pre The ISR must currently be pointing to a valid PostEntry.
      */
     virtual uint32_t GetDocumentID() override;
+
+    virtual size_t GetDocumentStart() override;
 
     /**
      * @brief Returns the number of documents that this term appears in
@@ -101,9 +103,12 @@ class ISRWord : public ISR {
      */
     virtual std::optional<PostEntry> Seek(size_t target) override;
 
+    std::optional<PostEntry> OldSeek(size_t target);
+    std::optional<PostEntry> NewSeek(size_t target);
+
    private:
     /// The postingList associated with this ISRWord
-    const PostingList& postingList;
+    const PostingList* postingList;
 
     /// The index of the current Post (document Post).
     int currentPostIdx;
@@ -120,6 +125,9 @@ class ISRWord : public ISR {
 
     /// The ID of the document this ISR is currently pointing at.
     uint32_t documentID;
+
+    /// Of the document this ISR is pointing at, what is its absolute start?
+    size_t docStart;
 
     /// The amount of documents that this word appears in.
     int documentCount;

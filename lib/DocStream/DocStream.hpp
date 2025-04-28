@@ -15,6 +15,7 @@ using std::cout;
 using std::endl;
 
 #include "PostEntry.hpp"
+#include "Util.hpp"
 #include "WordLocation.hpp"
 
 bool checkTagExists(std::string line, std::string tag);
@@ -45,8 +46,7 @@ class DocStream {
     size_t size();
 
    private:
-    std::priority_queue<std::string, std::vector<std::string>, BatchNumCompare>
-        _documents;
+    std::priority_queue<std::string, std::vector<std::string>, BatchNumCompare> _documents;
     std::unordered_set<std::string> _dictionary;
     std::string _dirPath;
 };

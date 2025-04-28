@@ -31,8 +31,7 @@ class Bucket {
     uint32_t hashValue;
     Tuple<Key, Value> tuple;
 
-    Bucket(const Key& k, uint32_t h, const Value v)
-        : tuple(k, v), next(nullptr), hashValue(h) {}
+    Bucket(const Key& k, uint32_t h, const Value v) : tuple(k, v), next(nullptr), hashValue(h) {}
 };
 
 template <typename Key, typename Value>
@@ -104,8 +103,7 @@ class HashTable {
         for (size_t i = 0; i < numBuckets; ++i) {
             buckets[i] = nullptr;
         }
-        buckets[numBuckets] =
-            new Bucket<Key, Value>(Key(), numBuckets, Value());
+        buckets[numBuckets] = new Bucket<Key, Value>(Key(), numBuckets, Value());
     }
 
     ~HashTable() {
@@ -186,9 +184,7 @@ class HashTable {
         return it;
     }
 
-    Iterator end() const {
-        return Iterator(this, numBuckets, buckets[numBuckets]);
-    }
+    Iterator end() const { return Iterator(this, numBuckets, buckets[numBuckets]); }
 
    private:
     // Requires

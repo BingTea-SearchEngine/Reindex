@@ -10,6 +10,12 @@ ISROr::ISROr(std::vector<ISR*> children)
       nearestStartLocation(-1),
       nearestEndLocation(-1) {}
 
+ISROr::~ISROr() {
+    for (auto child : childISRs) {
+        delete child;
+    }
+}
+
 int ISROr::GetStartLocation() {
     assert(this->currentPostEntry.has_value() &&
            "GetStartLocation called when this ISR is not pointing to anything");
@@ -30,6 +36,12 @@ uint32_t ISROr::GetDocumentID() {
     assert(this->currentPostEntry.has_value() &&
            "GetDocumentID called when this ISR is not pointing to anything");
     return (this->childISRs)[this->nearestTerm]->GetDocumentID();
+}
+
+size_t ISROr::GetDocumentStart() {
+    assert(this->currentPostEntry.has_value() &&
+           "GetDocumentStart called when this ISR is not pointing to anything");
+    return this->childISRs[nearestTerm]->GetDocumentStart();
 }
 
 // helper function to update the internal marker variables
@@ -63,8 +75,7 @@ void ISROr::UpdateMarkers() {
     this->nearestTerm = whichChild;
     this->nearestStartLocation = nearestStart;
     this->nearestEndLocation = nearestEnd;
-    this->currentPostEntry =
-        this->childISRs[this->nearestTerm]->GetCurrentPostEntry();
+    this->currentPostEntry = this->childISRs[this->nearestTerm]->GetCurrentPostEntry();
 }
 
 // internal helper function to determine if
@@ -146,8 +157,7 @@ std::optional<PostEntry> ISROr::NextDocument() {
     uint32_t prevDocumentID = this->GetDocumentID();
 
     while (this->GetDocumentID() == prevDocumentID) {
-        if (this->childISRs[this->nearestTerm]->NextDocument() ==
-            std::nullopt) {
+        if (this->childISRs[this->nearestTerm]->NextDocument() == std::nullopt) {
             this->whichChildFinished[this->nearestTerm] = true;
         }
 

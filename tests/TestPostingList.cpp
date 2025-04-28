@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <fcntl.h>  // For O_CREAT, O_RDWR
+#include <fcntl.h>     // For O_CREAT, O_RDWR
 #include <sys/mman.h>  // For shm_open, mmap, PROT_READ, PROT_WRITE, MAP_SHARED, munmap
 #include <sys/stat.h>  // For mode constants
 #include <unistd.h>    // For ftruncate, close
@@ -15,9 +15,9 @@ std::vector<uint8_t> encode(uint32_t value) {
         uint8_t byte = value & 0x7F;  // Get the lowest 7 bits
         value >>= 7;
         if (value != 0) {
-            bytes.push_back(byte);    // More bytes to come
+            bytes.push_back(byte);  // More bytes to come
         } else {
-            byte |= 0x80;             // Set MSB = 1 to mark end
+            byte |= 0x80;  // Set MSB = 1 to mark end
             bytes.push_back(byte);
             break;
         }
@@ -35,7 +35,8 @@ uint32_t decode(const uint8_t* base, size_t& offset) {
 
         result |= (byte & 0x7F) << shift;
 
-        if (byte & 0x80) break;  // MSB = 1 means done
+        if (byte & 0x80)
+            break;  // MSB = 1 means done
         shift += 7;
     }
     return result;
@@ -83,17 +84,16 @@ TEST(BasicPostingList, TestAddWord) {
     PostEntry w1 = {0, wordlocation_t::title};
     PostEntry w2 = {1, wordlocation_t::body};
     PostEntry w3 = {2, wordlocation_t::bold};
-    pl.AddWord(1, w1);
-    pl.AddWord(1, w2);
-    pl.AddWord(2, w3);
+    pl.AddWord(1, 0, w1);
+    pl.AddWord(1, 1, w2);
+    pl.AddWord(2, 2, w3);
 
     // Access posts using GetPosts()
     auto posts = pl.GetPosts();
 
     // First post
     EXPECT_EQ(posts[0].GetDocumentID(), 1);
-    auto wordEntries1 =
-        posts[0].GetEntries();  // Get entries for the first post
+    auto wordEntries1 = posts[0].GetEntries();  // Get entries for the first post
     EXPECT_EQ(wordEntries1[0].GetDelta(), w1.GetDelta());
     EXPECT_EQ(wordEntries1[0].GetLocationFound(), w1.GetLocationFound());
     EXPECT_EQ(wordEntries1[1].GetDelta(), w2.GetDelta());
@@ -101,8 +101,7 @@ TEST(BasicPostingList, TestAddWord) {
 
     // Second post
     EXPECT_EQ(posts[1].GetDocumentID(), 2);
-    auto wordEntries2 =
-        posts[1].GetEntries();  // Get entries for the second post
+    auto wordEntries2 = posts[1].GetEntries();  // Get entries for the second post
     EXPECT_EQ(wordEntries2[0].GetDelta(), w3.GetDelta());
     EXPECT_EQ(wordEntries2[0].GetLocationFound(), w3.GetLocationFound());
 }
@@ -110,8 +109,7 @@ TEST(BasicPostingList, TestAddWord) {
 void test_serializiation() {
     int fd;
     const size_t REGION_SIZE = 4096;
-    void* base_region =
-        create_mmap_region(fd, REGION_SIZE, "test_posting_list");
+    void* base_region = create_mmap_region(fd, REGION_SIZE, "test_posting_list");
 
     PostingList* postingList = new PostingList("cat");
 
@@ -129,21 +127,21 @@ void test_serializiation() {
     PostEntry word_occurrence_6 = {200010, wordlocation_t::title};
     PostEntry word_occurrence_7 = {200015, wordlocation_t::body};
 
-    postingList->AddWord(1, word_occurrence_1);
-    postingList->AddWord(1, word_occurrence_2);
-    postingList->AddWord(1, word_occurrence_3);
+    postingList->AddWord(1, 123000, word_occurrence_1);
+    postingList->AddWord(1, 123000, word_occurrence_2);
+    postingList->AddWord(1, 123000, word_occurrence_3);
 
-    postingList->AddWord(2, word_occurrence_4);
-    postingList->AddWord(2, word_occurrence_5);
-    postingList->AddWord(2, word_occurrence_6);
-    postingList->AddWord(2, word_occurrence_7);
+    postingList->AddWord(2, 200000, word_occurrence_4);
+    postingList->AddWord(2, 200000, word_occurrence_5);
+    postingList->AddWord(2, 200000, word_occurrence_6);
+    postingList->AddWord(2, 200000, word_occurrence_7);
 
     size_t offset = 0;
-    PostingList::NewSerialize(static_cast<char*>(base_region), offset,
-                           *postingList);
+    PostingList::NewSerialize(static_cast<char*>(base_region), offset, *postingList);
 
     std::cout << "Compressed PostingList serialized to mmap.\n";
-    std::cout << "This many bytes were used for COMPRESSED RELATIVE DELTAS: " << offset << std::endl;
+    std::cout << "This many bytes were used for COMPRESSED RELATIVE DELTAS: " << offset
+              << std::endl;
 
     size_t new_offset = offset;
     PostingList::OldSerialize(static_cast<char*>(base_region), new_offset, *postingList);
@@ -162,8 +160,7 @@ void test_deserialization() {
     auto [base_region, size] = read_mmap_region(fd, "test_posting_list");
     size_t offset = 0;
 
-    PostingList postingList =
-        PostingList::NewDeserialize(static_cast<char*>(base_region), offset);
+    PostingList postingList = PostingList::NewDeserialize(static_cast<char*>(base_region), offset);
 
     if (postingList.GetWord() == "cat") {
         std::cout << "Passed!" << std::endl;
@@ -263,8 +260,7 @@ void test_deserialization() {
         exit(1);
     }
 
-    postingList =
-        PostingList::OldDeserialize(static_cast<char*>(base_region), offset);
+    postingList = PostingList::OldDeserialize(static_cast<char*>(base_region), offset);
 
     if (postingList.GetWord() == "cat") {
         std::cout << "Passed!" << std::endl;

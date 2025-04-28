@@ -9,35 +9,29 @@ MasterChunk::MasterChunk(std::string outputDir, size_t chunkSize)
       _numDocuments(0) {
     std::filesystem::create_directories(_indexDir);
     std::filesystem::create_directories(_metadataDir);
-    assert(std::filesystem::exists(_indexDir) &&
-           std::filesystem::is_directory(_indexDir));
-    assert(std::filesystem::exists(_metadataDir) &&
-           std::filesystem::is_directory(_metadataDir));
+    assert(std::filesystem::exists(_indexDir) && std::filesystem::is_directory(_indexDir));
+    assert(std::filesystem::exists(_metadataDir) && std::filesystem::is_directory(_metadataDir));
+    _currIndexChunk = std::make_unique<IndexChunk>();
 }
 
-void MasterChunk::Serialize(char* baseRegion, size_t& offset,
-                            MasterChunk& master) {
+void MasterChunk::Serialize(char* baseRegion, size_t& offset, MasterChunk& master) {
     assert(offset == 0);
     // Serialize number of documents
-    std::memcpy(baseRegion + offset, &master._numDocuments,
-                sizeof(master._numDocuments));
+    std::memcpy(baseRegion + offset, &master._numDocuments, sizeof(master._numDocuments));
     offset += sizeof(master._numDocuments);
 
     // Serialize threshold chunk size
-    std::memcpy(baseRegion + offset, &master._chunkSize,
-                sizeof(master._chunkSize));
+    std::memcpy(baseRegion + offset, &master._chunkSize, sizeof(master._chunkSize));
     offset += sizeof(master._chunkSize);
 
     // Serialize index output directory
     size_t indexDirectorySize = master._indexDir.size() + 1;
-    std::memcpy(baseRegion + offset, master._indexDir.c_str(),
-                indexDirectorySize);
+    std::memcpy(baseRegion + offset, master._indexDir.c_str(), indexDirectorySize);
     offset += indexDirectorySize;
 
     // Serialize metadata output directory
     size_t metadataDirectorySize = master._metadataDir.size() + 1;
-    std::memcpy(baseRegion + offset, master._metadataDir.c_str(),
-                metadataDirectorySize);
+    std::memcpy(baseRegion + offset, master._metadataDir.c_str(), metadataDirectorySize);
     offset += metadataDirectorySize;
 
     // Serialize size of index chunk list (should be the same for index and master chunks since they are flushed together)
@@ -64,13 +58,11 @@ MasterChunk MasterChunk::Deserailize(char* baseRegion, size_t& offset) {
     assert(offset == 0);
     MasterChunk master;
     // Read number of documents
-    std::memcpy(&master._numDocuments, baseRegion + offset,
-                sizeof(master._numDocuments));
+    std::memcpy(&master._numDocuments, baseRegion + offset, sizeof(master._numDocuments));
     offset += sizeof(master._numDocuments);
 
     // Read threshold chunk size
-    std::memcpy(&master._chunkSize, baseRegion + offset,
-                sizeof(master._chunkSize));
+    std::memcpy(&master._chunkSize, baseRegion + offset, sizeof(master._chunkSize));
     offset += sizeof(master._chunkSize);
 
     // Read index output directory
@@ -115,71 +107,74 @@ int MasterChunk::GetNumDocuments() {
     return _numDocuments;
 }
 
-void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words,
-                              metadata_t metadata) {
+void MasterChunk::AddDocument(std::string doc, std::vector<word_t> words, metadata_t metadata) {
     // spdlog::info("Adding {}", doc);
     // Check if index will become too big
     // If too big write to disk and reinitialize _currIndexChunk
-    if (_currIndexChunk.GetBytesRequired() > _chunkSize ||
+    if (_currIndexChunk->GetBytesRequired() > _chunkSize ||
         _currMetadataChunk.GetBytesRequired() > _chunkSize) {
-        spdlog::info("Flushing");
-        spdlog::info("Offset reached {}", _currIndexChunk._offset);
         Flush();
-        spdlog::info("Done Flushing, number of index chunks: {}",
-                     _indexChunks.size());
-        spdlog::info("Number of documents indexed so far {}", _numDocuments);
     }
-    _currIndexChunk.AddDocument(doc, words);
+    metadata.docStartOffset = _currIndexChunk->GetCurrentOffset();
+    _currIndexChunk->AddDocument(doc, words);
+    metadata.docEndOffset = _currIndexChunk->GetCurrentOffset();
     _currMetadataChunk.AddDocument(doc, metadata);
     _numDocuments++;
+    if (_numDocuments % 10000 == 0) {
+        spdlog::info("{} indexed", _numDocuments);
+    }
 }
 
 void MasterChunk::Flush() {
+    spdlog::info("Flushing");
+    spdlog::info("Offset reached {}", _currIndexChunk->_offset);
     _serializeCurrIndexChunk();
     _serializeCurrMetadataChunk();
-    _currIndexChunk = IndexChunk();
+    _currIndexChunk.reset(new IndexChunk());
     _currMetadataChunk = MetadataChunk();
+    spdlog::info("Done Flushing, number of index chunks: {}", _indexChunks.size());
+    spdlog::info("Number of documents indexed so far {}", _numDocuments);
+}
+
+size_t MasterChunk::NumChunks() {
+    assert(_indexChunks.size() == _metadataChunks.size());
+    return _indexChunks.size();
 }
 
 void MasterChunk::PrintCurrentIndexChunk() const {
-    cout << "---------- Index Chunk " << _indexChunks.size() << " ----------"
-         << endl;
-    _currIndexChunk.Print();
-    cout << "---------- Index Chunk " << _indexChunks.size() << " ----------"
-         << endl;
+    cout << "---------- Index Chunk " << _indexChunks.size() << " ----------" << endl;
+    _currIndexChunk->Print();
+    cout << "---------- Index Chunk " << _indexChunks.size() << " ----------" << endl;
 }
 
 void MasterChunk::PrintCurrentMetadataChunk() const {
-    cout << "---------- Metadata Chunk " << _metadataChunks.size()
-         << " ----------" << endl;
+    cout << "---------- Metadata Chunk " << _metadataChunks.size() << " ----------" << endl;
     _currMetadataChunk.Print();
-    cout << "---------- Metadata Chunk " << _metadataChunks.size()
-         << " ----------" << endl;
+    cout << "---------- Metadata Chunk " << _metadataChunks.size() << " ----------" << endl;
 }
 
-IndexChunk MasterChunk::GetIndexChunk(size_t i) {
+std::unique_ptr<IndexChunk> MasterChunk::GetIndexChunk(size_t i) {
     assert(i < _indexChunks.size());
     std::string indexFilePath = _indexChunks[i];
     int fd = -1;
     auto [buf, size] = read_mmap_region(fd, indexFilePath);
     size_t offset = 0;
-    IndexChunk chunk = IndexChunk::Deserailize(static_cast<char*>(buf), offset);
+    std::unique_ptr<IndexChunk> chunk = IndexChunk::Deserailize(static_cast<char*>(buf), offset);
     munmap(buf, size);
     close(fd);
     return chunk;
 }
 
-MetadataChunk MasterChunk::GetMetadataChunk(size_t i) {
+std::unique_ptr<MetadataChunk> MasterChunk::GetMetadataChunk(size_t i) {
     assert(i < _metadataChunks.size());
     std::string indexFilePath = _metadataChunks[i];
     int fd = -1;
     auto [buf, size] = read_mmap_region(fd, indexFilePath);
     size_t offset = 0;
-    MetadataChunk chunk =
-        MetadataChunk::Deserailize(static_cast<char*>(buf), offset);
+    MetadataChunk chunk = MetadataChunk::Deserailize(static_cast<char*>(buf), offset);
     munmap(buf, size);
     close(fd);
-    return chunk;
+    return std::make_unique<MetadataChunk>(chunk);
 }
 
 void MasterChunk::_serializeCurrIndexChunk() {
@@ -192,8 +187,7 @@ void MasterChunk::_serializeCurrIndexChunk() {
     assert(fd != -1);
 
     size_t offset = 0;
-    IndexChunk::Serialize(static_cast<char*>(base_region), offset,
-                          _currIndexChunk);
+    IndexChunk::Serialize(static_cast<char*>(base_region), offset, *_currIndexChunk);
     munmap(base_region, _chunkSize * 2);
     if (ftruncate(fd, offset) == -1) {
         perror("Error truncating file");
@@ -202,8 +196,7 @@ void MasterChunk::_serializeCurrIndexChunk() {
 }
 
 void MasterChunk::_serializeCurrMetadataChunk() {
-    std::string chunkFilePath =
-        _metadataDir + std::to_string(_metadataChunks.size());
+    std::string chunkFilePath = _metadataDir + std::to_string(_metadataChunks.size());
     _metadataChunks.push_back(chunkFilePath);
 
     int fd = -1;
@@ -212,8 +205,7 @@ void MasterChunk::_serializeCurrMetadataChunk() {
     assert(fd != -1);
 
     size_t offset = 0;
-    MetadataChunk::Serialize(static_cast<char*>(base_region), offset,
-                             _currMetadataChunk);
+    MetadataChunk::Serialize(static_cast<char*>(base_region), offset, _currMetadataChunk);
     munmap(base_region, _chunkSize * 2);
     if (ftruncate(fd, offset) == -1) {
         perror("Error truncating file");

@@ -7,10 +7,10 @@
 
 #include <cassert>
 #include <cstring>
+#include <filesystem>
+#include <memory>
 #include <string>
 #include <vector>
-
-#include <filesystem>
 
 #include <spdlog/fmt/bundled/ranges.h>
 #include <spdlog/sinks/basic_file_sink.h>
@@ -56,8 +56,7 @@ class MasterChunk {
      * @param doc The name of the document
      * @param words The words in the document in a vector
      * */
-    void AddDocument(std::string doc, std::vector<word_t> words,
-                     metadata_t metadata);
+    void AddDocument(std::string doc, std::vector<word_t> words, metadata_t metadata);
 
     /*
      * @brief Gets the number of documents stored by this index
@@ -87,14 +86,20 @@ class MasterChunk {
      *
      * @param i The index of the index. Must be less than the size of _indexChunks
      * */
-    IndexChunk GetIndexChunk(size_t i);
+    std::unique_ptr<IndexChunk> GetIndexChunk(size_t i);
 
     /*
      * @brief Return the metadata chunk at index i of metadata chunk
      *
      * @param i The index of the index. Must be less than the size of _medataChunks
      * */
-    MetadataChunk GetMetadataChunk(size_t i);
+    std::unique_ptr<MetadataChunk> GetMetadataChunk(size_t i);
+
+    /*
+     * @brief Return the number of chunks in this index server
+     *
+     * */
+    size_t NumChunks();
 
     /**
      * @brief Serializes a given MasterChunk object into a specific region of memory.
@@ -115,8 +120,7 @@ class MasterChunk {
      * @post Writes the bytes of the MasterChunk object into memory at the calculated region.
      * @post Updates `offset` to the next available memory location.
      * */
-    static void Serialize(char* baseRegion, size_t& offset,
-                          MasterChunk& master);
+    static void Serialize(char* baseRegion, size_t& offset, MasterChunk& master);
 
     /**
      * @brief Deserializes a MasterChunk object from a specific region of memory.
@@ -156,7 +160,7 @@ class MasterChunk {
     std::string _indexDir;
     std::string _metadataDir;
     // The current index chunk being built
-    IndexChunk _currIndexChunk;
+    std::unique_ptr<IndexChunk> _currIndexChunk;
     // The current metadata chunk being built
     MetadataChunk _currMetadataChunk;
     // The threshold size of an index chunk

@@ -49,6 +49,8 @@ class ISR {
      */
     virtual uint32_t GetDocumentID() = 0;
 
+    virtual size_t GetDocumentStart() = 0;
+
     /**
      * @brief Returns the next PostEntry that matches the occurrence of
      * this term that this ISR is looking for and advances the ISR forward.

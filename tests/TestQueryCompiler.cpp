@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
-#include "Parser.hpp"
-#include "Expression.hpp"
-#include "PostingList.hpp"
 #include <iostream>
+#include "Expression.hpp"
+#include "Parser.hpp"
+#include "PostingList.hpp"
 
 class QueryCompilerTest : public ::testing::Test {
-protected:
+   protected:
     std::unordered_map<std::string, PostingList> index;
 
     struct Document {
@@ -14,16 +14,15 @@ protected:
     };
 
     std::vector<Document> documents = {
-        {"Document 1", {"i", "went", "to", "the", "store", "and", "grabbed", "some",
-                        "granola", "bar", "and", "then", "i", "went", "to", "another",
-                        "store"}},
-        {"Document 2", {"costco", "is", "the", "best", "megastore", "it", "has", "so", "many",
-                        "granola", "and", "protein", "bar", "love", "costco"}},
-        {"Document 3", {"i", "think", "the", "amazon", "online", "store", "is", "alright",
-                        "amazon", "is", "bananas"}},
-        {"Document 4", {"mcdonalds", "has", "the", "best", "food", "and", "fulfills", "my",
-                        "protein", "goal", "bar", "none"}}
-    };
+        {"Document 1",
+         {"went", "store", "grabbed", "some", "granola", "bar", "went", "another", "store"}},
+        {"Document 2",
+         {"costco", "best", "megastore", "many", "granola", "protein", "bar", "love", "costco"}},
+        {"Document 3",
+         {"think", "amazon", "online", "store", "alright", "amazon", "bananas", "university",
+          "michigan"}},
+        {"Document 4",
+         {"mcdonalds", "best", "food", "fulfills", "my", "protein", "goal", "bar", "none"}}};
 
     void SetUp() override {
         uint32_t word_counter = 0;
@@ -34,8 +33,15 @@ protected:
                 if (index.find(word) == index.end()) {
                     index[word] = PostingList(word);
                 }
-                index[word].AddWord(docID,
-                                    {word_counter, wordlocation_t::body});
+                if (docID == 1) {
+                    index[word].AddWord(docID, 0, {word_counter, wordlocation_t::body});
+                } else if (docID == 2) {
+                    index[word].AddWord(docID, 9, {word_counter, wordlocation_t::body});
+                } else if (docID == 3) {
+                    index[word].AddWord(docID, 18, {word_counter, wordlocation_t::body});
+                } else {
+                    index[word].AddWord(docID, 27, {word_counter, wordlocation_t::body});
+                }
                 word_counter++;
             }
             docID++;
@@ -43,12 +49,12 @@ protected:
     }
 };
 
-TEST_F(QueryCompilerTest, AndQuery) {
+TEST_F(QueryCompilerTest, AND) {
     std::string input = "amazon store";  // implicit AND
-    Parser parser(input, index);
+    Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);  // Parsing succeeded
-    std::cout<<expr->GetString()<<std::endl;
+    std::cout << expr->GetString() << std::endl;
 
     ISR* root = expr->Eval();
     ASSERT_NE(root, nullptr);  // Evaluation returned a valid ISR
@@ -65,14 +71,15 @@ TEST_F(QueryCompilerTest, AndQuery) {
     EXPECT_FALSE(post.has_value());  // Should be exhausted
 
     delete expr;
+    delete root;
 }
 
-TEST_F(QueryCompilerTest, AndNotQuery) {
+TEST_F(QueryCompilerTest, ANDNOT) {
     std::string input = "(granola bar) NOT costco";
-    Parser parser(input, index);
+    Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
-    std::cout<<expr->GetString()<<std::endl;
+    std::cout << expr->GetString() << std::endl;
 
     ISR* root = expr->Eval();
     ASSERT_NE(root, nullptr);
@@ -85,14 +92,15 @@ TEST_F(QueryCompilerTest, AndNotQuery) {
     EXPECT_FALSE(post.has_value());
 
     delete expr;
+    delete root;
 }
 
 TEST_F(QueryCompilerTest, Phrase) {
     std::string input = "\"i went to the store\"";
-    Parser parser(input, index);
+    Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
-    std::cout<<expr->GetString()<<std::endl;
+    std::cout << expr->GetString() << std::endl;
 
     ISR* root = expr->Eval();
     ASSERT_NE(root, nullptr);
@@ -105,14 +113,15 @@ TEST_F(QueryCompilerTest, Phrase) {
     EXPECT_FALSE(post.has_value());
 
     delete expr;
+    delete root;
 }
 
-TEST_F(QueryCompilerTest, OR) {
+TEST_F(QueryCompilerTest, ORAND) {
     std::string input = "(Granola OR protein) bar";
-    Parser parser(input, index);
+    Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
-    std::cout<<expr->GetString()<<std::endl;
+    std::cout << expr->GetString() << std::endl;
 
     ISR* root = expr->Eval();
     ASSERT_NE(root, nullptr);
@@ -134,14 +143,15 @@ TEST_F(QueryCompilerTest, OR) {
     EXPECT_FALSE(post.has_value());
 
     delete expr;
+    delete root;
 }
 
 TEST_F(QueryCompilerTest, PhraseOR) {
     std::string input = "\"Granola Bar\" OR \"Protein Bar\"";
-    Parser parser(input, index);
+    Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
-    std::cout<<expr->GetString()<<std::endl;
+    std::cout << expr->GetString() << std::endl;
 
     ISR* root = expr->Eval();
     ASSERT_NE(root, nullptr);
@@ -157,14 +167,15 @@ TEST_F(QueryCompilerTest, PhraseOR) {
     EXPECT_FALSE(post.has_value());
 
     delete expr;
+    delete root;
 }
 
 TEST_F(QueryCompilerTest, PhraseORNOT) {
     std::string input = "(\"Granola Bar\" OR \"Protein Bar\") NOT Costco";
-    Parser parser(input, index);
+    Parser parser(input, &index);
     Expression* expr = parser.Parse();
     ASSERT_NE(expr, nullptr);
-    std::cout<<expr->GetString()<<std::endl;
+    std::cout << expr->GetString() << std::endl;
 
     ISR* root = expr->Eval();
     ASSERT_NE(root, nullptr);
@@ -176,5 +187,29 @@ TEST_F(QueryCompilerTest, PhraseORNOT) {
     post = root->Next();
     EXPECT_FALSE(post.has_value());
 
+    delete expr;
+    delete root;
+}
+
+TEST_F(QueryCompilerTest, Invalid) {
+    std::string input = "These words are not in the index";
+    Parser parser(input, &index);
+    Expression* expr = parser.Parse();
+    ASSERT_NE(expr, nullptr);
+    std::cout << expr->GetString() << std::endl;
+
+    ISR* root = expr->Eval();
+    EXPECT_EQ(root, nullptr);
+
+    delete expr;
+}
+
+TEST_F(QueryCompilerTest, Test) {
+    std::string input = "university of michigan";
+    Parser parser(input, &index);
+    Expression* expr = parser.Parse();
+    std::cout << expr->GetString() << std::endl;
+    auto ISR = expr->Eval();
+    ASSERT_NE(ISR, nullptr);
     delete expr;
 }

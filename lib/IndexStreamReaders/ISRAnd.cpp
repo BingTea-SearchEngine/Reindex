@@ -10,6 +10,12 @@ ISRAnd::ISRAnd(std::vector<ISR*> children)
       nearestStartLocation(-1),
       nearestEndLocation(-1) {}
 
+ISRAnd::~ISRAnd() {
+    for (auto child : childISRs) {
+        delete child;
+    }
+}
+
 int ISRAnd::GetStartLocation() {
     assert(this->currentPostEntry.has_value() &&
            "GetStartLocation called when this ISR is not pointing to anything");
@@ -30,6 +36,12 @@ uint32_t ISRAnd::GetDocumentID() {
     assert(this->currentPostEntry.has_value() &&
            "GetDocumentID called when this ISR is not pointing to anything");
     return this->childISRs[nearestTerm]->GetDocumentID();
+}
+
+size_t ISRAnd::GetDocumentStart() {
+    assert(this->currentPostEntry.has_value() &&
+           "GetDocumentStart called when this ISR is not pointing to anything");
+    return this->childISRs[nearestTerm]->GetDocumentStart();
 }
 
 // helper function to update the internal marker variables
@@ -62,8 +74,7 @@ void ISRAnd::UpdateMarkers() {
     this->farthestTerm = whichChildLatest;
     this->nearestStartLocation = nearestStart;
     this->nearestEndLocation = nearestEnd;
-    this->currentPostEntry =
-        this->childISRs[nearestTerm]->GetCurrentPostEntry();
+    this->currentPostEntry = this->childISRs[nearestTerm]->GetCurrentPostEntry();
 }
 
 // helper function to check if all the current child ISRs
@@ -93,6 +104,10 @@ bool ISRAnd::ChildrenOnSameDocument() {
 // pointing to the same document
 // returns True or False for successful or unsuccessful
 bool ISRAnd::CatchUpStragglerISRs() {
+    return ISRAnd::NewCatchUpStragglerISRs();
+}
+
+bool ISRAnd::OldCatchUpStragglerISRs() {
     // not all pointing to the same document
     while (true) {
         // means that among child ISRs x, y, and z...
@@ -100,21 +115,59 @@ bool ISRAnd::CatchUpStragglerISRs() {
         // .........................y
         // .....................z....
         // move forward the proper stragglers until they're hopefully on the same document as y
-        uint32_t potentialTargetDocument =
-            (this->childISRs)[this->farthestTerm]->GetDocumentID();
+        uint32_t potentialTargetDocument = (this->childISRs)[this->farthestTerm]->GetDocumentID();
         for (int i = 0; i < childISRs.size(); ++i) {
             if (i == this->farthestTerm) {
                 continue;
             }
 
-            uint32_t currentDocument =
-                (this->childISRs)[i]->GetDocumentID();
+            uint32_t currentDocument = (this->childISRs)[i]->GetDocumentID();
             if (currentDocument == potentialTargetDocument) {
                 continue;
             }
 
             // that means this child ISR is behind on the wrong doc and needs to catch up
             if ((this->childISRs)[i]->Next() == std::nullopt) {
+                // this child ISR reached the end of its line, thus impossible
+                // to now have all ISRs pointing to the same document
+                return false;
+            }
+        }
+
+        this->UpdateMarkers();
+
+        // now, after doing that, are these child ISRs all pointing to the same document?
+        if (this->ChildrenOnSameDocument()) {
+            return true;
+        }
+        // otherwise, try again
+    }
+}
+
+bool ISRAnd::NewCatchUpStragglerISRs() {
+    // not all pointing to the same document
+    while (true) {
+        // means that among child ISRs x, y, and z...
+        // ..........x...............
+        // .........................y
+        // .....................z....
+        // move forward the proper stragglers until they're hopefully on the same document as y
+        uint32_t potentialTargetDocument = (this->childISRs)[this->farthestTerm]->GetDocumentID();
+        size_t beginningOfTargetDocument =
+            (this->childISRs)[this->farthestTerm]->GetDocumentStart();
+
+        for (int i = 0; i < childISRs.size(); ++i) {
+            if (i == this->farthestTerm) {
+                continue;
+            }
+
+            uint32_t currentDocument = (this->childISRs)[i]->GetDocumentID();
+            if (currentDocument == potentialTargetDocument) {
+                continue;
+            }
+
+            // that means this child ISR is behind on the wrong doc and needs to catch up
+            if ((this->childISRs)[i]->Seek(beginningOfTargetDocument) == std::nullopt) {
                 // this child ISR reached the end of its line, thus impossible
                 // to now have all ISRs pointing to the same document
                 return false;

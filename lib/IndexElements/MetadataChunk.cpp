@@ -38,12 +38,11 @@ std::vector<std::string> MetadataChunk::GetDocuments() {
     return _documents;
 }
 
-metadata_t MetadataChunk::GetMetadata(std::string doc) {
-    return _docMetadata[doc];
+metadata_t MetadataChunk::GetMetadata(std::string doc) const {
+    return _docMetadata.at(doc);
 }
 
-void MetadataChunk::Serialize(char* base_region, size_t& offset,
-                              MetadataChunk& chunk) {
+void MetadataChunk::Serialize(char* base_region, size_t& offset, MetadataChunk& chunk) {
     assert(offset == 0);
 
     // Serialize document list size
@@ -63,25 +62,37 @@ void MetadataChunk::Serialize(char* base_region, size_t& offset,
         // std::memcpy(base_region + offset, &index._docMetadata[docname], metadata_size);
         // offset+=metadata_size;
 
-        std::memcpy(base_region + offset, &metadata.numWords,
-                    sizeof(metadata.numWords));
+        std::memcpy(base_region + offset, &metadata.numWords, sizeof(metadata.numWords));
         offset += sizeof(metadata.numWords);
 
-        std::memcpy(base_region + offset, &metadata.numTitleWords,
-                    sizeof(metadata.numTitleWords));
+        std::memcpy(base_region + offset, &metadata.numTitleWords, sizeof(metadata.numTitleWords));
         offset += sizeof(metadata.numTitleWords);
 
-        std::memcpy(base_region + offset, &metadata.pageRank,
-                    sizeof(metadata.pageRank));
+        std::memcpy(base_region + offset, &metadata.numOutLinks, sizeof(metadata.numOutLinks));
+        offset += sizeof(metadata.numOutLinks);
+
+        std::memcpy(base_region + offset, &metadata.pageRank, sizeof(metadata.pageRank));
         offset += sizeof(metadata.pageRank);
 
-        std::memcpy(base_region + offset, &metadata.cheiRank,
-                    sizeof(metadata.cheiRank));
+        std::memcpy(base_region + offset, &metadata.cheiRank, sizeof(metadata.cheiRank));
         offset += sizeof(metadata.cheiRank);
 
-        uint32_t numOutLinks = metadata.numOutLinks;
-        std::memcpy(base_region + offset, &numOutLinks, sizeof(numOutLinks));
-        offset += sizeof(numOutLinks);
+        std::memcpy(base_region + offset, &metadata.community, sizeof(metadata.community));
+        offset += sizeof(metadata.community);
+
+        std::memcpy(base_region + offset, &metadata.communityCount,
+                    sizeof(metadata.communityCount));
+        offset += sizeof(metadata.communityCount);
+
+        std::memcpy(base_region + offset, &metadata.docNum, sizeof(metadata.docNum));
+        offset += sizeof(metadata.docNum);
+
+        std::memcpy(base_region + offset, &metadata.docStartOffset,
+                    sizeof(metadata.docStartOffset));
+        offset += sizeof(metadata.docStartOffset);
+
+        std::memcpy(base_region + offset, &metadata.docEndOffset, sizeof(metadata.docEndOffset));
+        offset += sizeof(metadata.docEndOffset);
     }
 
     // Serailize metadata for each document
@@ -108,15 +119,19 @@ MetadataChunk MetadataChunk::Deserailize(char* base_region, size_t& offset) {
         chunk._documents.push_back(docname);
 
         // Read number of words
-        uint32_t numWords = 0, numTitleWords = 0, numOutLinks = 0;
+        uint32_t numWords = 0, numTitleWords = 0, numOutLinks = 0, docNum = 0, docStartOffset = 0,
+                 docEndOffset = 0;
+        int community, communityCount;
         float pageRank = 0.0, cheiRank = 0.0;
 
         std::memcpy(&numWords, base_region + offset, sizeof(numWords));
         offset += sizeof(numWords);
 
-        std::memcpy(&numTitleWords, base_region + offset,
-                    sizeof(numTitleWords));
+        std::memcpy(&numTitleWords, base_region + offset, sizeof(numTitleWords));
         offset += sizeof(numTitleWords);
+
+        std::memcpy(&numOutLinks, base_region + offset, sizeof(numOutLinks));
+        offset += sizeof(numOutLinks);
 
         std::memcpy(&pageRank, base_region + offset, sizeof(pageRank));
         offset += sizeof(pageRank);
@@ -124,11 +139,23 @@ MetadataChunk MetadataChunk::Deserailize(char* base_region, size_t& offset) {
         std::memcpy(&cheiRank, base_region + offset, sizeof(cheiRank));
         offset += sizeof(cheiRank);
 
-        std::memcpy(&numOutLinks, base_region + offset, sizeof(numOutLinks));
-        offset += sizeof(numOutLinks);
+        std::memcpy(&community, base_region + offset, sizeof(community));
+        offset += sizeof(community);
 
-        metadata_t metadata{numWords, numTitleWords, numOutLinks, pageRank,
-                            cheiRank};
+        std::memcpy(&communityCount, base_region + offset, sizeof(communityCount));
+        offset += sizeof(communityCount);
+
+        std::memcpy(&docNum, base_region + offset, sizeof(docNum));
+        offset += sizeof(docNum);
+
+        std::memcpy(&docStartOffset, base_region + offset, sizeof(docStartOffset));
+        offset += sizeof(docStartOffset);
+
+        std::memcpy(&docEndOffset, base_region + offset, sizeof(docEndOffset));
+        offset += sizeof(docEndOffset);
+
+        metadata_t metadata{numWords,  numTitleWords,  numOutLinks, pageRank,       cheiRank,
+                            community, communityCount, docNum,      docStartOffset, docEndOffset};
         chunk._docMetadata.insert(make_pair(docname, metadata));
     }
 

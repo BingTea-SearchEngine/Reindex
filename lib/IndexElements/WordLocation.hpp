@@ -19,8 +19,7 @@ struct word_t {
     wordlocation_t location;
 
     friend std::ostream& operator<<(std::ostream& os, const word_t& w) {
-        os << "word_t{ word=" << w.word << " offset=" << w.offset
-           << " location=";
+        os << "word_t{ word=" << w.word << " offset=" << w.offset << " location=";
         switch (w.location) {
             case (wordlocation_t::title):
                 os << "title";
@@ -50,15 +49,21 @@ struct metadata_t {
     uint32_t numOutLinks;
     float pageRank;
     float cheiRank;
+    int community;
+    int communityCount;
+    uint32_t docNum;          // For snippet retrieval
+    uint32_t docStartOffset;  // For snippet retrieval
+    uint32_t docEndOffset;    // For ISR
 
     friend std::ostream& operator<<(std::ostream& os, const metadata_t& m);
 
     friend bool operator==(const metadata_t& lhs, const metadata_t& rhs);
 
     size_t getBytes() {
-        size_t bytes = sizeof(numWords) + sizeof(numTitleWords) +
-                       sizeof(numOutLinks) + sizeof(pageRank) +
-                       sizeof(cheiRank);
+        size_t bytes = sizeof(numWords) + sizeof(numTitleWords) + sizeof(numOutLinks) +
+                       sizeof(pageRank) + sizeof(cheiRank) + sizeof(community) +
+                       sizeof(communityCount) + sizeof(docNum) + sizeof(docStartOffset) +
+                       sizeof(docEndOffset);
         return bytes;
     }
 };

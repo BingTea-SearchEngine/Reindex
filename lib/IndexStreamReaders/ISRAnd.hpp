@@ -21,6 +21,11 @@ class ISRAnd : public ISR {
     ISRAnd(std::vector<ISR*> children);
 
     /**
+     * @brief Deletes all children ISRs
+    */
+    ~ISRAnd() override;
+
+    /**
      * @brief Returns the absolute location of the earliest occurrence
      *        among the child ISRs at this moment.
      * 
@@ -55,6 +60,8 @@ class ISRAnd : public ISR {
      * @pre The ISR must currently be pointing to a valid PostEntry.
      */
     virtual uint32_t GetDocumentID() override;
+
+    virtual size_t GetDocumentStart() override;
 
     /**
      * @brief Returns the next PostEntry that matches the occurrence of
@@ -112,4 +119,7 @@ class ISRAnd : public ISR {
 
     /// internal helper function
     bool CatchUpStragglerISRs();
+
+    bool OldCatchUpStragglerISRs();
+    bool NewCatchUpStragglerISRs();
 };

@@ -42,7 +42,7 @@ class MetadataChunk {
      * @param The document to look for
      * @return metadata for that document
      * */
-    metadata_t GetMetadata(std::string doc);
+    metadata_t GetMetadata(std::string doc) const;
 
     /*
      * @brief Prints the contents of the MetadataChunk
@@ -68,8 +68,7 @@ class MetadataChunk {
      * @post Writes the bytes of the MetadataChunk object into memory at the calculated region.
      * @post Updates `offset` to the next available memory location.
      * */
-    static void Serialize(char* base_region, size_t& offset,
-                          MetadataChunk& chunk);
+    static void Serialize(char* base_region, size_t& offset, MetadataChunk& chunk);
 
     /**
      * @brief Deserializes an MetadataChunk object from a specific region of memory.

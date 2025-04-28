@@ -1,6 +1,8 @@
 #pragma once
 
+#include <chrono>
 #include <iostream>
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -37,7 +39,7 @@ class IndexChunk {
      *
      * @return vector<std::string> of documents included in this index
      * */
-    std::vector<std::string> GetDocuments();
+    std::unordered_map<uint32_t, std::string> GetDocuments();
 
     /*
      * @brief Get the posting list for a word
@@ -52,7 +54,22 @@ class IndexChunk {
      *
      * @return Entire Posting list for this index chunk
      * */
-    const std::unordered_map<std::string, PostingList>& GetAllPostingLists();
+    const std::unordered_map<std::string, PostingList>& GetAllPostingLists() const;
+
+    /*
+     * @brief Get the current offset the index chunk is at
+     *
+     * @return The current offset of the index chunk
+     * */
+    uint32_t GetCurrentOffset();
+
+    /*
+     * @brief Get name of the document using document id
+     *
+     * @param docId assigned by IndexChunk when document was indexed
+     * @return The url of the document
+     * */
+    std::string GetDocName(uint32_t docId) const;
 
     /*
      * @brief Prints the contents of the IndexChunk
@@ -93,13 +110,10 @@ class IndexChunk {
      * @pre `base_region + offset` must point to a valid serialized MasterChunk object.
      * @post A IndexChunk object is created and the offset is updated.
      * */
-    static IndexChunk Deserailize(char* base_region, size_t& offset);
+    static std::unique_ptr<IndexChunk> Deserailize(char* base_region, size_t& offset);
 
    private:
     friend class MasterChunk;
-    // Set of documents in this index chunk
-    std::vector<std::string> _documents;
-
     // map from document ID to document name
     std::unordered_map<uint32_t, std::string> docID_to_doc_name;
 

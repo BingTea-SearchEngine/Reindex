@@ -15,15 +15,19 @@ std::string PostingList::GetWord() {
     return word;
 }
 
-size_t PostingList::AddWord(uint32_t docID, PostEntry word) {
+std::vector<SyncPoint> PostingList::GetSyncTable() const {
+    return sync_table;
+}
+
+size_t PostingList::AddWord(uint32_t docID, size_t earliestOccurrenceInDoc, PostEntry word) {
     size_t bytesRequired = 0;
     if (posts.empty()) {
-        posts.emplace_back(docID);
+        posts.emplace_back(docID, earliestOccurrenceInDoc);
         bytesRequired += sizeof(docID);
     }
 
     if (docID != posts.back().GetDocumentID()) {
-        posts.emplace_back(docID);
+        posts.emplace_back(docID, earliestOccurrenceInDoc);
         bytesRequired += sizeof(docID);
     }
 
@@ -44,18 +48,16 @@ std::vector<Post> PostingList::GetPosts() const {
     return posts;
 }
 
-void PostingList::Serialize(char* base_region, size_t& offset,
-                            const PostingList& postingList) {
+void PostingList::Serialize(char* base_region, size_t& offset, const PostingList& postingList) {
     // PostingList::NewSerialize(base_region, offset, postingList);
-    PostingList::OldSerialize(base_region, offset, postingList);
+    PostingList::NewSerialize(base_region, offset, postingList);
 }
 
-void PostingList::OldSerialize(char* base_region, size_t& offset,
-                               const PostingList& postingList) {
+void PostingList::OldSerialize(char* base_region, size_t& offset, const PostingList& postingList) {
     // Serialize the word representing the PostingList
     uint16_t word_size = postingList.word.size();
-    std::memcpy(base_region+offset, &word_size, sizeof(word_size));
-    offset+=sizeof(word_size);
+    std::memcpy(base_region + offset, &word_size, sizeof(word_size));
+    offset += sizeof(word_size);
 
     std::memcpy(base_region + offset, postingList.word.c_str(), word_size);
     offset += word_size;
@@ -76,9 +78,9 @@ std::vector<uint8_t> encodeVB(uint32_t value) {
         uint8_t byte = value & 0x7F;  // Get the lowest 7 bits
         value >>= 7;
         if (value != 0) {
-            bytes.push_back(byte);    // More bytes to come
+            bytes.push_back(byte);  // More bytes to come
         } else {
-            byte |= 0x80;             // Set MSB = 1 to mark end
+            byte |= 0x80;  // Set MSB = 1 to mark end
             bytes.push_back(byte);
             break;
         }
@@ -95,23 +97,22 @@ uint32_t decodeVB(const uint8_t* data, size_t& consumed_bytes) {
     while (true) {
         uint8_t byte = data[consumed_bytes++];
         result |= (byte & 0x7F) << shift;
-        if (byte & 0x80) break;
+        if (byte & 0x80)
+            break;
         shift += 7;
     }
 
     return result;
 }
 
-void PostingList::NewSerialize(char* base_region, size_t& offset,
-                               const PostingList& postingList) {
+void PostingList::NewSerialize(char* base_region, size_t& offset, const PostingList& postingList) {
     // Serialize size of word
     uint16_t word_size = static_cast<uint16_t>(postingList.word.size());
     std::memcpy(base_region + offset, &word_size, sizeof(word_size));
     offset += sizeof(word_size);
 
     // Serialize the word representing the PostingList
-    std::memcpy(base_region + offset, postingList.word.c_str(),
-                word_size);
+    std::memcpy(base_region + offset, postingList.word.c_str(), word_size);
     offset += word_size;
 
     // Serialize the number of posts (documents)
@@ -130,6 +131,11 @@ void PostingList::NewSerialize(char* base_region, size_t& offset,
         uint32_t docID = post.GetDocumentID();
         std::memcpy(base_region + offset, &docID, sizeof(docID));
         offset += sizeof(docID);
+
+        // Serialize the earliest start absolute location
+        size_t earliestStart = post.GetEarliestStart();
+        std::memcpy(base_region + offset, &earliestStart, sizeof(earliestStart));
+        offset += sizeof(earliestStart);
 
         const auto& entries = post.GetEntries();
         size_t num_entries = entries.size();
@@ -162,7 +168,7 @@ void PostingList::NewSerialize(char* base_region, size_t& offset,
 
 PostingList PostingList::Deserialize(char* base_region, size_t& offset) {
     // return PostingList::NewDeserialize(base_region, offset);
-    return PostingList::OldDeserialize(base_region, offset);
+    return PostingList::NewDeserialize(base_region, offset);
 }
 
 PostingList PostingList::OldDeserialize(char* base_region, size_t& offset) {
@@ -188,8 +194,7 @@ PostingList PostingList::OldDeserialize(char* base_region, size_t& offset) {
     // Deserialize each post in the vector
     for (size_t i = 0; i < num_of_posts; ++i) {
         // postingList.posts[i] = Post::Deserialize(base_region, offset);
-        postingList.posts.emplace_back(
-            std::move(Post::Deserialize(base_region, offset)));
+        postingList.posts.emplace_back(Post::Deserialize(base_region, offset));
     }
 
     return postingList;
@@ -200,12 +205,12 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
 
     // Deserialize word size
     uint16_t word_size;
-    std::memcpy(&word_size, base_region+offset, sizeof(word_size));
-    offset+=sizeof(word_size);
+    std::memcpy(&word_size, base_region + offset, sizeof(word_size));
+    offset += sizeof(word_size);
 
     // Deserialize the word associated with the PostingList
     std::string word(word_size, '\0');
-    std::memcpy(word.data(), base_region+offset, word_size);
+    std::memcpy(word.data(), base_region + offset, word_size);
     offset += word_size;
     list.word = word;
 
@@ -215,13 +220,18 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
     offset += sizeof(num_posts);
     list.posts.resize(num_posts);
 
+    size_t total_num_entries = 0;
     uint32_t prev_pos = 0;
     for (size_t i = 0; i < num_posts; ++i) {
         uint32_t docID = 0;
         std::memcpy(&docID, base_region + offset, sizeof(docID));
-
-        Post post(docID);
         offset += sizeof(docID);
+
+        size_t earliestStart = 0;
+        std::memcpy(&earliestStart, base_region + offset, sizeof(earliestStart));
+        offset += sizeof(earliestStart);
+
+        Post post(docID, earliestStart);
         // std::string docName(base_region + offset);
 
         // Post post(docName);
@@ -230,10 +240,12 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
         size_t num_entries;
         std::memcpy(&num_entries, base_region + offset, sizeof(num_entries));
         offset += sizeof(num_entries);
+        total_num_entries += num_entries;
 
         for (uint32_t j = 0; j < num_entries; ++j) {
             size_t bytes_read = 0;
-            uint32_t delta = decodeVB(reinterpret_cast<const uint8_t*>(base_region + offset), bytes_read);
+            uint32_t delta =
+                decodeVB(reinterpret_cast<const uint8_t*>(base_region + offset), bytes_read);
             offset += bytes_read;
             uint32_t abs_pos = prev_pos + delta;
             prev_pos = abs_pos;
@@ -248,6 +260,27 @@ PostingList PostingList::NewDeserialize(char* base_region, size_t& offset) {
         }
 
         list.posts[i] = post;
+    }
+
+    // Craft the synchronization table
+    size_t sync_freq = std::max(size_t(1), size_t(std::sqrt(total_num_entries)));
+    size_t entry_counter =
+        0;  // put in a synchronization point every sqrt(N) PostEntries, where N is the total number of PostEntries
+
+    for (size_t post_idx = 0; post_idx < list.posts.size(); ++post_idx) {
+        const Post& post = list.posts[post_idx];
+        const auto& postEntries = post.GetEntries();
+
+        for (size_t entry_idx = 0; entry_idx < postEntries.size(); ++entry_idx) {
+            const PostEntry& entry = postEntries[entry_idx];
+
+            if (entry_counter % sync_freq == 0 || entry_counter == 0) {
+                list.sync_table.push_back(
+                    {.position = entry.GetDelta(), .post_idx = post_idx, .entry_idx = entry_idx});
+            }
+
+            ++entry_counter;
+        }
     }
 
     return list;
