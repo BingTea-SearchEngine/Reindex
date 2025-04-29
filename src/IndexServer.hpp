@@ -52,11 +52,11 @@ struct search_result_t {
           docNum(docNum),
           docStartOffset(docStartOffset),
           matchAbsoluteOffset(matchAbsoluteOffset) {
-        if (pageRank <= 0) {
-            pageRank = 1e-9;
+        if (pageRank <= 0 || pageRank == 1) {
+            this->pageRank = 1e-9;
         }
-        if (cheiRank <= 0) {
-            cheiRank = 1e-9;
+        if (cheiRank <= 0 || cheiRank == 1) {
+            this->cheiRank = 1e-9;
         }
         rankingScore = 10.0f * std::log(1 + numTitleMatch) +  // strongest boost
                        5.0f * std::log(1 + numBodyMatch) +    // secondary boost

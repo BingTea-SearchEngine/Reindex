@@ -51,7 +51,7 @@ IndexMessage IndexServer::_handleSearch(IndexMessage msg) {
     rank(docs);
 
     std::vector<doc_t> results;
-    for (size_t i = 0; i < docs.size(); ++i) {
+    for (size_t i = 0; i < std::min(docs.size(), (size_t)10); ++i) {
         search_result_t result = docs[i];
         cout << result << endl;
         auto [title, snippet] = getTitleAndSnippet(result, 10);

@@ -2,7 +2,7 @@
 
 bool checkTagExists(std::string line, std::string tag) {
     if (line.rfind(tag, 0) != 0) {
-        std::cerr << "Malformed file. " << tag << " not found." << endl;
+        // std::cerr << "Malformed file. " << tag << " not found." << endl;
         return false;
     }
     return true;
